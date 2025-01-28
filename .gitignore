@@ -1,2 +1,6 @@
 ### macOS ###
 .DS_store
+
+### IDE specific ###
+.vscode
+*/.vscode/*
