@@ -37,7 +37,7 @@ public class DatabaseHelper {
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             statement = connection.createStatement();
             // You can use this command to clear the database and restart from fresh.
-            statement.execute("DROP ALL OBJECTS");
+            //statement.execute("DROP ALL OBJECTS");
 
             createTables(); // Create the necessary tables if they don't exist
         } catch (ClassNotFoundException e) {
