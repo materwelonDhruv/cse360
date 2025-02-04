@@ -1,0 +1,53 @@
+package src.application;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import src.database.DatabaseHelper;
+
+public class AdminDeletePage {
+	private final DatabaseHelper databaseHelper;
+	public AdminDeletePage(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
+    }
+	/**
+     * Displays the admin page in the provided primary stage.
+     * @param primaryStage The primary stage where the scene will be displayed.
+     */
+    public void show(Stage primaryStage) {
+    	VBox layout = new VBox();
+    	
+	    layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+	    
+	    // label to display message for the admin
+	    Label adminLabel = new Label("Choose a User to Delete");
+	    // Declare a listview object
+	    ListView<String> userBox = new ListView<>();
+	    ArrayList<String> userList = new ArrayList<>();
+	    try {
+	    	//Load users from database
+			userList = databaseHelper.getUserList();
+			ObservableList<String> obUserList = FXCollections.observableArrayList();
+			obUserList.addAll(userList);
+			userBox.setItems(obUserList);
+		} catch (SQLException e) {
+			// Catch errors
+			e.printStackTrace();
+		}
+	    adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+	    layout.getChildren().addAll(adminLabel,userBox);
+	    Scene adminScene = new Scene(layout, 800, 400);
+
+	    // Set the scene to primary stage
+	    primaryStage.setScene(adminScene);
+	    primaryStage.setTitle("Admin Page");
+    }
+}

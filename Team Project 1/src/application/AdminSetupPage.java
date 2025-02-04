@@ -17,7 +17,7 @@ import java.sql.SQLException;
 public class AdminSetupPage {
 
     private final DatabaseHelper databaseHelper;
-
+    
     public AdminSetupPage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }

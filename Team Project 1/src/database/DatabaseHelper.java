@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import src.application.User;
@@ -36,7 +37,7 @@ public class DatabaseHelper {
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             statement = connection.createStatement();
             // You can use this command to clear the database and restart from fresh.
-            // statement.execute("DROP ALL OBJECTS");
+            statement.execute("DROP ALL OBJECTS");
 
             createTables(); // Create the necessary tables if they don't exist
         } catch (ClassNotFoundException e) {
@@ -169,7 +170,20 @@ public class DatabaseHelper {
             e.printStackTrace();
         }
     }
-
+    // Returns an ArrayList Containing all usernames
+    public ArrayList<String> getUserList() throws SQLException{
+		String query = "SELECT userName FROM cse360users";
+		ArrayList<String> userList = new ArrayList<>();
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				userList.add(rs.getString("userName"));
+			}
+		}catch(SQLException se){ 
+			se.printStackTrace(); 
+		} 
+		return userList;
+	}
     // Closes the database connection and statement.
     public void closeConnection() {
         try {

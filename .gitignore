@@ -4,3 +4,4 @@
 ### IDE specific ###
 .vscode
 */.vscode/*
+/bin/
