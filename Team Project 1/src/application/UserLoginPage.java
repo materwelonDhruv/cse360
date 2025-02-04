@@ -21,7 +21,6 @@ public class UserLoginPage {
     public UserLoginPage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
-
     public void show(Stage primaryStage) {
         // Input field for the user's userName, password
         TextField userNameField = new TextField();

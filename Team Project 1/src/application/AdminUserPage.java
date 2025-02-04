@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -12,9 +13,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import src.database.DatabaseHelper;
 
-public class AdminDeletePage {
+public class AdminUserPage {
 	private final DatabaseHelper databaseHelper;
-	public AdminDeletePage(DatabaseHelper databaseHelper) {
+	public AdminUserPage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
 	/**
@@ -27,16 +28,19 @@ public class AdminDeletePage {
 	    layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
 	    
 	    // label to display message for the admin
-	    Label adminLabel = new Label("Choose a User to Delete");
+	    Label adminLabel = new Label("Choose a User to Modify");
 	    // Declare a listview object
-	    ListView<String> userBox = new ListView<>();
-	    ArrayList<String> userList = new ArrayList<>();
+	    TableView<User> userBox = new TableView<>();
+	    ArrayList<User> userList = new ArrayList<>();
 	    try {
 	    	//Load users from database
 			userList = databaseHelper.getUserList();
-			ObservableList<String> obUserList = FXCollections.observableArrayList();
+			ObservableList<User> obUserList = FXCollections.observableArrayList();
 			obUserList.addAll(userList);
 			userBox.setItems(obUserList);
+			TableColumn<User,String> userNameCol = new TableColumn<>("Username");
+			userNameCol.setCellValueFactory(new PropertyValueFactory<>("UserName"));
+			userBox.getColumns().setAll(userNameCol);
 		} catch (SQLException e) {
 			// Catch errors
 			e.printStackTrace();

@@ -30,7 +30,7 @@ public class AdminHomePage {
 		Label adminLabel = new Label("Hello, Admin!");
 		Button userButton = new Button("Show Users");
 		userButton.setOnAction(a -> {
-	    	new AdminDeletePage(databaseHelper).show(primaryStage);
+	    	new AdminUserPage(databaseHelper).show(primaryStage);
 	    });
 		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 

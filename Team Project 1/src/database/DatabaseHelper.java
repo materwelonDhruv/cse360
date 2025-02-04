@@ -171,13 +171,32 @@ public class DatabaseHelper {
         }
     }
     // Returns an ArrayList Containing all usernames
-    public ArrayList<String> getUserList() throws SQLException{
+    public ArrayList<String> getUsernameList() throws SQLException{
 		String query = "SELECT userName FROM cse360users";
 		ArrayList<String> userList = new ArrayList<>();
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			ResultSet rs = pstmt.executeQuery();
 			while(rs.next()) {
 				userList.add(rs.getString("userName"));
+			}
+		}catch(SQLException se){ 
+			se.printStackTrace(); 
+		} 
+		return userList;
+	}
+    public ArrayList<User> getUserList() throws SQLException{
+		String query = "SELECT * FROM cse360users";
+		ArrayList<User> userList = new ArrayList<>();
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			String tempPW = "";
+			String tempUN = "";
+			String tempR = "";
+			while(rs.next()) {
+				tempPW = rs.getString("password");
+				tempUN = rs.getString("userName");
+				tempR = rs.getString("role");
+				userList.add(new User(tempUN, tempPW, tempR));
 			}
 		}catch(SQLException se){ 
 			se.printStackTrace(); 
