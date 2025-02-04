@@ -40,7 +40,10 @@ public class AdminUserPage {
 			userBox.setItems(obUserList);
 			TableColumn<User,String> userNameCol = new TableColumn<>("Username");
 			userNameCol.setCellValueFactory(new PropertyValueFactory<>("UserName"));
-			userBox.getColumns().setAll(userNameCol);
+			TableColumn<User,String> roleCol = new TableColumn<>("Role");
+			roleCol.setCellValueFactory(new PropertyValueFactory<>("Role"));
+			userBox.getColumns().setAll(userNameCol,roleCol);
+			userBox.getSelectionModel();
 		} catch (SQLException e) {
 			// Catch errors
 			e.printStackTrace();
