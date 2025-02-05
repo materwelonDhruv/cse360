@@ -19,7 +19,7 @@ public class WelcomeLoginPage {
 	public WelcomeLoginPage(DatabaseHelper databaseHelper) {
 		this.databaseHelper = databaseHelper;
 	}
-
+	
 	public void show(Stage primaryStage, User user) {
 
 		VBox layout = new VBox(5);
@@ -35,7 +35,7 @@ public class WelcomeLoginPage {
 			System.out.println(role);
 
 			if (role.equals("admin")) {
-				new AdminHomePage().show(primaryStage);
+				new AdminHomePage(databaseHelper).show(primaryStage);
 			} else if (role.equals("user")) {
 				new UserHomePage().show(primaryStage);
 			}

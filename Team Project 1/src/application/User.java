@@ -1,5 +1,6 @@
 package src.application;
 
+
 /**
  * The User class represents a user entity in the system.
  * It contains the user's details such as userName, password, and role.
@@ -16,7 +17,7 @@ public class User {
         this.password = password;
         this.role = role;
     }
-
+    
     // Sets the role of the user.
     public void setRole(String role) {
         this.role = role;

@@ -272,3 +272,4 @@ $RECYCLE.BIN/
 ### IDE specific ###
 .vscode
 */.vscode/*
+/bin/
