@@ -63,7 +63,7 @@ public class AppContext {
      * Closes the connection to the database.
      * @throws SQLException if the connection cannot be closed.
      */
-    public void close() throws SQLException {
+    public void closeConnection() throws SQLException {
         DatabaseConnection.closeConnection();
     }
 }
