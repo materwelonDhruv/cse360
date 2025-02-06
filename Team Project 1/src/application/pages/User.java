@@ -4,6 +4,7 @@ package src.application.pages;
 /**
  * The User class represents a user entity in the system.
  * It contains the user's details such as userName, password, and role.
+ * @deprecated Please use the classes from the database.model.entities package.
  */
 public class User {
     private String userName;
