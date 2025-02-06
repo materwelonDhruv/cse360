@@ -85,4 +85,12 @@ public class Invites extends Repository<Invite> {
         String sql = "DELETE FROM Invites WHERE inviteID = ?";
         executeUpdate(sql, pstmt -> pstmt.setInt(1, id));
     }
+
+    public int findInviteUsedByUserId(int userId) {
+        String sql = "SELECT COUNT(*) FROM Invites WHERE userID = ?";
+        return queryForObject(sql,
+                pstmt -> pstmt.setInt(1, userId),
+                rs -> rs.getInt(1)
+        );
+    }
 }
