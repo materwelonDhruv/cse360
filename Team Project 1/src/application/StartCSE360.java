@@ -2,8 +2,6 @@ package src.application;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import src.application.pages.FirstPage;
-import src.application.pages.SetupLoginSelectionPage;
 
 import java.sql.SQLException;
 

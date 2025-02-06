@@ -44,38 +44,38 @@ public class RolesUtilTest {
 
     @Test
     public void testRolesToString_NoRoles() {
-        String result = RolesUtil.rolesToString(new Roles[0]);
-        assertEquals("0", result, "No roles should produce '0'");
+        int result = RolesUtil.rolesToInt(new Roles[0]);
+        assertEquals(0, result, "No roles should produce '0'");
     }
 
     @Test
     public void testRolesToString_Null() {
-        String result = RolesUtil.rolesToString(null);
-        assertEquals("0", result, "Null array should produce '0'");
+        int result = RolesUtil.rolesToInt(null);
+        assertEquals(0, result, "Null array should produce '0'");
     }
 
     @Test
     public void testRolesToString_UserInstructor() {
         // user => 1, instructor => 4 => combined => 5
         Roles[] roles = { Roles.USER, Roles.INSTRUCTOR };
-        String result = RolesUtil.rolesToString(roles);
-        assertEquals("5", result, "Should produce 5 for USER+INSTRUCTOR");
+        int result = RolesUtil.rolesToInt(roles);
+        assertEquals(5, result, "Should produce 5 for USER+INSTRUCTOR");
     }
 
     @Test
     public void testRolesToString_ReviewerStaff() {
         // reviewer => 16, staff => 32 => combined => 48
         Roles[] roles = { Roles.REVIEWER, Roles.STAFF };
-        String result = RolesUtil.rolesToString(roles);
-        assertEquals("48", result, "Should produce 48 for REVIEWER+STAFF");
+        int result = RolesUtil.rolesToInt(roles);
+        assertEquals(48, result, "Should produce 48 for REVIEWER+STAFF");
     }
 
     @Test
     public void testRolesToString_AllRoles() {
         // All roles => 1+2+4+8+16+32 = 63
         Roles[] roles = Roles.values();
-        String result = RolesUtil.rolesToString(roles);
-        assertEquals("63", result, "All roles combined is decimal 63");
+        int result = RolesUtil.rolesToInt(roles);
+        assertEquals(63, result, "All roles combined is decimal 63");
     }
 
     @Test
@@ -130,6 +130,16 @@ public class RolesUtilTest {
         Roles[] roles = { Roles.ADMIN, Roles.STAFF };
         Roles[] required = new Roles[0];
         assertFalse(RolesUtil.hasAnyRole(roles, required), "Empty required roles should return false");
+    }
+
+    @Test
+    public void testRoleNameAsString() {
+        assertEquals("User", RolesUtil.roleName(Roles.USER), "User role should be 'User'");
+        assertEquals("Admin", RolesUtil.roleName(Roles.ADMIN), "Admin role should be 'Admin'");
+        assertEquals("Instructor", RolesUtil.roleName(Roles.INSTRUCTOR), "Instructor role should be 'Instructor'");
+        assertEquals("Student", RolesUtil.roleName(Roles.STUDENT), "Student role should be 'Student'");
+        assertEquals("Reviewer", RolesUtil.roleName(Roles.REVIEWER), "Reviewer role should be 'Reviewer'");
+        assertEquals("Staff", RolesUtil.roleName(Roles.STAFF), "Staff role should be 'Staff'");
     }
 
 }

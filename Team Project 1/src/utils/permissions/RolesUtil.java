@@ -42,16 +42,16 @@ public class RolesUtil {
      * @param roles array of Roles
      * @return decimal string of the combined bit value
      */
-    public static String rolesToString(Roles[] roles) {
+    public static int rolesToInt(Roles[] roles) {
         if (roles == null || roles.length == 0) {
-            return "0";
+            return 0;
         }
 
         int permissions = 0;
         for (Roles r : roles) {
             permissions |= r.getBit();
         }
-        return String.valueOf(permissions);
+        return permissions;
     }
 
     /**
@@ -88,5 +88,13 @@ public class RolesUtil {
             }
         }
         return false;
+    }
+
+    public static String roleName(Roles role) {
+        String fullCapsRole = role.toString();
+        String firstLetter = fullCapsRole.substring(0, 1);
+        String restOfRole = fullCapsRole.substring(1).toLowerCase();
+
+        return firstLetter + restOfRole;
     }
 }

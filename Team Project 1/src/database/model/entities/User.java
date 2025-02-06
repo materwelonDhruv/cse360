@@ -11,11 +11,12 @@ public class User extends BaseEntity {
 
     public User() {}
 
-    public User(String userName, String password, String email) {
+    public User(String userName, String password, String email, int inviteUsed, int roles) {
         this.userName = userName;
         this.password = password; // plain text initially; repository will hash it
         this.email = email;
-        this.roles = 0; // default no roles set
+        this.inviteUsed = inviteUsed;
+        this.roles = roles;
     }
 
     public String getUserName() {

@@ -17,4 +17,8 @@ public enum Roles {
     public int getBit() {
         return bit;
     }
+
+    public String toString() {
+        return this.name();
+    }
 }
