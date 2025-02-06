@@ -9,13 +9,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import src.application.User;
+import src.application.pages.User;
 
 /**
  * The DatabaseHelper class is responsible for managing the connection to the
  * database,
  * performing operations such as user registration, login validation, and
  * handling invitation codes.
+ * @deprecated Use the Repository pattern to manage database operations.
  */
 public class DatabaseHelper {
     // JDBC driver name and database URL
