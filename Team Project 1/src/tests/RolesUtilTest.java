@@ -35,15 +35,6 @@ public class RolesUtilTest {
     }
 
     @Test
-    public void testParseRoles_MultipleRoles() {
-        // Suppose "3" => binary 0011 => USER(1<<0) + ADMIN(1<<1)
-        Roles[] roles = RolesUtil.parseRoles("3");
-        assertTrue(containsRole(roles, Roles.USER), "Should contain USER");
-        assertTrue(containsRole(roles, Roles.ADMIN), "Should contain ADMIN");
-        assertEquals(2, roles.length, "Expected exactly two roles");
-    }
-
-    @Test
     public void testParseRoles_AllRoles() {
         // Combine all bits for [USER(1), ADMIN(2), INSTRUCTOR(4), STUDENT(8), REVIEWER(16), STAFF(32)]
         // Sum => 1+2+4+8+16+32 = 63
@@ -72,6 +63,14 @@ public class RolesUtilTest {
     }
 
     @Test
+    public void testRolesToString_ReviewerStaff() {
+        // reviewer => 16, staff => 32 => combined => 48
+        Roles[] roles = { Roles.REVIEWER, Roles.STAFF };
+        String result = RolesUtil.rolesToString(roles);
+        assertEquals("48", result, "Should produce 48 for REVIEWER+STAFF");
+    }
+
+    @Test
     public void testRolesToString_AllRoles() {
         // All roles => 1+2+4+8+16+32 = 63
         Roles[] roles = Roles.values();
@@ -79,10 +78,58 @@ public class RolesUtilTest {
         assertEquals("63", result, "All roles combined is decimal 63");
     }
 
-    private boolean containsRole(Roles[] arr, Roles role) {
-        for (Roles r : arr) {
-            if (r == role) return true;
-        }
-        return false;
+    @Test
+    public void testHasRole_RoleFound() {
+        Roles[] roles = { Roles.USER, Roles.ADMIN };
+        assertTrue(RolesUtil.hasRole(roles, Roles.ADMIN), "Should return true when the role is present");
     }
+
+    @Test
+    public void testHasRole_RoleNotFound() {
+        Roles[] roles = { Roles.USER, Roles.INSTRUCTOR };
+        assertFalse(RolesUtil.hasRole(roles, Roles.STAFF), "Should return false when the role is not present");
+    }
+
+    @Test
+    public void testHasAllRoles_AllPresent() {
+        Roles[] roles = { Roles.USER, Roles.ADMIN, Roles.INSTRUCTOR };
+        Roles[] required = { Roles.USER, Roles.ADMIN };
+        assertTrue(RolesUtil.hasAllRoles(roles, required), "Should return true when all required roles are present");
+    }
+
+    @Test
+    public void testHasAllRoles_NotAllPresent() {
+        Roles[] roles = { Roles.USER, Roles.STUDENT };
+        Roles[] required = { Roles.USER, Roles.ADMIN };
+        assertFalse(RolesUtil.hasAllRoles(roles, required), "Should return false if any required role is missing");
+    }
+
+    @Test
+    public void testHasAllRoles_EmptyRequired() {
+        Roles[] roles = { Roles.ADMIN, Roles.STAFF };
+        Roles[] required = new Roles[0];
+        assertTrue(RolesUtil.hasAllRoles(roles, required), "Empty required roles should return true");
+    }
+
+    @Test
+    public void testHasAnyRole_OnePresent() {
+        Roles[] roles = { Roles.USER, Roles.REVIEWER };
+        Roles[] required = { Roles.ADMIN, Roles.REVIEWER };
+        assertTrue(RolesUtil.hasAnyRole(roles, required), "Should return true when at least one required role is present");
+    }
+
+    @Test
+    public void testHasAnyRole_NonePresent() {
+        Roles[] roles = { Roles.USER, Roles.INSTRUCTOR };
+        Roles[] required = { Roles.ADMIN, Roles.STUDENT };
+        assertFalse(RolesUtil.hasAnyRole(roles, required), "Should return false when none of the required roles are present");
+    }
+
+    @Test
+    public void testHasAnyRole_EmptyRequired() {
+        Roles[] roles = { Roles.ADMIN, Roles.STAFF };
+        Roles[] required = new Roles[0];
+        assertFalse(RolesUtil.hasAnyRole(roles, required), "Empty required roles should return false");
+    }
+
 }

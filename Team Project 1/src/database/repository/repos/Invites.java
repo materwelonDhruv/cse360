@@ -16,7 +16,7 @@ public class Invites extends Repository<Invite> {
 
     @Override
     public Invite create(Invite invite) {
-        String sql = "INSERT INTO Invites (code, userID) VALUES (?, ?)";
+        String sql = "INSERT INTO Invites (code, userID, roles, createdAt) VALUES (?, ?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
             pstmt.setString(1, invite.getCode());
             if (invite.getUserId() == null) {
@@ -24,6 +24,8 @@ public class Invites extends Repository<Invite> {
             } else {
                 pstmt.setInt(2, invite.getUserId());
             }
+            pstmt.setInt(3, invite.getRoles());
+            pstmt.setLong(4, invite.getCreatedAt());
         });
         if (generatedId > 0) {
             invite.setId(generatedId);
@@ -56,12 +58,14 @@ public class Invites extends Repository<Invite> {
         i.setCode(rs.getString("code"));
         int userId = rs.getInt("userID");
         i.setUserId(rs.wasNull() ? null : userId);
+        i.setRoles(rs.getInt("roles"));
+        i.setCreatedAt(rs.getLong("createdAt"));
         return i;
     }
 
     @Override
     public Invite update(Invite invite) {
-        String sql = "UPDATE Invites SET code = ?, userID = ? WHERE inviteID = ?";
+        String sql = "UPDATE Invites SET code = ?, userID = ?, roles = ?, createdAt = ? WHERE inviteID = ?";
         int rows = executeUpdate(sql, pstmt -> {
             pstmt.setString(1, invite.getCode());
             if (invite.getUserId() == null) {
@@ -69,7 +73,9 @@ public class Invites extends Repository<Invite> {
             } else {
                 pstmt.setInt(2, invite.getUserId());
             }
-            pstmt.setInt(3, invite.getId());
+            pstmt.setInt(3, invite.getRoles());
+            pstmt.setLong(4, invite.getCreatedAt());
+            pstmt.setInt(5, invite.getId());
         });
         return rows > 0 ? invite : null;
     }

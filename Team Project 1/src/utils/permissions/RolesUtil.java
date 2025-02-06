@@ -53,4 +53,40 @@ public class RolesUtil {
         }
         return String.valueOf(permissions);
     }
+
+    /**
+     * Checks if the given Roles array contains the specified role.
+     */
+    public static boolean hasRole(Roles[] roles, Roles role) {
+        for (Roles r : roles) {
+            if (r == role) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the given Roles array contains all the specified roles.
+     */
+    public static boolean hasAllRoles(Roles[] roles, Roles[] requiredRoles) {
+        for (Roles r : requiredRoles) {
+            if (!hasRole(roles, r)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the given Roles array contains any of the specified roles.
+     */
+    public static boolean hasAnyRole(Roles[] roles, Roles[] requiredRoles) {
+        for (Roles r : requiredRoles) {
+            if (hasRole(roles, r)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

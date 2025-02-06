@@ -17,7 +17,7 @@ public class UserTable extends BaseTable {
                 + " userName VARCHAR(255) NOT NULL UNIQUE, "
                 + " password VARCHAR(255) NOT NULL, "
                 + " email VARCHAR(255), "
-                + " roles INT NOT NULL DEFAULT 0, "  // NEW column for roles bit field
+                + " roles INT NOT NULL DEFAULT 0, "  // roles bit field
                 + " inviteUsed INT, "               // FK to Invites table
                 + " CONSTRAINT fk_inviteUsed FOREIGN KEY (inviteUsed) "
                 + "     REFERENCES Invites(inviteID) "
