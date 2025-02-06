@@ -54,7 +54,7 @@ public class AppContext {
         return otpRepository;
     }
 
-    // Also provide a getter for the connection if needed:
+    // -- Getters for the connection:
     public Connection getConnection() {
         return connection;
     }
