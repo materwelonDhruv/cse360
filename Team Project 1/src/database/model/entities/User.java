@@ -4,16 +4,18 @@ import src.database.model.BaseEntity;
 
 public class User extends BaseEntity {
     private String userName;
-    private String password; // Will store the hashed password
+    private String password; // stores the hashed password
     private String email;
-    private Integer inviteUsed; // May be null
+    private Integer inviteUsed; // may be null
+    private int roles; // new bit field integer representing user roles
 
     public User() {}
 
     public User(String userName, String password, String email) {
         this.userName = userName;
-        this.password = password; // plain text initially; will be hashed by the repository
+        this.password = password; // plain text initially; repository will hash it
         this.email = email;
+        this.roles = 0; // default no roles set
     }
 
     public String getUserName() {
@@ -42,5 +44,12 @@ public class User extends BaseEntity {
     }
     public void setInviteUsed(Integer inviteUsed) {
         this.inviteUsed = inviteUsed;
+    }
+
+    public int getRoles() {
+        return roles;
+    }
+    public void setRoles(int roles) {
+        this.roles = roles;
     }
 }

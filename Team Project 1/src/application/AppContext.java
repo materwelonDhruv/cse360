@@ -15,8 +15,6 @@ public class AppContext {
     private final Users userRepository;
     private final Invites inviteRepository;
     private final OneTimePasswords otpRepository;
-    private final Roles roleRepository;
-    private final UserRoles userRoleRepository;
 
     public AppContext() throws SQLException {
         // 1) Initialize the DB connection
@@ -30,8 +28,6 @@ public class AppContext {
         this.userRepository = new Users(connection);
         this.inviteRepository = new Invites(connection);
         this.otpRepository = new OneTimePasswords(connection);
-        this.roleRepository = new Roles(connection);
-        this.userRoleRepository = new UserRoles(connection);
     }
 
     /**
@@ -56,14 +52,6 @@ public class AppContext {
 
     public OneTimePasswords oneTimePasswords() {
         return otpRepository;
-    }
-
-    public Roles roles() {
-        return roleRepository;
-    }
-
-    public UserRoles userRoles() {
-        return userRoleRepository;
     }
 
     // Also provide a getter for the connection if needed:

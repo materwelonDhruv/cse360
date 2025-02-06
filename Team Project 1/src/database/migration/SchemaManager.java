@@ -18,8 +18,6 @@ public class SchemaManager {
         // Register the tables in the order you want them created
         tables.add(new UserTable());
         tables.add(new InviteTable());
-        tables.add(new RoleTable());
-        tables.add(new UserRoleTable());
         tables.add(new OneTimePasswordTable());
     }
 

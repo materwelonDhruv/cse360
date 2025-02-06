@@ -17,20 +17,21 @@ public class Users extends Repository<User> {
 
     @Override
     public User create(User user) {
-        // Hash password
+        // Hash password before inserting
         String plain = user.getPassword();
         String hashed = PasswordUtil.hashPassword(plain);
         user.setPassword(hashed);
 
-        String sql = "INSERT INTO Users (userName, password, email, inviteUsed) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (userName, password, email, roles, inviteUsed) VALUES (?, ?, ?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
+            pstmt.setInt(4, user.getRoles()); // store the roles bit field
             if (user.getInviteUsed() == null) {
-                pstmt.setNull(4, Types.INTEGER);
+                pstmt.setNull(5, Types.INTEGER);
             } else {
-                pstmt.setInt(4, user.getInviteUsed());
+                pstmt.setInt(5, user.getInviteUsed());
             }
         });
 
@@ -65,6 +66,7 @@ public class Users extends Repository<User> {
         u.setUserName(rs.getString("userName"));
         u.setPassword(rs.getString("password"));
         u.setEmail(rs.getString("email"));
+        u.setRoles(rs.getInt("roles")); // read roles from the new column
         int inviteUsed = rs.getInt("inviteUsed");
         u.setInviteUsed(rs.wasNull() ? null : inviteUsed);
         return u;
@@ -72,21 +74,22 @@ public class Users extends Repository<User> {
 
     @Override
     public User update(User user) {
-        // If you allow changing the password, re-hash
+        // If allowing password changes, re-hash
         String hashed = PasswordUtil.hashPassword(user.getPassword());
         user.setPassword(hashed);
 
-        String sql = "UPDATE Users SET userName = ?, password = ?, email = ?, inviteUsed = ? WHERE userID = ?";
+        String sql = "UPDATE Users SET userName = ?, password = ?, email = ?, roles = ?, inviteUsed = ? WHERE userID = ?";
         int rows = executeUpdate(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
+            pstmt.setInt(4, user.getRoles());
             if (user.getInviteUsed() == null) {
-                pstmt.setNull(4, Types.INTEGER);
+                pstmt.setNull(5, Types.INTEGER);
             } else {
-                pstmt.setInt(4, user.getInviteUsed());
+                pstmt.setInt(5, user.getInviteUsed());
             }
-            pstmt.setInt(5, user.getId());
+            pstmt.setInt(6, user.getId());
         });
         return rows > 0 ? user : null;
     }
@@ -98,7 +101,7 @@ public class Users extends Repository<User> {
     }
 
     /**
-     * Validates a user's login attempt by comparing the hashed password.
+     * Validates a user's login by comparing the hashed password.
      */
     public boolean validateLogin(String userName, String plainPassword) {
         String sql = "SELECT password FROM Users WHERE userName = ?";

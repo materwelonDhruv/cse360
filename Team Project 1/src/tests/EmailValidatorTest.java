@@ -1,4 +1,4 @@
-package src.tests.email;
+package src.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
