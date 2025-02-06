@@ -44,6 +44,16 @@ public class DatabaseConnection {
     }
 
     /**
+     * Closes the connection to the database.
+     */
+    public static void closeConnection() throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+            System.out.println("Connection closed.");
+        }
+    }
+
+    /**
      * Deletes all data from the database.
      */
     public static void clearDatabase() throws SQLException {

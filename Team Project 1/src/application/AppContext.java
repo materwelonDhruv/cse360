@@ -58,4 +58,12 @@ public class AppContext {
     public Connection getConnection() {
         return connection;
     }
+
+    /**
+     * Closes the connection to the database.
+     * @throws SQLException if the connection cannot be closed.
+     */
+    public void close() throws SQLException {
+        DatabaseConnection.closeConnection();
+    }
 }
