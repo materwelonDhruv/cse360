@@ -25,11 +25,6 @@ public class DatabaseConnection {
                 System.out.println("Connecting to database...");
                 connection = DriverManager.getConnection(DB_URL, USER, PASS);
 
-                // Drop all objects each run:
-                // try (var stmt = connection.createStatement()) {
-                //     stmt.execute("DROP ALL OBJECTS");
-                // }
-
                 initialized = true;
             } catch (ClassNotFoundException e) {
                 throw new SQLException("H2 Driver not found.", e);
@@ -45,5 +40,14 @@ public class DatabaseConnection {
             initialize();
         }
         return connection;
+    }
+
+    /**
+     * Deletes all data from the database.
+     */
+    public static void clearDatabase() throws SQLException {
+        try (var stmt = getConnection().createStatement()) {
+            stmt.execute("DROP ALL OBJECTS");
+        }
     }
 }
