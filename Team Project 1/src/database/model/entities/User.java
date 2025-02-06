@@ -6,7 +6,6 @@ public class User extends BaseEntity {
     private String userName;
     private String password; // stores the hashed password
     private String email;
-    private Integer inviteUsed; // may be null
     private int roles; // new bit field integer representing user roles
 
     public User() {}
@@ -15,7 +14,6 @@ public class User extends BaseEntity {
         this.userName = userName;
         this.password = password; // plain text initially; repository will hash it
         this.email = email;
-        this.inviteUsed = inviteUsed;
         this.roles = roles;
     }
 
@@ -38,13 +36,6 @@ public class User extends BaseEntity {
     }
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Integer getInviteUsed() {
-        return inviteUsed;
-    }
-    public void setInviteUsed(Integer inviteUsed) {
-        this.inviteUsed = inviteUsed;
     }
 
     public int getRoles() {

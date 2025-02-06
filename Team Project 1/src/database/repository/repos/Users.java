@@ -28,11 +28,6 @@ public class Users extends Repository<User> {
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
             pstmt.setInt(4, user.getRoles()); // store the roles bit field
-            if (user.getInviteUsed() == null) {
-                pstmt.setNull(5, Types.INTEGER);
-            } else {
-                pstmt.setInt(5, user.getInviteUsed());
-            }
         });
 
         if (generatedId > 0) {
@@ -68,7 +63,6 @@ public class Users extends Repository<User> {
         u.setEmail(rs.getString("email"));
         u.setRoles(rs.getInt("roles")); // read roles from the new column
         int inviteUsed = rs.getInt("inviteUsed");
-        u.setInviteUsed(rs.wasNull() ? null : inviteUsed);
         return u;
     }
 
@@ -84,11 +78,6 @@ public class Users extends Repository<User> {
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
             pstmt.setInt(4, user.getRoles());
-            if (user.getInviteUsed() == null) {
-                pstmt.setNull(5, Types.INTEGER);
-            } else {
-                pstmt.setInt(5, user.getInviteUsed());
-            }
             pstmt.setInt(6, user.getId());
         });
         return rows > 0 ? user : null;

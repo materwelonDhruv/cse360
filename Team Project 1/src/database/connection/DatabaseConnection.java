@@ -24,6 +24,7 @@ public class DatabaseConnection {
                 Class.forName(JDBC_DRIVER);
                 System.out.println("Connecting to database...");
                 connection = DriverManager.getConnection(DB_URL, USER, PASS);
+                System.out.println("Connected to database.");
 
                 initialized = true;
             } catch (ClassNotFoundException e) {
@@ -48,6 +49,7 @@ public class DatabaseConnection {
     public static void clearDatabase() throws SQLException {
         try (var stmt = getConnection().createStatement()) {
             stmt.execute("DROP ALL OBJECTS");
+            System.out.println("Database cleared.");
         }
     }
 }
