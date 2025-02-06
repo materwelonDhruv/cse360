@@ -4,14 +4,14 @@ import src.database.model.entities.User;
 import src.database.repository.Repository;
 import src.utils.PasswordUtil;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 public class Users extends Repository<User> {
 
-    public Users(java.sql.Connection connection) throws SQLException {
+    public Users(Connection connection) throws SQLException {
         super(connection);
     }
 
@@ -62,7 +62,6 @@ public class Users extends Repository<User> {
         u.setPassword(rs.getString("password"));
         u.setEmail(rs.getString("email"));
         u.setRoles(rs.getInt("roles")); // read roles from the new column
-        int inviteUsed = rs.getInt("inviteUsed");
         return u;
     }
 

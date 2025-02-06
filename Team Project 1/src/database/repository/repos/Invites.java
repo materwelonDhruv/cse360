@@ -4,13 +4,14 @@ import src.database.model.entities.Invite;
 import src.database.repository.Repository;
 
 import java.sql.ResultSet;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
 public class Invites extends Repository<Invite> {
 
-    public Invites(java.sql.Connection connection) throws SQLException {
+    public Invites(Connection connection) throws SQLException {
         super(connection);
     }
 

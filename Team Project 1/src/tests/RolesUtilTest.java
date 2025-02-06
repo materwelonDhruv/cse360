@@ -9,27 +9,21 @@ import src.utils.permissions.RolesUtil;
 public class RolesUtilTest {
 
     @Test
-    public void testParseRoles_EmptyString() {
-        Roles[] roles = RolesUtil.parseRoles("");
+    public void testParseRoles_Zero() {
+        Roles[] roles = RolesUtil.parseRoles(0);
         assertEquals(0, roles.length, "Empty string should return no roles");
     }
 
     @Test
-    public void testParseRoles_NullString() {
-        Roles[] roles = RolesUtil.parseRoles(null);
+    public void testParseRoles_NegativeNum() {
+        Roles[] roles = RolesUtil.parseRoles(-1);
         assertEquals(0, roles.length, "Null string should return no roles");
-    }
-
-    @Test
-    public void testParseRoles_NonNumeric() {
-        Roles[] roles = RolesUtil.parseRoles("abc");
-        assertEquals(0, roles.length, "Non-numeric string should return no roles");
     }
 
     @Test
     public void testParseRoles_SingleRole_Admin() {
         // Admin is 1 << 1 => decimal 2
-        Roles[] roles = RolesUtil.parseRoles("2");
+        Roles[] roles = RolesUtil.parseRoles(2);
         assertEquals(1, roles.length);
         assertEquals(Roles.ADMIN, roles[0]);
     }
@@ -38,7 +32,7 @@ public class RolesUtilTest {
     public void testParseRoles_AllRoles() {
         // Combine all bits for [USER(1), ADMIN(2), INSTRUCTOR(4), STUDENT(8), REVIEWER(16), STAFF(32)]
         // Sum => 1+2+4+8+16+32 = 63
-        Roles[] roles = RolesUtil.parseRoles("63");
+        Roles[] roles = RolesUtil.parseRoles(63);
         assertEquals(6, roles.length, "All roles should be present");
     }
 

@@ -10,17 +10,17 @@ public class RolesUtil {
      * and converts it to an array/list of Roles.
      * Example: "3" => binary 0b11 => USER and ADMIN bits are set.
      *
-     * @param roleString decimal string representing bitwise roles
+     * @param rolesInt decimal string representing bitwise roles
      * @return an array of Roles that are set in the given string
      */
-    public static Roles[] parseRoles(String roleString) {
-        if (roleString == null || roleString.isEmpty()) {
+    public static Roles[] parseRoles(int rolesInt) {
+        if (rolesInt == 0 || rolesInt < 0) {
             return new Roles[0];
         }
 
         int permissions;
         try {
-            permissions = Integer.parseInt(roleString);
+            permissions = rolesInt;
         } catch (NumberFormatException e) {
             // If the input cannot be parsed as an int, treat as no roles
             return new Roles[0];

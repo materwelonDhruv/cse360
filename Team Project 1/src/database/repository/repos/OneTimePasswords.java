@@ -5,12 +5,13 @@ import src.database.repository.Repository;
 import src.utils.PasswordUtil;
 
 import java.sql.ResultSet;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 public class OneTimePasswords extends Repository<OneTimePassword> {
 
-    public OneTimePasswords(java.sql.Connection connection) throws SQLException {
+    public OneTimePasswords(Connection connection) throws SQLException {
         super(connection);
     }
 
