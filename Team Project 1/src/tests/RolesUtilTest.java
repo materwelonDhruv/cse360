@@ -85,6 +85,12 @@ public class RolesUtilTest {
     }
 
     @Test
+    public void testHasRole_SingleRole() {
+        Roles role = Roles.STUDENT;
+        assertTrue(RolesUtil.hasRole(role, Roles.STUDENT), "Should return true when the role is present");
+    }
+
+    @Test
     public void testHasAllRoles_AllPresent() {
         Roles[] roles = { Roles.USER, Roles.ADMIN, Roles.INSTRUCTOR };
         Roles[] required = { Roles.USER, Roles.ADMIN };

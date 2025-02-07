@@ -87,11 +87,33 @@ public class Invites extends Repository<Invite> {
         executeUpdate(sql, pstmt -> pstmt.setInt(1, id));
     }
 
+    /**
+     * Find an invitation by its code.
+     * @param userId the user ID to search for
+     * @return the invite id, or null if not found
+     */
     public int findInviteUsedByUserId(int userId) {
         String sql = "SELECT COUNT(*) FROM Invites WHERE userID = ?";
         return queryForObject(sql,
                 pstmt -> pstmt.setInt(1, userId),
                 rs -> rs.getInt(1)
+        );
+    }
+
+    /**
+     * Check if an invitation code exists for a user ID.
+     * @param code the invite code to check
+     * @param userId the user ID to search for
+     * @return true if the code exists, false otherwise
+     */
+    public boolean checkInviteCode(String code, int userId) {
+        String sql = "SELECT COUNT(*) FROM Invites WHERE code = ? AND userID = ?";
+        return queryForObject(sql,
+                pstmt -> {
+                    pstmt.setString(1, code);
+                    pstmt.setInt(2, userId);
+                },
+                rs -> rs.getInt(1) > 0
         );
     }
 }
