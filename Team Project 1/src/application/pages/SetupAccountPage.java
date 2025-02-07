@@ -26,7 +26,7 @@ public class SetupAccountPage {
 
     /**
      * Displays the Setup Account page in the provided stage.
-     * 
+     *
      * @param primaryStage The primary stage where the scene will be displayed.
      */
     public void show(Stage primaryStage) {
