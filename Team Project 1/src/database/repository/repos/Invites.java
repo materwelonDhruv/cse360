@@ -106,12 +106,11 @@ public class Invites extends Repository<Invite> {
      * @param userId the user ID to search for
      * @return true if the code exists, false otherwise
      */
-    public boolean checkInviteCode(String code, int userId) {
+    public boolean checkInviteCode(String code) {
         String sql = "SELECT COUNT(*) FROM Invites WHERE code = ? AND userID = ?";
         return queryForObject(sql,
                 pstmt -> {
                     pstmt.setString(1, code);
-                    pstmt.setInt(2, userId);
                 },
                 rs -> rs.getInt(1) > 0
         );

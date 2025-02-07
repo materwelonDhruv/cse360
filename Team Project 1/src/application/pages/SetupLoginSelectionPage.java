@@ -1,10 +1,12 @@
 package src.application.pages;
 
-import src.database.DatabaseHelper;
+import src.application.AppContext;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 /**
  * The SetupLoginSelectionPage class allows users to choose between setting up a
@@ -14,10 +16,10 @@ import javafx.stage.Stage;
  */
 public class SetupLoginSelectionPage {
 
-    private final DatabaseHelper databaseHelper;
+    private final AppContext context;
 
-    public SetupLoginSelectionPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    public SetupLoginSelectionPage() throws SQLException {
+        this.context = AppContext.getInstance();
     }
 
     public void show(Stage primaryStage) {
@@ -27,10 +29,18 @@ public class SetupLoginSelectionPage {
         Button loginButton = new Button("Login");
 
         setupButton.setOnAction(_ -> {
-            new SetupAccountPage(databaseHelper).show(primaryStage);
+            try {
+                new SetupAccountPage().show(primaryStage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         });
         loginButton.setOnAction(_ -> {
-            new UserLoginPage(databaseHelper).show(primaryStage);
+            try {
+                new UserLoginPage().show(primaryStage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         VBox layout = new VBox(10);

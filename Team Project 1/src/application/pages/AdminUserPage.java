@@ -11,12 +11,14 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import src.database.DatabaseHelper;
+
+import src.application.AppContext;
+import src.database.model.entities.User;
 
 public class AdminUserPage {
-	private final DatabaseHelper databaseHelper;
-	public AdminUserPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+	private final AppContext context;
+	public AdminUserPage() throws SQLException {
+        this.context = AppContext.getInstance();
     }
 	/**
      * Displays the admin page in the provided primary stage.
@@ -32,23 +34,18 @@ public class AdminUserPage {
 	    // Declare a listview object
 	    TableView<User> userBox = new TableView<>();
 	    ArrayList<User> userList = new ArrayList<>();
-	    try {
-	    	//Load users from database
-			userList = databaseHelper.getUserList();
-			ObservableList<User> obUserList = FXCollections.observableArrayList();
-			obUserList.addAll(userList);
-			userBox.setItems(obUserList);
-			TableColumn<User,String> userNameCol = new TableColumn<>("Username");
-			userNameCol.setCellValueFactory(new PropertyValueFactory<>("UserName"));
-			TableColumn<User,String> roleCol = new TableColumn<>("Role");
-			roleCol.setCellValueFactory(new PropertyValueFactory<>("Role"));
-			userBox.getColumns().setAll(userNameCol,roleCol);
-			userBox.getSelectionModel();
-		} catch (SQLException e) {
-			// Catch errors
-			e.printStackTrace();
-		}
-	    adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        //Load users from database
+        userList = (ArrayList<User>) context.users().getAll();
+        ObservableList<User> obUserList = FXCollections.observableArrayList();
+        obUserList.addAll(userList);
+        userBox.setItems(obUserList);
+        TableColumn<User,String> userNameCol = new TableColumn<>("Username");
+        userNameCol.setCellValueFactory(new PropertyValueFactory<>("UserName"));
+        TableColumn<User,String> roleCol = new TableColumn<>("Role");
+        roleCol.setCellValueFactory(new PropertyValueFactory<>("Role"));
+        userBox.getColumns().setAll(userNameCol,roleCol);
+        userBox.getSelectionModel();
+        adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
 	    layout.getChildren().addAll(adminLabel,userBox);
 	    Scene adminScene = new Scene(layout, 800, 400);

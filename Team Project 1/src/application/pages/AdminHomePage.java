@@ -1,10 +1,12 @@
 package src.application.pages;
 
-import src.database.DatabaseHelper;
+import src.application.AppContext;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 /**
  * AdminPage class represents the user interface for the admin user.
@@ -16,10 +18,10 @@ public class AdminHomePage {
 	 * 
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
-	private final DatabaseHelper databaseHelper;
+	private final AppContext context;
 
-    public AdminHomePage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    public AdminHomePage() throws SQLException {
+		this.context = AppContext.getInstance();
     }
 	public void show(Stage primaryStage) {
 		VBox layout = new VBox();
@@ -29,12 +31,23 @@ public class AdminHomePage {
 		// label to display the welcome message for the admin
 		Label adminLabel = new Label("Hello, Admin!");
 		Button userButton = new Button("Show Users");
+
 		userButton.setOnAction(a -> {
-	    	new AdminUserPage(databaseHelper).show(primaryStage);
-	    });
+            try {
+                new AdminUserPage().show(primaryStage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+		Button inviteButton = new Button("Invite");
+		inviteButton.setOnAction(_ -> {
+			new InvitationPage().show(primaryStage);
+		});
+
 		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-		layout.getChildren().addAll(adminLabel, userButton);
+		layout.getChildren().addAll(adminLabel, userButton, inviteButton);
 		Scene adminScene = new Scene(layout, 800, 400);
 
 		// Set the scene to primary stage

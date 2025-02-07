@@ -2,6 +2,10 @@ package src.application;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import src.application.pages.FirstPage;
+import src.application.pages.SetupLoginSelectionPage;
 
 import java.sql.SQLException;
 
@@ -17,13 +21,20 @@ public class StartCSE360 extends Application {
             // Force the AppContext to initialize everything
             AppContext context = AppContext.getInstance();
 
+            VBox root = new VBox();
+            Scene scene = new Scene(root, 400, 300);
+
+            primaryStage.setTitle("My JavaFX App");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
             // Example: check if any users exist
             boolean isEmpty = context.users().getAll().isEmpty();
 
             if (isEmpty) {
-//                new FirstPage().show(primaryStage);
+                new FirstPage().show(primaryStage);
             } else {
-//                new SetupLoginSelectionPage().show(primaryStage);
+                new SetupLoginSelectionPage().show(primaryStage);
             }
 
         } catch (SQLException e) {

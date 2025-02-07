@@ -1,11 +1,13 @@
 package src.application.pages;
 
-import src.database.DatabaseHelper;
+import src.application.AppContext;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 /**
  * FirstPage class represents the initial screen for the first user.
@@ -15,10 +17,10 @@ import javafx.stage.Stage;
 public class FirstPage {
 
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final AppContext context;
 
-	public FirstPage(DatabaseHelper databaseHelper) {
-		this.databaseHelper = databaseHelper;
+	public FirstPage() throws SQLException {
+		this.context = AppContext.getInstance();
 	}
 
 	/**
@@ -39,9 +41,13 @@ public class FirstPage {
 		// Button to navigate to the SetupAdmin page
 
 		continueButton.setOnAction(_ -> {
-			new AdminSetupPage(databaseHelper).show(primaryStage);
+            try {
+                new AdminSetupPage().show(primaryStage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
-		});
+        });
 
 		layout.getChildren().addAll(userLabel, continueButton);
 		Scene firstPageScene = new Scene(layout, 800, 400);

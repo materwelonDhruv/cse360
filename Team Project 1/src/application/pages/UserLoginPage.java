@@ -1,10 +1,11 @@
 package src.application.pages;
 
-import src.database.DatabaseHelper;
+import src.application.AppContext;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.User;
 
 import java.sql.SQLException;
 
@@ -16,10 +17,10 @@ import java.sql.SQLException;
  */
 public class UserLoginPage {
 
-    private final DatabaseHelper databaseHelper;
+    private final AppContext context;
 
-    public UserLoginPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    public UserLoginPage() throws SQLException {
+        this.context = AppContext.getInstance();
     }
     public void show(Stage primaryStage) {
         // Input field for the user's userName, password
@@ -30,6 +31,7 @@ public class UserLoginPage {
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
+
 
         // Label to display error messages
         Label errorLabel = new Label();
@@ -42,25 +44,22 @@ public class UserLoginPage {
             String userName = userNameField.getText();
             String password = passwordField.getText();
             try {
-                User user = new User(userName, password, "");
-                WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage(databaseHelper);
+                boolean userValid = context.users().validateLogin(userName, password);
+                if (userValid) {
+                    User user = context.users().getByUsername(userName);
+                    if (user != null) {
 
-                // Retrieve the user's role from the database using userName
-                String role = databaseHelper.getUserRole(userName);
-
-                if (role != null) {
-                    user.setRole(role);
-                    if (databaseHelper.login(user)) {
+                        // Open the welcome page
+                        WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
                         welcomeLoginPage.show(primaryStage, user);
                     } else {
-                        // Display an error if the login fails
-                        errorLabel.setText("Error logging in");
+                        errorLabel.setText("Error retrieving user details.");
                     }
-                } else {
-                    // Display an error if the account does not exist
-                    errorLabel.setText("user account doesn't exist");
-                }
 
+                } else {
+                    // Display an error if the login fails
+                    errorLabel.setText("Error logging in");
+                }
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();

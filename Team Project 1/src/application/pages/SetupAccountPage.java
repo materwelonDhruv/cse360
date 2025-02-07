@@ -1,11 +1,12 @@
 package src.application.pages;
 
-import src.database.DatabaseHelper;
+import src.application.AppContext;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.User;
 
 import java.sql.SQLException;
 
@@ -16,11 +17,11 @@ import java.sql.SQLException;
  */
 public class SetupAccountPage {
 
-    private final DatabaseHelper databaseHelper;
+    private final AppContext context;
 
     // DatabaseHelper to handle database operations.
-    public SetupAccountPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    public SetupAccountPage() throws SQLException {
+        this.context = AppContext.getInstance();
     }
 
     /**
@@ -38,6 +39,10 @@ public class SetupAccountPage {
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
 
+        TextField emailField = new TextField();
+        emailField.setPromptText("Enter Email");
+        emailField.setMaxWidth(250);
+
         TextField inviteCodeField = new TextField();
         inviteCodeField.setPromptText("Enter InvitationCode");
         inviteCodeField.setMaxWidth(250);
@@ -52,26 +57,26 @@ public class SetupAccountPage {
             // Retrieve user input
             String userName = userNameField.getText();
             String password = passwordField.getText();
+            String email = emailField.getText();
             String code = inviteCodeField.getText();
 
             try {
                 // Check if the user already exists
-                if (!databaseHelper.doesUserExist(userName)) {
+                if (context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
-                    if (databaseHelper.validateInvitationCode(code)) {
-
+                    if (context.invites().checkInviteCode(code)) {
                         // Create a new user and register them in the database
-                        User user = new User(userName, password, "user");
-                        databaseHelper.register(user);
+                        User user = new User(userName, password, email, 1);
+                        context.users().create(user);
 
                         // Navigate to the Welcome Login Page
-                        new WelcomeLoginPage(databaseHelper).show(primaryStage, user);
+                        new WelcomeLoginPage().show(primaryStage, user);
                     } else {
                         errorLabel.setText("Please enter a valid invitation code");
                     }
                 } else {
-                    errorLabel.setText("This useruserName is taken!!.. Please use another to setup an account");
+                    errorLabel.setText("This userrName is taken!!.. Please use another to setup an account");
                 }
 
             } catch (SQLException e) {

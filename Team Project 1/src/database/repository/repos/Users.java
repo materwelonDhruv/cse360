@@ -22,12 +22,12 @@ public class Users extends Repository<User> {
         String hashed = PasswordUtil.hashPassword(plain);
         user.setPassword(hashed);
 
-        String sql = "INSERT INTO Users (userName, password, email, roles, inviteUsed) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (userName, password, email, roles) VALUES (?, ?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
-            pstmt.setInt(4, user.getRoles()); // store the roles bit field
+            pstmt.setInt(4, user.getRoles());// store the roles bit field
         });
 
         if (generatedId > 0) {
@@ -110,4 +110,13 @@ public class Users extends Repository<User> {
                 rs -> rs.getInt(1) > 0
         );
     }
+
+    public User getByUsername(String username) {
+        String sql = "SELECT * FROM Users WHERE userName = ?";
+        return queryForObject(sql,
+                pstmt -> pstmt.setString(1, username),
+                this::build
+        );
+    }
+
 }

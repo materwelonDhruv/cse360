@@ -4,7 +4,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.database.DatabaseHelper;
+import src.application.AppContext;
+import src.database.model.entities.User;
+import src.utils.permissions.Roles;
 
 import java.sql.SQLException;
 
@@ -16,10 +18,10 @@ import java.sql.SQLException;
  */
 public class AdminSetupPage {
 
-    private final DatabaseHelper databaseHelper;
+    private final AppContext context;
     
-    public AdminSetupPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    public AdminSetupPage() throws SQLException {
+        this.context = AppContext.getInstance();
     }
 
     public void show(Stage primaryStage) {
@@ -32,20 +34,26 @@ public class AdminSetupPage {
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
 
+        TextField emailField = new TextField();
+        emailField.setPromptText("Enter Email");
+        emailField.setMaxWidth(250);
+
         Button setupButton = new Button("Setup");
 
         setupButton.setOnAction(_ -> {
             // Retrieve user input
             String userName = userNameField.getText();
             String password = passwordField.getText();
+            String email = emailField.getText();
+
             try {
                 // Create a new User object with admin role and register in the database
-                User user = new User(userName, password, "admin");
-                databaseHelper.register(user);
+                User user = new User(userName, password, email, Roles.ADMIN.getBit());
+                context.users().create(user);
                 System.out.println("Administrator setup completed.");
 
                 // Navigate to the Welcome Login Page
-                new WelcomeLoginPage(databaseHelper).show(primaryStage, user);
+                new WelcomeLoginPage().show(primaryStage, user);
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();

@@ -1,11 +1,11 @@
 package src.application.pages;
 
-import src.database.DatabaseHelper;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.Invite;
 
 /**
  * InvitePage class represents the page where an admin can generate an
@@ -15,14 +15,8 @@ import javafx.stage.Stage;
 
 public class InvitationPage {
 
-	/**
-	 * Displays the Invite Page in the provided primary stage.
-	 * 
-	 * @param databaseHelper An instance of DatabaseHelper to handle database
-	 *                       operations.
-	 * @param primaryStage   The primary stage where the scene will be displayed.
-	 */
-	public void show(DatabaseHelper databaseHelper, Stage primaryStage) {
+
+	public void show(Stage primaryStage) {
 		VBox layout = new VBox();
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
 
@@ -40,8 +34,8 @@ public class InvitationPage {
 
 		showCodeButton.setOnAction(_ -> {
 			// Generate the invitation code using the databaseHelper and set it to the label
-			String invitationCode = databaseHelper.generateInvitationCode();
-			inviteCodeLabel.setText(invitationCode);
+			Invite invitationCode = new Invite();
+			inviteCodeLabel.setText(invitationCode.getCode());
 		});
 
 		layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel);
