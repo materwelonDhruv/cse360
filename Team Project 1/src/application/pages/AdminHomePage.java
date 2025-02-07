@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.User;
 
 import java.sql.SQLException;
 
@@ -23,7 +24,7 @@ public class AdminHomePage {
 	public AdminHomePage() throws SQLException {
 		this.context = AppContext.getInstance();
 	}
-	public void show(Stage primaryStage) {
+	public void show(Stage primaryStage, User user) {
 		VBox layout = new VBox();
 
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
@@ -43,7 +44,7 @@ public class AdminHomePage {
 		Button inviteButton = new Button("Invite");
 		inviteButton.setOnAction(_ -> {
 			try {
-				new InvitationPage().show(primaryStage);
+				new InvitationPage().show(primaryStage, user);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
