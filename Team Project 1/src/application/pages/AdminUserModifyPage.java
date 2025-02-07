@@ -1,5 +1,6 @@
 package src.application.pages;
 
+import src.application.AppContext;
 import src.application.pages.AdminUserPage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,8 +26,9 @@ public class AdminUserModifyPage {
      * @param primaryStage The primary stage where the scene will be displayed.
      */
     private final User user;
-
-    public AdminUserModifyPage(User user) {
+    private final AppContext context;
+    public AdminUserModifyPage(User user) throws SQLException {
+        this.context = AppContext.getInstance();
         this.user = user;
     }
     public void show(Stage primaryStage) {

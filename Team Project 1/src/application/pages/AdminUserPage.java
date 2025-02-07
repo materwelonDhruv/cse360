@@ -1,5 +1,7 @@
 package src.application.pages;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -7,21 +9,27 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import src.application.AppContext;
+import src.application.pages.AdminHomePage;
+import src.application.pages.AdminUserModifyPage;
+import src.database.model.entities.User;
+import src.database.repository.repos.Users;
+import src.utils.permissions.Roles;
 
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import src.application.AppContext;
-import src.database.model.entities.User;
+import static src.utils.permissions.RolesUtil.parseRoles;
 
 public class AdminUserPage {
 	private final AppContext context;
 	public AdminUserPage() throws SQLException {
-		this.context = AppContext.getInstance();
+		context = AppContext.getInstance();
 	}
 	/**
-	 * Displays the admin page in the provided primary stage.
+	 * Displays a list of all potential users, and
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
 	public void show(Stage primaryStage) {
@@ -31,23 +39,63 @@ public class AdminUserPage {
 
 		// label to display message for the admin
 		Label adminLabel = new Label("Choose a User to Modify");
-		// Declare a listview object
+		// Declare a TableView object
 		TableView<User> userBox = new TableView<>();
-		ArrayList<User> userList = new ArrayList<>();
-		//Load users from database
-		userList = (ArrayList<User>) context.users().getAll();
-		ObservableList<User> obUserList = FXCollections.observableArrayList();
-		obUserList.addAll(userList);
-		userBox.setItems(obUserList);
-		TableColumn<User,String> userNameCol = new TableColumn<>("Username");
-		userNameCol.setCellValueFactory(new PropertyValueFactory<>("UserName"));
-		TableColumn<User,String> roleCol = new TableColumn<>("Roles");
-		roleCol.setCellValueFactory(new PropertyValueFactory<>("Roles"));
-		userBox.getColumns().setAll(userNameCol,roleCol);
-		userBox.getSelectionModel();
-		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+		Button backButton = new Button("Back");
+		// Set backButton to redirect to home page
+		backButton.setOnAction(a -> {
+            try {
+                new AdminHomePage().show(primaryStage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+		Users userList;
+        //Load users from database
+        userList = context.users();
+        //Cast the ArrayList to ObservableList
+        ObservableList<User> obUserList = FXCollections.observableArrayList();
+        obUserList.addAll(userList.getAll());
+        userBox.setItems(obUserList);
+        //Code for detecting a double click on a TableView (https://stackoverflow.com/questions/26563390/detect-doubleclick-on-row-of-tableview-javafx)
+        userBox.setRowFactory(tv -> {
+            TableRow<User> row = new TableRow<>();
+            row.setOnMouseClicked(event ->{
+                if(event.getClickCount() == 2 && !row.isEmpty()) {
+                    User rowUser = row.getItem();
+                    //load specific modification page for user
+					try {
+						new AdminUserModifyPage(rowUser).show(primaryStage);
+					} catch (SQLException e) {
+						throw new RuntimeException(e);
+					}
+				}
+            });
+            return row;
+        });
+        //Fetch usernames from class and display on columns
+        TableColumn<User,String> userNameCol = new TableColumn<>("Username");
+        userNameCol.setCellValueFactory(new PropertyValueFactory<>("UserName"));
+		//Fetch Role values and display on column (https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/PropertyValueFactory.html)
+        TableColumn<User,String> roleCol = new TableColumn<>("Role");
+        roleCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<User,String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(TableColumn.CellDataFeatures<User,String> param) {
+				User user = param.getValue();
+				int roles = user.getRoles();
+				Roles[] roleList = parseRoles(roles);
+				String out = "";
+                for (Roles value : roleList) {
+                    out = out.concat(value.toString());
+                }
+				return new SimpleStringProperty(out);
+			}
+		});
+        //Load the columns into TableView
+        userBox.getColumns().setAll(userNameCol,roleCol);
 
-		layout.getChildren().addAll(adminLabel,userBox);
+        adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+		layout.getChildren().addAll(adminLabel,userBox,backButton);
 		Scene adminScene = new Scene(layout, 800, 400);
 
 		// Set the scene to primary stage
