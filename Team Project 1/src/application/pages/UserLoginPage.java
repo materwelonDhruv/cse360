@@ -32,6 +32,14 @@ public class UserLoginPage {
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
 
+        TextField firstNameField = new TextField();
+        userNameField.setPromptText("Enter userName");
+        userNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        userNameField.setPromptText("Enter userName");
+        userNameField.setMaxWidth(250);
+
 
         // Label to display error messages
         Label errorLabel = new Label();
@@ -43,6 +51,8 @@ public class UserLoginPage {
             // Retrieve user inputs
             String userName = userNameField.getText();
             String password = passwordField.getText();
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
             try {
                 boolean userValid = context.users().validateLogin(userName, password);
                 if (userValid) {

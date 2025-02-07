@@ -38,7 +38,7 @@ public class AdminUserModifyPage {
 
         layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
         AtomicInteger roleInt = new AtomicInteger(user.getRoles());
-        Roles[] roles = RolesUtil.parseRoles(roleInt.get());
+        Roles[] roles = RolesUtil.intToRoles(roleInt.get());
         //Label to display the user information
         Label userNameLabel = new Label("Name: " + user.getUserName());
         //Instantiate and declare Checkboxes

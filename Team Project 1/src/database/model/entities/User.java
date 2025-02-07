@@ -12,7 +12,7 @@ public class User extends BaseEntity {
     private String email;
     private int roles; // new bit field integer representing user roles
 
-    //public User() {}
+    public User() {}
 
     public User(String userName, String firstName, String lastName, String password, String email, int roles) {
         this.userName = userName;
