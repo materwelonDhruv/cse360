@@ -102,8 +102,8 @@ public class Invites extends Repository<Invite> {
 
     /**
      * Check if an invitation code exists for a user ID.
+     *
      * @param code the invite code to check
-     * @param userId the user ID to search for
      * @return true if the code exists, false otherwise
      */
     public boolean checkInviteCode(String code) {
@@ -111,6 +111,7 @@ public class Invites extends Repository<Invite> {
         return queryForObject(sql,
                 pstmt -> {
                     pstmt.setString(1, code);
+                    //pstmt.setInt(2, userId);
                 },
                 rs -> rs.getInt(1) > 0
         );

@@ -46,4 +46,6 @@ public class User extends BaseEntity {
     public void setRoles(int roles) {
         this.roles = roles;
     }
+
 }
+

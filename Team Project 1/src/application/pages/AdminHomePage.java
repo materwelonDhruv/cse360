@@ -15,14 +15,14 @@ import java.sql.SQLException;
 public class AdminHomePage {
 	/**
 	 * Displays the admin page in the provided primary stage.
-	 * 
+	 *
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
 	private final AppContext context;
 
-    public AdminHomePage() throws SQLException {
+	public AdminHomePage() throws SQLException {
 		this.context = AppContext.getInstance();
-    }
+	}
 	public void show(Stage primaryStage) {
 		VBox layout = new VBox();
 
@@ -33,12 +33,12 @@ public class AdminHomePage {
 		Button userButton = new Button("Show Users");
 
 		userButton.setOnAction(a -> {
-            try {
-                new AdminUserPage().show(primaryStage);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+			try {
+				new AdminUserPage().show(primaryStage);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
 		Button inviteButton = new Button("Invite");
 		inviteButton.setOnAction(_ -> {

@@ -25,7 +25,7 @@ public class FirstPage {
 
 	/**
 	 * Displays the first page in the provided primary stage.
-	 * 
+	 *
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
 	public void show(Stage primaryStage) {
@@ -41,13 +41,13 @@ public class FirstPage {
 		// Button to navigate to the SetupAdmin page
 
 		continueButton.setOnAction(_ -> {
-            try {
-                new AdminSetupPage().show(primaryStage);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+			try {
+				new AdminSetupPage().show(primaryStage);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
 
-        });
+		});
 
 		layout.getChildren().addAll(userLabel, continueButton);
 		Scene firstPageScene = new Scene(layout, 800, 400);

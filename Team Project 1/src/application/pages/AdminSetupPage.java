@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class AdminSetupPage {
 
     private final AppContext context;
-    
+
     public AdminSetupPage() throws SQLException {
         this.context = AppContext.getInstance();
     }
