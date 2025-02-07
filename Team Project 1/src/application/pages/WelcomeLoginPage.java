@@ -41,7 +41,7 @@ public class WelcomeLoginPage {
 
 		//get all the roles assigned to the user
 		int roleInt = user.getRoles();
-		Roles[] roles = RolesUtil.parseRoles(roleInt);
+		Roles[] roles = RolesUtil.intToRoles(roleInt);
 
 		//continue button to go to user page
 		Button continueButton = new Button("Continue to your page");
