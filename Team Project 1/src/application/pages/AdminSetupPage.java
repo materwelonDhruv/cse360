@@ -44,11 +44,13 @@ public class AdminSetupPage {
             // Retrieve user input
             String userName = userNameField.getText();
             String password = passwordField.getText();
+            String firstName = "Admin";
+            String lastName = "Admin";
             String email = emailField.getText();
 
             try {
                 // Create a new User object with admin role and register in the database
-                User user = new User(userName, password, email, Roles.ADMIN.getBit());
+                User user = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
                 context.users().create(user);
                 System.out.println("Administrator setup completed.");
 

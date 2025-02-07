@@ -59,6 +59,8 @@ public class Users extends Repository<User> {
         User u = new User();
         u.setId(rs.getInt("userID"));
         u.setUserName(rs.getString("userName"));
+        u.setFirstName(rs.getString("firstName"));
+        u.setLastName(rs.getString("lastName"));
         u.setPassword(rs.getString("password"));
         u.setEmail(rs.getString("email"));
         u.setRoles(rs.getInt("roles")); // read roles from the new column
