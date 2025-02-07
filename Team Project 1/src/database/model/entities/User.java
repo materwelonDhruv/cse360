@@ -1,5 +1,7 @@
 package src.database.model.entities;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import src.database.model.BaseEntity;
 
 public class User extends BaseEntity {
@@ -8,7 +10,7 @@ public class User extends BaseEntity {
     private String email;
     private int roles; // new bit field integer representing user roles
 
-    public User() {}
+    //public User() {}
 
     public User(String userName, String password, String email, int roles) {
         this.userName = userName;
@@ -19,6 +21,9 @@ public class User extends BaseEntity {
 
     public String getUserName() {
         return userName;
+    }
+    public StringProperty userNameProperty() {
+        return new SimpleStringProperty(userName);
     }
 
     public void setUserName(String userName) {

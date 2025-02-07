@@ -56,12 +56,13 @@ public class Users extends Repository<User> {
 
     @Override
     public User build(ResultSet rs) throws SQLException {
-        User u = new User();
+        User u = new User(
+        rs.getString("userName"),
+        rs.getString("password"),
+        rs.getString("email"),
+        rs.getInt("roles") // read roles from the new column
+        );
         u.setId(rs.getInt("userID"));
-        u.setUserName(rs.getString("userName"));
-        u.setPassword(rs.getString("password"));
-        u.setEmail(rs.getString("email"));
-        u.setRoles(rs.getInt("roles")); // read roles from the new column
         return u;
     }
 
