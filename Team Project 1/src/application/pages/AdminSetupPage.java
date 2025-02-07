@@ -26,6 +26,14 @@ public class AdminSetupPage {
 
     public void show(Stage primaryStage) {
         // Input fields for userName and password
+        TextField firstNameField = new TextField();
+        firstNameField.setPromptText("Enter first name");
+        firstNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        lastNameField.setPromptText("Enter last name");
+        lastNameField.setMaxWidth(250);
+
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter Admin userName");
         userNameField.setMaxWidth(250);
@@ -42,6 +50,8 @@ public class AdminSetupPage {
 
         setupButton.setOnAction(_ -> {
             // Retrieve user input
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
             String userName = userNameField.getText();
             String password = passwordField.getText();
             String email = emailField.getText();
@@ -60,7 +70,7 @@ public class AdminSetupPage {
             }
         });
 
-        VBox layout = new VBox(10, userNameField, passwordField, emailField, setupButton);
+        VBox layout = new VBox(10,firstNameField,lastNameField,emailField, userNameField, passwordField, setupButton);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
         primaryStage.setScene(new Scene(layout, 800, 400));

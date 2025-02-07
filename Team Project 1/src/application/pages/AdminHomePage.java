@@ -34,6 +34,7 @@ public class AdminHomePage {
 		Button userButton = new Button("Show Users");
 		Button logoutButton = new Button("Logout");
 		Button inviteButton = new Button("Invite");
+		Button otpButton = new Button("Set user OTP");
 
 		userButton.setOnAction(a -> {
 			try {
@@ -61,7 +62,7 @@ public class AdminHomePage {
 
 		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-		layout.getChildren().addAll(adminLabel, userButton, inviteButton, logoutButton);
+		layout.getChildren().addAll(adminLabel, userButton, inviteButton,otpButton, logoutButton);
 		Scene adminScene = new Scene(layout, 800, 400);
 
 		// Set the scene to primary stage

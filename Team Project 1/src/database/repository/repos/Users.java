@@ -57,6 +57,7 @@ public class Users extends Repository<User> {
     @Override
     public User build(ResultSet rs) throws SQLException {
         User u = new User(
+
         rs.getString("userName"),
         rs.getString("password"),
         rs.getString("email"),

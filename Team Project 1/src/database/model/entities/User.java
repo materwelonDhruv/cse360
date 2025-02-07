@@ -5,6 +5,8 @@ import javafx.beans.property.StringProperty;
 import src.database.model.BaseEntity;
 
 public class User extends BaseEntity {
+    private String firstName;
+    private String lastName;
     private String userName;
     private String password; // stores the hashed password
     private String email;
@@ -19,7 +21,16 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
     public String getUserName() {
+
         return userName;
     }
     public StringProperty userNameProperty() {
@@ -51,6 +62,10 @@ public class User extends BaseEntity {
     public void setRoles(int roles) {
         this.roles = roles;
     }
+
+    public void setFirstName(String firstName) {this.firstName = firstName;}
+
+    public void setLastName(String lastName) {this.lastName = lastName;}
 
 }
 
