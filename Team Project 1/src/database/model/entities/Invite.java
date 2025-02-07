@@ -52,9 +52,6 @@ public class Invite extends BaseEntity {
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
-<<<<<<< HEAD
-}
-=======
 
     private String generateCode() {
         // Generate a random 6-character alphanumeric code
@@ -70,4 +67,3 @@ public class Invite extends BaseEntity {
         return sb.toString();
     }
 }
->>>>>>> origin/feat/DatabaseUpdate
