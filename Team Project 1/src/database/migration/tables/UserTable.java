@@ -15,6 +15,8 @@ public class UserTable extends BaseTable {
         return "CREATE TABLE IF NOT EXISTS Users ("
                 + " userID INT AUTO_INCREMENT PRIMARY KEY, "
                 + " userName VARCHAR(255) NOT NULL UNIQUE, "
+                + " firstName VARCHAR(255), "
+                + " lastName VARCHAR(255), "
                 + " password VARCHAR(255) NOT NULL, "
                 + " email VARCHAR(255), "
                 + " roles INT NOT NULL DEFAULT 0 "  // roles bit field

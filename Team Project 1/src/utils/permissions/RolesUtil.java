@@ -13,7 +13,7 @@ public class RolesUtil {
      * @param rolesInt decimal string representing bitwise roles
      * @return an array of Roles that are set in the given string
      */
-    public static Roles[] parseRoles(int rolesInt) {
+    public static Roles[] intToRoles(int rolesInt) {
         if (rolesInt == 0 || rolesInt < 0) {
             return new Roles[0];
         }
@@ -78,6 +78,15 @@ public class RolesUtil {
     }
 
     /**
+     * Checks if the provided roles integer contains the specified role.
+     * @param rolesInt integer representing the combined bitwise roles.
+     * @param requiredRole role to check for.
+     */
+    private static boolean hasRole(int rolesInt, Roles requiredRole) {
+        return (rolesInt & requiredRole.getBit()) == requiredRole.getBit();
+    }
+
+    /**
      * Checks if the given Roles array contains all the specified roles.
      * @param roles array of Roles user has
      * @param requiredRoles array of Roles to check for
@@ -111,5 +120,33 @@ public class RolesUtil {
         String restOfRole = fullCapsRole.substring(1).toLowerCase();
 
         return firstLetter + restOfRole;
+    }
+
+    /**
+     * Add a role to a given integer representing the combined bitwise roles.
+     * @param rolesInt integer representing the combined bitwise roles
+     * @param role role to add
+     * @return integer with the added role
+     */
+    public static int addRole(int rolesInt, Roles role) {
+        if (hasRole(rolesInt, role)) {
+            return rolesInt;
+        }
+
+        return rolesInt | role.getBit();
+    }
+
+    /**
+     * Remove a role from a given integer representing the combined bitwise roles.
+     * @param rolesInt integer representing the combined bitwise roles
+     * @param role role to remove
+     * @return integer with the removed role
+     */
+    public static int removeRole(int rolesInt, Roles role) {
+        if (!hasRole(rolesInt, role)) {
+            return rolesInt;
+        }
+
+        return rolesInt & ~role.getBit();
     }
 }

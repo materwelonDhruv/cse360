@@ -9,30 +9,30 @@ import src.utils.permissions.RolesUtil;
 public class RolesUtilTest {
 
     @Test
-    public void testParseRoles_Zero() {
-        Roles[] roles = RolesUtil.parseRoles(0);
+    public void testIntToRoles_Zero() {
+        Roles[] roles = RolesUtil.intToRoles(0);
         assertEquals(0, roles.length, "Empty string should return no roles");
     }
 
     @Test
-    public void testParseRoles_NegativeNum() {
-        Roles[] roles = RolesUtil.parseRoles(-1);
+    public void testIntToRoles_NegativeNum() {
+        Roles[] roles = RolesUtil.intToRoles(-1);
         assertEquals(0, roles.length, "Null string should return no roles");
     }
 
     @Test
-    public void testParseRoles_SingleRole_Admin() {
+    public void testIntToRoles_SingleRole_Admin() {
         // Admin is 1 << 1 => decimal 2
-        Roles[] roles = RolesUtil.parseRoles(2);
+        Roles[] roles = RolesUtil.intToRoles(2);
         assertEquals(1, roles.length);
         assertEquals(Roles.ADMIN, roles[0]);
     }
 
     @Test
-    public void testParseRoles_AllRoles() {
+    public void testIntToRoles_AllRoles() {
         // Combine all bits for [USER(1), ADMIN(2), INSTRUCTOR(4), STUDENT(8), REVIEWER(16), STAFF(32)]
         // Sum => 1+2+4+8+16+32 = 63
-        Roles[] roles = RolesUtil.parseRoles(63);
+        Roles[] roles = RolesUtil.intToRoles(63);
         assertEquals(6, roles.length, "All roles should be present");
     }
 
@@ -142,4 +142,45 @@ public class RolesUtilTest {
         assertEquals("Staff", RolesUtil.roleName(Roles.STAFF), "Staff role should be 'Staff'");
     }
 
+    @Test
+    public void testAddRole_NewRole() {
+        int rolesInt = 0; // No roles initially
+        int result = RolesUtil.addRole(rolesInt, Roles.ADMIN);
+        assertEquals(2, result, "Adding ADMIN should result in bitwise value 2");
+    }
+
+    @Test
+    public void testAddRole_ExistingRole() {
+        int rolesInt = 2; // Already has ADMIN
+        int result = RolesUtil.addRole(rolesInt, Roles.ADMIN);
+        assertEquals(2, result, "Adding ADMIN again should not change the value");
+    }
+
+    @Test
+    public void testAddRole_MultipleRoles() {
+        int rolesInt = RolesUtil.addRole(0, Roles.USER); // Add USER
+        rolesInt = RolesUtil.addRole(rolesInt, Roles.INSTRUCTOR); // Add INSTRUCTOR
+        assertEquals(5, rolesInt, "Adding USER (1) and INSTRUCTOR (4) should result in 5");
+    }
+
+    @Test
+    public void testRemoveRole_ExistingRole() {
+        int rolesInt = 3; // USER (1) + ADMIN (2) = 3
+        int result = RolesUtil.removeRole(rolesInt, Roles.ADMIN);
+        assertEquals(1, result, "Removing ADMIN should leave only USER");
+    }
+
+    @Test
+    public void testRemoveRole_NonExistingRole() {
+        int rolesInt = 1; // Only USER (1)
+        int result = RolesUtil.removeRole(rolesInt, Roles.ADMIN);
+        assertEquals(1, result, "Removing ADMIN from USER-only roles should not change value");
+    }
+
+    @Test
+    public void testRemoveRole_AllRoles() {
+        int rolesInt = 63; // All roles combined
+        rolesInt = RolesUtil.removeRole(rolesInt, Roles.REVIEWER); // Remove REVIEWER (16)
+        assertEquals(47, rolesInt, "Removing REVIEWER from all roles should result in 47");
+    }
 }
