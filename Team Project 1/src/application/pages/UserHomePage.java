@@ -7,7 +7,6 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
 import src.database.model.entities.User;
 import src.utils.permissions.Roles;
 import src.utils.permissions.RolesUtil;
@@ -33,7 +32,7 @@ public class UserHomePage {
 
 		//get all the roles assigned to the user
 		int roleInt = user.getRoles();
-		Roles[] allRoles = RolesUtil.parseRoles(roleInt);
+		Roles[] allRoles = RolesUtil.intToRoles(roleInt);
 
 		// Dropdown menu to choose from all the assigned roles
 		MenuButton roleMenu = new MenuButton("Select Role");

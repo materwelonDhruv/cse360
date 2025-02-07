@@ -60,6 +60,8 @@ public class SetupAccountPage {
         setupButton.setOnAction(_ -> {
             // Retrieve user input
             String userName = userNameField.getText();
+            String firstName = "User";
+            String lastName = "User";
             String password = passwordField.getText();
             String email = emailField.getText();
             String code = inviteCodeField.getText();
@@ -77,7 +79,7 @@ public class SetupAccountPage {
                         // Check if the invite is less than a day old
                         if (Helpers.getCurrentTimeInSeconds() - invite.getCreatedAt() < 86400) {
                             // Create a new user and register them in the database
-                            User user = new User(userName, password, email, invite.getRoles());
+                            User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
                             context.users().create(user);
 
                             // Navigate to the Welcome Login Page
