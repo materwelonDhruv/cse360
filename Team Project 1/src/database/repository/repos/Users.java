@@ -22,7 +22,9 @@ public class Users extends Repository<User> {
         String hashed = PasswordUtil.hashPassword(plain);
         user.setPassword(hashed);
 
-        String sql = "INSERT INTO Users (userName, firstName, lastName, password, email, roles) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Users "
+                + "(userName, firstName, lastName, password, email, roles) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
             pstmt.setString(2, user.getFirstName());
