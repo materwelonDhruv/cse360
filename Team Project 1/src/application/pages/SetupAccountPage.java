@@ -6,7 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.Invite;
 import src.database.model.entities.User;
+import src.utils.Helpers;
 
 import java.sql.SQLException;
 
@@ -65,18 +67,27 @@ public class SetupAccountPage {
                 if (!context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
-                    if (context.invites().checkInviteCode(code)) {
-                        // Create a new user and register them in the database
-                        User user = new User(userName, password, email, 1);
-                        context.users().create(user);
+                    Invite invite = context.invites().getInviteFromCode(code);
+                    if (invite != null) {
+                        // delete the invitation from the database
+                        context.invites().delete(invite.getId());
 
-                        // Navigate to the Welcome Login Page
-                        new WelcomeLoginPage().show(primaryStage, user);
+                        // Check if the invite is less than a day old
+                        if (Helpers.getCurrentTimeInSeconds() - invite.getCreatedAt() < 86400) {
+                            // Create a new user and register them in the database
+                            User user = new User(userName, password, email, invite.getRoles());
+                            context.users().create(user);
+
+                            // Navigate to the Welcome Login Page
+                            new WelcomeLoginPage().show(primaryStage, user);
+                        } else {
+                            errorLabel.setText("Invitation is expired");
+                        }
                     } else {
-                        errorLabel.setText("Please enter a valid invitation code");
+                        errorLabel.setText("Invitation code does not exist or is expired");
                     }
                 } else {
-                    errorLabel.setText("This userrName is taken!!.. Please use another to setup an account");
+                    errorLabel.setText("This userName is taken!!.. Please use another to setup an account");
                 }
 
             } catch (SQLException e) {

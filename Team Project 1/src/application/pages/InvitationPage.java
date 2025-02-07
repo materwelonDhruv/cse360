@@ -1,6 +1,5 @@
 package src.application.pages;
 
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -19,7 +18,6 @@ import src.utils.permissions.RolesUtil;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * InvitePage class represents the page where an admin can generate an

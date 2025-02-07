@@ -21,6 +21,9 @@ public class StartCSE360 extends Application {
             // Force the AppContext to initialize everything
             AppContext context = AppContext.getInstance();
 
+            // Delete all expired invitations
+            context.invites().deleteExpired();
+
             VBox root = new VBox();
             Scene scene = new Scene(root, 400, 300);
 
