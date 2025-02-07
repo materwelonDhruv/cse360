@@ -1,6 +1,7 @@
 package src.database.model.entities;
 
 import src.database.model.BaseEntity;
+import src.utils.Helpers;
 
 import java.security.SecureRandom;
 
@@ -8,12 +9,12 @@ public class OneTimePassword extends BaseEntity {
     private int creatorId;
     private int targetId;
     private boolean isUsed;
-    private String otpValue;         // This will hold the hashed OTP in the DB.
-    private transient String plainOtp; // Holds the plaintext OTP temporarily.
+    private String otpValue;
+    private final transient String plainOtp = Helpers.generateRandomCode(10, true);
 
-    // Default constructor auto-generates the OTP.
     public OneTimePassword() {
-        generateOtp();
+        this.isUsed = false;
+        this.otpValue = plainOtp;
     }
 
     // Convenience constructor with creator and target IDs.
@@ -21,21 +22,7 @@ public class OneTimePassword extends BaseEntity {
         this.creatorId = creatorId;
         this.targetId = targetId;
         this.isUsed = false;
-        generateOtp();
-    }
-
-    // Auto-generates a 10-character OTP with letters, digits, and special characters.
-    private void generateOtp() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            int index = random.nextInt(chars.length());
-            sb.append(chars.charAt(index));
-        }
-        plainOtp = sb.toString();
-        // Initially, store the plaintext in otpValue; the repository will hash it upon creation.
-        otpValue = plainOtp;
+        this.otpValue = plainOtp;
     }
 
     // Getters and setters

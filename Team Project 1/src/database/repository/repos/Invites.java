@@ -101,9 +101,8 @@ public class Invites extends Repository<Invite> {
     }
 
     /**
-     * Check if an invitation code exists for a user ID.
+     * Check if an invitation code exists in the database.
      * @param code the invite code to check
-     * @param userId the user ID to search for
      * @return true if the code exists, false otherwise
      */
     public boolean checkInviteCode(String code) {
