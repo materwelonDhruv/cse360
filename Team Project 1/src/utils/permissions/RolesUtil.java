@@ -69,6 +69,15 @@ public class RolesUtil {
     }
 
     /**
+     * Checks if the provided role is the required role.
+     * @param role user's role
+     * @param requiredRole role to check for
+     */
+    public static boolean hasRole(Roles role, Roles requiredRole) {
+        return role == requiredRole;
+    }
+
+    /**
      * Checks if the given Roles array contains all the specified roles.
      * @param roles array of Roles user has
      * @param requiredRoles array of Roles to check for
