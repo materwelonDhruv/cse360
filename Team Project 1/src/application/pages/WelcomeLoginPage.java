@@ -13,7 +13,8 @@ import src.utils.permissions.RolesUtil;
 import src.database.repository.DataAccessException;
 
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicReference;
+
+
 
 /**
  * The WelcomeLoginPage class displays a welcome screen for authenticated users.
@@ -42,38 +43,8 @@ public class WelcomeLoginPage {
 		int roleInt = user.getRoles();
 		Roles[] roles = RolesUtil.parseRoles(roleInt);
 
+		//continue button to go to user page
 		Button continueButton = new Button("Continue to your page");
-
-		//continue to your page if only 1 role assigned
-		if (roles.length == 1) {
-			if (roles[0] == Roles.ADMIN) {
-				continueButton.setOnAction(e -> {
-					try {
-						new AdminHomePage().show(primaryStage);
-					} catch (SQLException ex) {
-						throw new RuntimeException(ex);
-					}
-				});
-			} else {
-				continueButton.setOnAction(e -> {
-					new UserHomePage().show(primaryStage);
-				});
-			}
-		}
-		// Dropdown menu to choose from all the assigned roles
-		MenuButton roleMenu = new MenuButton("Select Role");
-
-		//the role selected by the user from the menu bar
-		Roles[] selectedRole = new Roles[1];
-
-		for (Roles role : roles) {
-			MenuItem roleItem = new MenuItem(role.toString());
-			roleItem.setOnAction(e -> {
-				selectedRole[0] = role;
-				roleMenu.setText(role.toString());
-			});
-			roleMenu.getItems().add(roleItem);
-		}
 
 		// Button to quit the application
 		Button quitButton = new Button("Quit");
@@ -86,20 +57,62 @@ public class WelcomeLoginPage {
 			Platform.exit(); // Exit the JavaFX application
 		});
 
-		//continue button which changes depending on the selectedRole
-		continueButton.setOnAction(e -> {
-			if (selectedRole[0] == Roles.ADMIN) {
-				try {
-					new AdminHomePage().show(primaryStage);
-				} catch (SQLException ex) {
-					throw new RuntimeException(ex);
-				}
+		//continue to your page if only 1 role assigned
+		if (roles.length == 1) {
+			if (RolesUtil.hasRole(roles, Roles.ADMIN)) {
+				continueButton.setOnAction(e -> {
+					try {
+						new AdminHomePage().show(primaryStage, user);
+					} catch (SQLException ex) {
+						throw new RuntimeException(ex);
+					}
+				});
 			} else {
-				new UserHomePage().show(primaryStage);
+				continueButton.setOnAction(e -> {
+					new UserHomePage().show(primaryStage, user, roles[0]);
+				});
 			}
-		});
+		}
+		// Dropdown menu to choose from all the assigned roles
+		MenuButton roleMenu = new MenuButton("Select Role");
 
-		layout.getChildren().addAll(welcomeLabel, continueButton, quitButton, roleMenu);
+		//the role selected by the user from the menu bar
+		Roles[] selectedRole = new Roles[1];
+		if (roles.length > 1) {
+			for (Roles role : roles) {
+				MenuItem roleItem = new MenuItem(role.toString());
+				roleItem.setOnAction(e -> {
+					selectedRole[0] = role;
+					roleMenu.setText(role.toString());
+				});
+				roleMenu.getItems().add(roleItem);
+			}
+		}
+
+
+		//continue button which changes depending on the selectedRole
+		if (roles.length > 1) {
+			continueButton.setOnAction(e -> {
+				if (RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
+					try {
+						new AdminHomePage().show(primaryStage, user);
+					} catch (SQLException ex) {
+						throw new RuntimeException(ex);
+					}
+				} else {
+					if(selectedRole[0] != null) {
+						new UserHomePage().show(primaryStage, user, selectedRole[0]);
+					}
+
+				}
+			});
+		}
+
+		// Add components to the layout
+		layout.getChildren().addAll(welcomeLabel, continueButton);
+		if (roles.length > 1) {
+			layout.getChildren().add(roleMenu);
+		}
 
 		// Set the scene to primary stage
 		Scene welcomeScene = new Scene(layout, 800, 400);

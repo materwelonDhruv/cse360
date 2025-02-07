@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.User;
 
 import java.sql.SQLException;
 
@@ -23,7 +24,7 @@ public class AdminHomePage {
 	public AdminHomePage() throws SQLException {
 		this.context = AppContext.getInstance();
 	}
-	public void show(Stage primaryStage) {
+	public void show(Stage primaryStage, User user) {
 		VBox layout = new VBox();
 
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
@@ -31,6 +32,8 @@ public class AdminHomePage {
 		// label to display the welcome message for the admin
 		Label adminLabel = new Label("Hello, Admin!");
 		Button userButton = new Button("Show Users");
+		Button logoutButton = new Button("Logout");
+		Button inviteButton = new Button("Invite");
 
 		userButton.setOnAction(a -> {
 			try {
@@ -40,14 +43,25 @@ public class AdminHomePage {
 			}
 		});
 
-		Button inviteButton = new Button("Invite");
 		inviteButton.setOnAction(_ -> {
-			new InvitationPage().show(primaryStage);
+			try {
+				new InvitationPage().show(primaryStage, user);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+		logoutButton.setOnAction(a -> {
+			try {
+				new UserLoginPage().show(primaryStage);
+			} catch (SQLException ex) {
+				throw new RuntimeException(ex);
+			}
 		});
 
 		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-		layout.getChildren().addAll(adminLabel, userButton, inviteButton);
+		layout.getChildren().addAll(adminLabel, userButton, inviteButton, logoutButton);
 		Scene adminScene = new Scene(layout, 800, 400);
 
 		// Set the scene to primary stage

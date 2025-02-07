@@ -6,7 +6,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.database.model.entities.Invite;
 import src.database.model.entities.User;
+import src.utils.Helpers;
+import src.validators.PasswordValidator;
+import src.validators.UsernameValidator;
 
 import java.sql.SQLException;
 
@@ -62,21 +66,30 @@ public class SetupAccountPage {
 
             try {
                 // Check if the user already exists
-                if (context.users().doesUserExist(userName)) {
+                if (!context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
-                    if (context.invites().checkInviteCode(code)) {
-                        // Create a new user and register them in the database
-                        User user = new User(userName, password, email, 1);
-                        context.users().create(user);
+                    Invite invite = context.invites().getInviteFromCode(code);
+                    if (invite != null) {
+                        // delete the invitation from the database
+                        context.invites().delete(invite.getId());
 
-                        // Navigate to the Welcome Login Page
-                        new WelcomeLoginPage().show(primaryStage, user);
+                        // Check if the invite is less than a day old
+                        if (Helpers.getCurrentTimeInSeconds() - invite.getCreatedAt() < 86400) {
+                            // Create a new user and register them in the database
+                            User user = new User(userName, password, email, invite.getRoles());
+                            context.users().create(user);
+
+                            // Navigate to the Welcome Login Page
+                            new WelcomeLoginPage().show(primaryStage, user);
+                        } else {
+                            errorLabel.setText("Invitation is expired");
+                        }
                     } else {
-                        errorLabel.setText("Please enter a valid invitation code");
+                        errorLabel.setText("Invitation code does not exist or is expired");
                     }
                 } else {
-                    errorLabel.setText("This userrName is taken!!.. Please use another to setup an account");
+                    errorLabel.setText("This userName is taken!!.. Please use another to setup an account");
                 }
 
             } catch (SQLException e) {
@@ -87,7 +100,7 @@ public class SetupAccountPage {
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        layout.getChildren().addAll(userNameField, passwordField, inviteCodeField, setupButton, errorLabel);
+        layout.getChildren().addAll(userNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
 
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Account Setup");

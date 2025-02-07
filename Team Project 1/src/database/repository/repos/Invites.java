@@ -2,6 +2,7 @@ package src.database.repository.repos;
 
 import src.database.model.entities.Invite;
 import src.database.repository.Repository;
+import src.utils.Helpers;
 
 import java.sql.ResultSet;
 import java.sql.Connection;
@@ -87,6 +88,11 @@ public class Invites extends Repository<Invite> {
         executeUpdate(sql, pstmt -> pstmt.setInt(1, id));
     }
 
+    public void deleteExpired() {
+        String sql = "DELETE FROM Invites WHERE ? - createdAt > 86400";
+        executeUpdate(sql, pstmt -> pstmt.setInt(1, Helpers.getCurrentTimeInSeconds()));
+    }
+
     /**
      * Find an invitation by its code.
      * @param userId the user ID to search for
@@ -101,15 +107,15 @@ public class Invites extends Repository<Invite> {
     }
 
     /**
-     * Check if an invitation code exists in the database.
+     * find an invite from its code
      * @param code the invite code to check
-     * @return true if the code exists, false otherwise
+     * @return the invite, or null if not found
      */
-    public boolean checkInviteCode(String code) {
-        String sql = "SELECT COUNT(*) FROM Invites WHERE code = ?";
+    public Invite getInviteFromCode(String code) {
+        String sql = "SELECT * FROM Invites WHERE code = ?";
         return queryForObject(sql,
                 pstmt -> pstmt.setString(1, code),
-                rs -> rs.getInt(1)
-        ) > 0;
+                this::build
+        );
     }
 }
