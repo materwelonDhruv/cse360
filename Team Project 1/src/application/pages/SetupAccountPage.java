@@ -9,6 +9,8 @@ import javafx.stage.Stage;
 import src.database.model.entities.Invite;
 import src.database.model.entities.User;
 import src.utils.Helpers;
+import src.validators.PasswordValidator;
+import src.validators.UsernameValidator;
 
 import java.sql.SQLException;
 
@@ -98,7 +100,7 @@ public class SetupAccountPage {
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        layout.getChildren().addAll(userNameField, passwordField, inviteCodeField, setupButton, errorLabel);
+        layout.getChildren().addAll(userNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
 
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Account Setup");

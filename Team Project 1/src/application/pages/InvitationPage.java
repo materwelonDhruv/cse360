@@ -3,6 +3,7 @@ package src.application.pages;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -32,6 +33,7 @@ public class InvitationPage {
 	}
 
 	public void show(Stage primaryStage, User user) {
+
 		VBox layout = new VBox();
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
 
@@ -93,6 +95,7 @@ public class InvitationPage {
 			}
 		});
 
+		// Action for copying the code to clipboard
 		copyCodeToClipboard.setOnAction(_ -> {
 			// Copy the generated code into the user's clipboard and change text for feedback
 			Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -101,12 +104,24 @@ public class InvitationPage {
 			clipboard.setContent(content);
 			copyCodeToClipboard.setText("Copied!");
 		});
+		Button backButton = new Button("Back");
 
-		layout.getChildren().addAll(userLabel, roleInstructions, roles, showCodeButton, inviteCodeLabel);
+		// Action for back button
+		backButton.setOnAction(_ -> {
+			try {
+				new AdminHomePage().show(primaryStage, user);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+
+		// Add components to layout
+		layout.getChildren().addAll(userLabel, roleInstructions, roles, showCodeButton, inviteCodeLabel, backButton);
 		roles.getChildren().addAll(admin, student, reviewer, instructor, staff);
-		Scene inviteScene = new Scene(layout, 800, 400);
 
-		// Set the scene to primary stage
+		// Set the scene
+		Scene inviteScene = new Scene(layout, 800, 400);
 		primaryStage.setScene(inviteScene);
 		primaryStage.setTitle("Invite Page");
 	}

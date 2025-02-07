@@ -32,6 +32,8 @@ public class AdminHomePage {
 		// label to display the welcome message for the admin
 		Label adminLabel = new Label("Hello, Admin!");
 		Button userButton = new Button("Show Users");
+		Button logoutButton = new Button("Logout");
+		Button inviteButton = new Button("Invite");
 
 		userButton.setOnAction(a -> {
 			try {
@@ -41,7 +43,6 @@ public class AdminHomePage {
 			}
 		});
 
-		Button inviteButton = new Button("Invite");
 		inviteButton.setOnAction(_ -> {
 			try {
 				new InvitationPage().show(primaryStage, user);
@@ -50,9 +51,17 @@ public class AdminHomePage {
 			}
 		});
 
+		logoutButton.setOnAction(a -> {
+			try {
+				new UserLoginPage().show(primaryStage);
+			} catch (SQLException ex) {
+				throw new RuntimeException(ex);
+			}
+		});
+
 		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-		layout.getChildren().addAll(adminLabel, userButton, inviteButton);
+		layout.getChildren().addAll(adminLabel, userButton, inviteButton, logoutButton);
 		Scene adminScene = new Scene(layout, 800, 400);
 
 		// Set the scene to primary stage
