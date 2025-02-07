@@ -62,7 +62,7 @@ public class SetupAccountPage {
 
             try {
                 // Check if the user already exists
-                if (context.users().doesUserExist(userName)) {
+                if (!context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
                     if (context.invites().checkInviteCode(code)) {

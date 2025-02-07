@@ -12,6 +12,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import src.application.AppContext;
 import src.database.model.entities.Invite;
+import src.database.model.entities.User;
 import src.utils.permissions.Roles;
 import src.utils.permissions.RolesUtil;
 
@@ -32,7 +33,7 @@ public class InvitationPage {
 		this.context = AppContext.getInstance();
 	}
 
-	public void show(Stage primaryStage) {
+	public void show(Stage primaryStage, User user) {
 		VBox layout = new VBox();
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
 
@@ -77,12 +78,11 @@ public class InvitationPage {
 
 			if (!roleList.isEmpty()) {
 				// Generate the invitation and set it to the label
-				String code = UUID.randomUUID().toString().substring(0, 4);
-				Invite invite = new Invite(code, 1);
+				Invite invite = new Invite(user.getId());
 				int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
 				invite.setRoles(roleInt);
 				context.invites().create(invite);
-				inviteCodeLabel.setText(code);
+				inviteCodeLabel.setText(invite.getCode());
 
 				// Show copyCodeToClipboard button or reset its text if it is already shown
 				if (copyCodeToClipboard.getParent() == null) {
