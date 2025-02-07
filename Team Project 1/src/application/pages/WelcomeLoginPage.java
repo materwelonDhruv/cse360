@@ -49,7 +49,7 @@ public class WelcomeLoginPage {
 			if (roles[0] == Roles.ADMIN) {
 				continueButton.setOnAction(e -> {
 					try {
-						new AdminHomePage().show(primaryStage);
+						new AdminHomePage().show(primaryStage, user);
 					} catch (SQLException ex) {
 						throw new RuntimeException(ex);
 					}
