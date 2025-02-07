@@ -56,10 +56,12 @@ public class RolesUtil {
 
     /**
      * Checks if the given Roles array contains the specified role.
+     * @param roles array of Roles user has
+     * @param requiredRole role to check for
      */
-    public static boolean hasRole(Roles[] roles, Roles role) {
+    public static boolean hasRole(Roles[] roles, Roles requiredRole) {
         for (Roles r : roles) {
-            if (r == role) {
+            if (r == requiredRole) {
                 return true;
             }
         }
@@ -68,6 +70,8 @@ public class RolesUtil {
 
     /**
      * Checks if the given Roles array contains all the specified roles.
+     * @param roles array of Roles user has
+     * @param requiredRoles array of Roles to check for
      */
     public static boolean hasAllRoles(Roles[] roles, Roles[] requiredRoles) {
         for (Roles r : requiredRoles) {
@@ -80,6 +84,8 @@ public class RolesUtil {
 
     /**
      * Checks if the given Roles array contains any of the specified roles.
+     * @param roles array of Roles user has
+     * @param requiredRoles array of Roles to check for
      */
     public static boolean hasAnyRole(Roles[] roles, Roles[] requiredRoles) {
         for (Roles r : requiredRoles) {
