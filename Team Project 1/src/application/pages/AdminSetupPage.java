@@ -38,14 +38,22 @@ public class AdminSetupPage {
         emailField.setPromptText("Enter Email");
         emailField.setMaxWidth(250);
 
+        TextField firstNameField = new TextField();
+        firstNameField.setPromptText("Enter Admin first name");
+        firstNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        lastNameField.setPromptText("Enter Admin userName");
+        lastNameField.setMaxWidth(250);
+
         Button setupButton = new Button("Setup");
 
         setupButton.setOnAction(_ -> {
             // Retrieve user input
             String userName = userNameField.getText();
             String password = passwordField.getText();
-            String firstName = "Admin";
-            String lastName = "Admin";
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
             String email = emailField.getText();
 
             try {
