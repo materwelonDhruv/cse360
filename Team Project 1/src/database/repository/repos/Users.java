@@ -53,7 +53,8 @@ public class Users extends Repository<User> {
     public List<User> getAll() {
         String sql = "SELECT * FROM Users";
         return queryForList(sql,
-                pstmt -> {},
+                pstmt -> {
+                },
                 this::build
         );
     }
@@ -79,15 +80,14 @@ public class Users extends Repository<User> {
 
         String sql = "UPDATE Users SET userName = ?, "
                 + "firstName = ?, lastName = ?, "
-                + "password = ?, email = ?, roles = ? WHERE userID = ?";
+                + "email = ?, roles = ? WHERE userID = ?";
         int rows = executeUpdate(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
             pstmt.setString(2, user.getFirstName());
             pstmt.setString(3, user.getLastName());
-            pstmt.setString(4, user.getPassword());
-            pstmt.setString(5, user.getEmail());
-            pstmt.setInt(6, user.getRoles());
-            pstmt.setInt(7, user.getId());
+            pstmt.setString(4, user.getEmail());
+            pstmt.setInt(5, user.getRoles());
+            pstmt.setInt(6, user.getId());
         });
         return rows > 0 ? user : null;
     }
