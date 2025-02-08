@@ -70,6 +70,16 @@ public class UserHomePage {
 			}
 		});
 
+		//Reset password button for user
+		Button resetPasswordPageButton = new Button("Reset Password");
+		resetPasswordPageButton.setOnAction(e -> {
+		try{
+			new ResetPasswordPage().show(primaryStage,user);
+		} catch(SQLException ex){
+			throw new RuntimeException(ex);
+		}
+		});
+
 		//logout button to Log Out from the account
 		Button logoutButton = new Button("Logout");
 		logoutButton.setOnAction(e -> {
@@ -79,11 +89,11 @@ public class UserHomePage {
                 throw new RuntimeException(ex);
             }
         });
-		layout.getChildren().addAll(userLabel, roleLabel, logoutButton);
+		layout.getChildren().addAll(userLabel,resetPasswordPageButton, roleLabel, logoutButton);
 
 		//Don't show the menubar and goButton if only 1 role is assigned
 		if (allRoles.length > 1) {
-			layout.getChildren().addAll(roleMenu, goButton);
+			layout.getChildren().addAll(roleMenu,resetPasswordPageButton, goButton);
 		}
 
 		Scene userScene = new Scene(layout, 800, 400);
