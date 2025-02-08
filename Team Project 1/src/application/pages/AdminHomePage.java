@@ -37,7 +37,7 @@ public class AdminHomePage {
 
 		userButton.setOnAction(a -> {
 			try {
-				new AdminUserPage().show(primaryStage);
+				new AdminUserPage().show(primaryStage, user);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}

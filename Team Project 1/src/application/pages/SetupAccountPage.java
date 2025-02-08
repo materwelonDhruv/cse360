@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import src.database.model.entities.Invite;
 import src.database.model.entities.User;
 import src.utils.Helpers;
+import src.validators.EmailValidator;
 import src.validators.PasswordValidator;
 import src.validators.UsernameValidator;
 
@@ -47,6 +48,14 @@ public class SetupAccountPage {
         emailField.setPromptText("Enter Email");
         emailField.setMaxWidth(250);
 
+        TextField firstNameField = new TextField();
+        firstNameField.setPromptText("Enter Admin first name");
+        firstNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        lastNameField.setPromptText("Enter Admin userName");
+        lastNameField.setMaxWidth(250);
+
         TextField inviteCodeField = new TextField();
         inviteCodeField.setPromptText("Enter InvitationCode");
         inviteCodeField.setMaxWidth(250);
@@ -60,13 +69,34 @@ public class SetupAccountPage {
         setupButton.setOnAction(_ -> {
             // Retrieve user input
             String userName = userNameField.getText();
-            String firstName = "User";
-            String lastName = "User";
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
             String password = passwordField.getText();
             String email = emailField.getText();
             String code = inviteCodeField.getText();
 
             try {
+                //validate username
+                String UsernameCheck = UsernameValidator.validateUserName(userName);
+                if(!UsernameCheck.isEmpty()) {
+                    errorLabel.setText(UsernameCheck);
+                    return;
+                }
+
+                //validate password
+                String passwordCheck = PasswordValidator.evaluatePassword(password);
+                if(!passwordCheck.isEmpty()) {
+                    errorLabel.setText(passwordCheck);
+                    return;
+                }
+
+                //validate email
+                String emailCheck = EmailValidator.validateEmail(email);
+                if(!emailCheck.isEmpty()) {
+                    errorLabel.setText(emailCheck);
+                    return;
+                }
+
                 // Check if the user already exists
                 if (!context.users().doesUserExist(userName)) {
 
