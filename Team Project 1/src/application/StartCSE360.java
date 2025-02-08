@@ -1,14 +1,15 @@
 package src.application;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import src.application.pages.FirstPage;
+import src.application.pages.SetupLoginSelectionPage;
+
 import java.sql.SQLException;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-import src.database.DatabaseHelper;
-
 public class StartCSE360 extends Application {
-
-    private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 
     public static void main(String[] args) {
         launch(args);
@@ -17,16 +18,27 @@ public class StartCSE360 extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            databaseHelper.connectToDatabase(); // Connect to the database
-            if (databaseHelper.isDatabaseEmpty()) {
+            // Force the AppContext to initialize everything
+            AppContext context = AppContext.getInstance();
 
-                new FirstPage(databaseHelper).show(primaryStage);
+            VBox root = new VBox();
+            Scene scene = new Scene(root, 400, 300);
+
+            primaryStage.setTitle("My JavaFX App");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+            // Example: check if any users exist
+            boolean isEmpty = context.users().getAll().isEmpty();
+
+            if (isEmpty) {
+                new FirstPage().show(primaryStage);
             } else {
-                new SetupLoginSelectionPage(databaseHelper).show(primaryStage);
+                new SetupLoginSelectionPage().show(primaryStage);
             }
+
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
-
 }
