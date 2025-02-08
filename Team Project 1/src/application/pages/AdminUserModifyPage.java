@@ -2,20 +2,20 @@ package src.application.pages;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import src.application.AppContext;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.application.AppContext;
 import src.database.model.entities.User;
 import src.utils.permissions.Roles;
 import src.utils.permissions.RolesUtil;
 
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
 
-import static src.utils.permissions.RolesUtil.hasRole;
+import static src.utils.permissions.RolesUtil.*;
 
 /**
  * AdminPage class represents the user interface for the admin user.
@@ -29,16 +29,18 @@ public class AdminUserModifyPage {
      */
     private final User user;
     private final AppContext context;
+
     public AdminUserModifyPage(User user) throws SQLException {
         this.context = AppContext.getInstance();
         this.user = user;
     }
-    public void show(Stage primaryStage) {
+
+    public void show(Stage primaryStage, User currentUser) {
         VBox layout = new VBox();
 
         layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-        AtomicInteger roleInt = new AtomicInteger(user.getRoles());
-        Roles[] roles = RolesUtil.intToRoles(roleInt.get());
+        int roleInt = user.getRoles();
+        Roles[] roles = RolesUtil.intToRoles(roleInt);
         //Label to display the user information
         Label userNameLabel = new Label("Name: " + user.getUserName());
         //Instantiate and declare Checkboxes
@@ -52,7 +54,7 @@ public class AdminUserModifyPage {
         Button userButton = new Button("Delete");
         //Instantiate and declare Alert confirmation boxes
         Alert confirm = new Alert(AlertType.CONFIRMATION, "Are you sure you want to delete User " + user.getUserName() + "?");
-        Alert adminError = new Alert(AlertType.CONFIRMATION, "You cannot remove this admin!");
+        Alert adminError = new Alert(AlertType.ERROR, "You cannot remove this admin!");
         Button backButton = new Button("Back");
         // Set backButton to redirect to home page
         backButton.setOnAction(a -> {
@@ -62,56 +64,71 @@ public class AdminUserModifyPage {
                 throw new RuntimeException(e);
             }
         });
+        //set initial checkbox values
         userRoleAdmin.selectedProperty().set(hasRole(roles, Roles.ADMIN));
+        userRoleReviewer.selectedProperty().set(hasRole(roles, Roles.INSTRUCTOR));
+        userRoleStudent.selectedProperty().set(hasRole(roles, Roles.STUDENT));
+        userRoleReviewer.selectedProperty().set(hasRole(roles, Roles.REVIEWER));
+        userRoleStaff.selectedProperty().set(hasRole(roles, Roles.STAFF));
         //Sets the User Checkbox actions(https://stackoverflow.com/questions/13726824/javafx-event-triggered-when-selecting-a-check-box)
-        userRoleUser.selectedProperty().set(hasRole(roles, Roles.USER));
-        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>(){
+        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
-                if(event.getSource() instanceof CheckBox){
-                    CheckBox checkBox = (CheckBox) event.getSource();
-                    //Swap User role from
-                    if("User".equals(checkBox.getText())){
-                        if(hasRole(roles, Roles.USER)){
+                if (event.getSource() instanceof CheckBox checkBox) {
+                    if (roles.length == 2) {
 
+                    }
+                    //Remove/add roles
+                    if ("Admin".equals(checkBox.getText())) {
+                        if (!checkBox.isSelected()) {
+                            adminRoleRemovalConfirm(primaryStage, currentUser);
+                            user.setRoles(removeRole(roleInt, Roles.ADMIN));
+                        } else {
+                            user.setRoles(addRole(roleInt, Roles.ADMIN));
                         }
-                    } else if ("Admin".equals(checkBox.getText())) {
-                        if(hasRole(roles, Roles.ADMIN)){
-
+                    } else if ("Instructor".equals(checkBox.getText())) {
+                        if (!checkBox.isSelected()) {
+                            user.setRoles(removeRole(roleInt, Roles.INSTRUCTOR));
+                        } else {
+                            user.setRoles(addRole(roleInt, Roles.INSTRUCTOR));
                         }
-                    }else if ("Instructor".equals(checkBox.getText())) {
-                        if(hasRole(roles, Roles.INSTRUCTOR)){
-
+                    } else if ("Student".equals(checkBox.getText())) {
+                        if (!checkBox.isSelected()) {
+                            user.setRoles(removeRole(roleInt, Roles.STUDENT));
+                        } else {
+                            user.setRoles(addRole(roleInt, Roles.STUDENT));
                         }
-                    }else if ("Student".equals(checkBox.getText())) {
-                        if(hasRole(roles, Roles.STUDENT)){
-
+                    } else if ("Reviewer".equals(checkBox.getText())) {
+                        if (!checkBox.isSelected()) {
+                            user.setRoles(removeRole(roleInt, Roles.REVIEWER));
+                        } else {
+                            user.setRoles(addRole(roleInt, Roles.REVIEWER));
                         }
-                    }else if ("Reviewer".equals(checkBox.getText())) {
-                        if(hasRole(roles, Roles.REVIEWER)){
-
-                        }
-                    }else if ("Staff".equals(checkBox.getText())) {
-                        if(hasRole(roles, Roles.STAFF)){
-
+                    } else if ("Staff".equals(checkBox.getText())) {
+                        if (!checkBox.isSelected()) {
+                            user.setRoles(removeRole(roleInt, Roles.STAFF));
+                        } else {
+                            user.setRoles(addRole(roleInt, Roles.STAFF));
                         }
                     }
+                    context.users().update(user);
                 }
             }
         };
-        //Sets the AdminCheckBox actions
 
+        //Sets the Admin Checkbox actions
+        userRoleAdmin.setOnAction(event);
         //Sets the Instructor Checkbox actions
-
+        userRoleInstructor.setOnAction(event);
         //Sets the Student Checkbox actions
-
+        userRoleStudent.setOnAction(event);
         //Sets the Reviewer Checkbox actions
-
+        userRoleReviewer.setOnAction(event);
         //Sets the Staff Checkbox actions
-
+        userRoleStaff.setOnAction(event);
         // Set userButton to delete user with confirmation box
         userButton.setOnAction(a -> {
             confirm.showAndWait().ifPresent(response -> {
-                if(response == ButtonType.OK) {
+                if (response == ButtonType.OK) {
                     //Delete user if they don't have admin role
                     if (!hasRole(roles, Roles.ADMIN)) {
                         context.users().delete(user.getId());
@@ -125,18 +142,57 @@ public class AdminUserModifyPage {
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
-                }else if(response == ButtonType.CANCEL) {
+                } else if (response == ButtonType.CANCEL) {
                     confirm.close();
                 }
             });
         });
         userNameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        layout.getChildren().addAll(userNameLabel, userButton, userRoleUser, userRoleAdmin, backButton);
+        layout.getChildren().addAll(userNameLabel, userButton, userRoleAdmin, userRoleStudent, userRoleInstructor, userRoleReviewer, userRoleStaff, backButton);
         Scene adminScene = new Scene(layout, 800, 400);
 
         // Set the scene to primary stage
         primaryStage.setScene(adminScene);
         primaryStage.setTitle("Admin Page");
+    }
+
+    public void adminRoleRemovalConfirm(Stage primaryStage, User currentUser) {
+        int roleInt = user.getRoles();
+        ArrayList<User> list = (ArrayList<User>) context.users().getAll();
+        //count all admins in the system
+        int count = (int) list.stream().filter(value -> hasRole(value.getRoles(), Roles.ADMIN)).count();
+        //declare and instantiate  Alerts for later use
+        Alert adminConfirm = new Alert(AlertType.CONFIRMATION, "Are you sure you want to delete admin from User " + user.getUserName() + "?");
+        Alert adminError = new Alert(AlertType.ERROR, "You cannot remove the last admin!");
+
+        adminConfirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                //Delete role if they aren't the last admin
+                if (count > 1) {
+                    user.setRoles(removeRole(roleInt, Roles.ADMIN));
+                    context.users().update(user);
+                    if (currentUser.getId() == user.getId()) {
+                        new UserHomePage().show(primaryStage, user, Roles.USER);
+                    }
+                }
+                //if
+                else {
+                    adminError.show();
+                }
+            } else if (response == ButtonType.CANCEL) {
+                adminConfirm.close();
+            }
+        });
+    }
+
+    public void oneRoleRemoval(Stage primaryStage, User currentUser) {
+        int roleInt = user.getRoles();
+        ArrayList<User> list = (ArrayList<User>) context.users().getAll();
+        //count all admins in the system
+        int count = (int) list.stream().filter(value -> hasRole(value.getRoles(), Roles.ADMIN)).count();
+        //declare and instantiate  Alerts for later use
+        Alert adminError = new Alert(AlertType.ERROR, "You cannot remove the last role from this user!");
+        adminError.show();
     }
 }

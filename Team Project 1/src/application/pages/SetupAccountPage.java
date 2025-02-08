@@ -49,11 +49,11 @@ public class SetupAccountPage {
         emailField.setMaxWidth(250);
 
         TextField firstNameField = new TextField();
-        firstNameField.setPromptText("Enter Admin first name");
+        firstNameField.setPromptText("Enter first name");
         firstNameField.setMaxWidth(250);
 
         TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Enter Admin userName");
+        lastNameField.setPromptText("Enter last name");
         lastNameField.setMaxWidth(250);
 
         TextField inviteCodeField = new TextField();
@@ -132,7 +132,7 @@ public class SetupAccountPage {
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        layout.getChildren().addAll(userNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
+        layout.getChildren().addAll(userNameField,firstNameField,lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
 
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Account Setup");
