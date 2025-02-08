@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import src.database.model.entities.User;
+import src.database.repository.repos.OneTimePasswords;
 
 import java.sql.SQLException;
 
@@ -40,29 +41,42 @@ public class UserLoginPage {
         Button loginButton = new Button("Login");
 
         loginButton.setOnAction(_ -> {
-            // Retrieve user inputs
+            // Retrieve user's username and password
             String userName = userNameField.getText();
             String password = passwordField.getText();
             try {
-                boolean userValid = context.users().validateLogin(userName, password);
-                if (userValid) {
-                    User user = context.users().getByUsername(userName);
-                    if (user != null) {
+                User user = context.users().getByUsername(userName);
+                if (user == null) {
+                    errorLabel.setText("Invalid User!");
+                    return;
+                }
 
-                        // Open the welcome page
+                // Check if retrieved password matches stored password
+                boolean userValid = context.users().validateLogin(userName, password);
+                if (!userValid) {
+                    // If password does not match, try one-time password
+                    OneTimePasswords otpRepo = context.oneTimePasswords();
+                    boolean otpValid = otpRepo.check(user.getId(), password);
+                    if (otpValid) {
+                        // If one-time password is valid, bring user to welcome page
                         WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
                         welcomeLoginPage.show(primaryStage, user);
+                        return;
                     } else {
-                        errorLabel.setText("Error retrieving user details.");
+                        //If one-time password does not match, tell user either the password or one-time password is wrong
+                        errorLabel.setText("Invalid Password or OTP!");
+                        return;
                     }
-
-                } else {
-                    // Display an error if the login fails
-                    errorLabel.setText("Invalid User or Password!");
                 }
+
+                // If retrieved password matches stored user password, bring user to welcome page
+                WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
+                welcomeLoginPage.show(primaryStage, user);
+
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();
+
             }
         });
 

@@ -3,8 +3,6 @@ package src.database.model.entities;
 import src.database.model.BaseEntity;
 
 public class User extends BaseEntity {
-    private String firstName;
-    private String lastName;
     private String userName;
     private String firstName;
     private String lastName;
@@ -24,16 +22,7 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
     public String getUserName() {
-
         return userName;
     }
 
@@ -81,9 +70,4 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
-    public void setFirstName(String firstName) {this.firstName = firstName;}
-
-    public void setLastName(String lastName) {this.lastName = lastName;}
-
 }
-
