@@ -1,9 +1,9 @@
 package src.application;
 
 import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import src.application.pages.FirstPage;
 import src.application.pages.SetupLoginSelectionPage;
 
@@ -20,9 +20,6 @@ public class StartCSE360 extends Application {
         try {
             // Force the AppContext to initialize everything
             AppContext context = AppContext.getInstance();
-
-            // Delete all expired invitations
-            context.invites().deleteExpired();
 
             VBox root = new VBox();
             Scene scene = new Scene(root, 400, 300);

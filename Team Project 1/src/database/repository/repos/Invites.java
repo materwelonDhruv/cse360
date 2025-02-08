@@ -89,11 +89,6 @@ public class Invites extends Repository<Invite> {
         executeUpdate(sql, pstmt -> pstmt.setInt(1, id));
     }
 
-    public void deleteExpired() {
-        String sql = "DELETE FROM Invites WHERE ? - createdAt > 86400";
-        executeUpdate(sql, pstmt -> pstmt.setInt(1, Helpers.getCurrentTimeInSeconds()));
-    }
-
     /**
      * Find an invitation by its code.
      *
@@ -113,13 +108,15 @@ public class Invites extends Repository<Invite> {
      *
      * @param code the invite code to check
      * @return the invite, or null if not found
-     * TODO: This method needs to delete the invite if found or is expired. It should also return boolean and not the invite.
      */
-    public Invite findInvite(String code) {
-        String sql = "SELECT * FROM Invites WHERE code = ?";
+    public boolean findInvite(String code) {
+        String sql = "SELECT * FROM Invites WHERE code = ? AND ? - createdAt < 86400";
         return queryForObject(sql,
-                pstmt -> pstmt.setString(1, code),
-                this::build
-        );
+                pstmt -> {
+                    pstmt.setString(1, code);
+                    pstmt.setLong(2, Helpers.getCurrentTimeInSeconds());
+                },
+                rs -> rs.getInt(1)
+        ) != null;
     }
 }
