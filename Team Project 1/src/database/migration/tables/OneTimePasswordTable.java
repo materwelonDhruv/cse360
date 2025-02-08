@@ -2,6 +2,9 @@ package src.database.migration.tables;
 
 import src.database.migration.BaseTable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class OneTimePasswordTable extends BaseTable {
 
     @Override
@@ -10,19 +13,21 @@ public class OneTimePasswordTable extends BaseTable {
     }
 
     @Override
-    public String getCreateTableSQL() {
-        return "CREATE TABLE IF NOT EXISTS OneTimePasswords ("
-                + " otpID INT AUTO_INCREMENT PRIMARY KEY, "
-                + " otpValue VARCHAR(255) NOT NULL, "
-                + " creatorID INT NOT NULL, "
-                + " targetID INT NOT NULL, "
-                + " isUsed BOOLEAN DEFAULT FALSE, "
-                + " CONSTRAINT fk_creatorID FOREIGN KEY (creatorID) "
-                + "     REFERENCES Users(userID) "
-                + "     ON DELETE CASCADE, "
-                + " CONSTRAINT fk_targetID FOREIGN KEY (targetID) "
-                + "     REFERENCES Users(userID) "
-                + "     ON DELETE CASCADE "
-                + ")";
+    public Map<String, String> getExpectedColumns() {
+        Map<String, String> cols = new LinkedHashMap<>();
+        cols.put("otpID",    "INT AUTO_INCREMENT PRIMARY KEY");
+        cols.put("otpValue", "VARCHAR(255) NOT NULL");
+        cols.put("creatorID","INT NOT NULL");
+        cols.put("targetID", "INT NOT NULL");
+        cols.put("isUsed",   "BOOLEAN DEFAULT FALSE");
+        return cols;
+    }
+
+    @Override
+    public String[] getInlineConstraints() {
+        return new String[] {
+                "CONSTRAINT fk_creatorID FOREIGN KEY (creatorID) REFERENCES Users(userID) ON DELETE CASCADE",
+                "CONSTRAINT fk_targetID FOREIGN KEY (targetID)  REFERENCES Users(userID) ON DELETE CASCADE"
+        };
     }
 }

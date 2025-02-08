@@ -8,14 +8,18 @@ public class User extends BaseEntity {
     private String firstName;
     private String lastName;
     private String userName;
+    private String firstName;
+    private String lastName;
     private String password; // stores the hashed password
     private String email;
     private int roles; // new bit field integer representing user roles
 
-    //public User() {}
+    public User() {}
 
-    public User(String userName, String password, String email, int roles) {
+    public User(String userName, String firstName, String lastName, String password, String email, int roles) {
         this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password; // plain text initially; repository will hash it
         this.email = email;
         this.roles = roles;
@@ -39,6 +43,22 @@ public class User extends BaseEntity {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPassword() {

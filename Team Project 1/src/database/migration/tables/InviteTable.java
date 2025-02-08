@@ -2,6 +2,9 @@ package src.database.migration.tables;
 
 import src.database.migration.BaseTable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class InviteTable extends BaseTable {
 
     @Override
@@ -10,16 +13,20 @@ public class InviteTable extends BaseTable {
     }
 
     @Override
-    public String getCreateTableSQL() {
-        return "CREATE TABLE IF NOT EXISTS Invites ("
-                + " inviteID INT AUTO_INCREMENT PRIMARY KEY, "
-                + " code VARCHAR(50) NOT NULL UNIQUE, "
-                + " userID INT, "  // FK referencing the user who created this invite
-                + " roles INT NOT NULL DEFAULT 0, "       // roles bit field
-                + " createdAt BIGINT NOT NULL, "           // Unix timestamp (in seconds)
-                + " CONSTRAINT fk_userID FOREIGN KEY (userID) "
-                + "     REFERENCES Users(userID) "
-                + "     ON DELETE CASCADE"
-                + ")";
+    public Map<String, String> getExpectedColumns() {
+        Map<String, String> cols = new LinkedHashMap<>();
+        cols.put("inviteID",  "INT AUTO_INCREMENT PRIMARY KEY");
+        cols.put("code",      "VARCHAR(50) NOT NULL UNIQUE");
+        cols.put("userID",    "INT");
+        cols.put("roles",     "INT NOT NULL DEFAULT 0");
+        cols.put("createdAt", "BIGINT NOT NULL");
+        return cols;
+    }
+
+    @Override
+    public String[] getInlineConstraints() {
+        return new String[] {
+                "CONSTRAINT fk_userID FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE"
+        };
     }
 }

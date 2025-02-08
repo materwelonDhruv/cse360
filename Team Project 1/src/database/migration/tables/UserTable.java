@@ -2,6 +2,9 @@ package src.database.migration.tables;
 
 import src.database.migration.BaseTable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class UserTable extends BaseTable {
 
     @Override
@@ -10,14 +13,15 @@ public class UserTable extends BaseTable {
     }
 
     @Override
-    public String getCreateTableSQL() {
-        // Note: The new "roles" column stores an integer bit field (default 0)
-        return "CREATE TABLE IF NOT EXISTS Users ("
-                + " userID INT AUTO_INCREMENT PRIMARY KEY, "
-                + " userName VARCHAR(255) NOT NULL UNIQUE, "
-                + " password VARCHAR(255) NOT NULL, "
-                + " email VARCHAR(255), "
-                + " roles INT NOT NULL DEFAULT 0 "  // roles bit field
-                + ")";
+    public Map<String, String> getExpectedColumns() {
+        Map<String, String> cols = new LinkedHashMap<>();
+        cols.put("userID",    "INT AUTO_INCREMENT PRIMARY KEY");
+        cols.put("userName",  "VARCHAR(255) NOT NULL UNIQUE");
+        cols.put("firstName", "VARCHAR(255)");
+        cols.put("lastName",  "VARCHAR(255)");
+        cols.put("password",  "VARCHAR(255) NOT NULL");
+        cols.put("email",     "VARCHAR(255)");
+        cols.put("roles",     "INT NOT NULL DEFAULT 0");
+        return cols;
     }
 }

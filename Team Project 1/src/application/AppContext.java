@@ -17,14 +17,18 @@ public class AppContext {
     private final OneTimePasswords otpRepository;
 
     public AppContext() throws SQLException {
-        // 1) Initialize the DB connection
+        // 1) Initialize the DB connection and schema manager
         DatabaseConnection.initialize();
+        SchemaManager schemaManager = new SchemaManager();
         this.connection = DatabaseConnection.getConnection();
 
         // 2) Run any migrations or schema sync if necessary
-        new SchemaManager().syncDatabases(connection);
+        schemaManager.syncTables(connection);
 
-        // 3) Initialize repositories with the connection (injected)
+        // 3) Inspect database tables
+        schemaManager.inspectTables(connection);
+
+        // 4) Initialize repositories with the connection (injected)
         this.userRepository = new Users(connection);
         this.inviteRepository = new Invites(connection);
         this.otpRepository = new OneTimePasswords(connection);

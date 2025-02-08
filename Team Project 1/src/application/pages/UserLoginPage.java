@@ -58,7 +58,7 @@ public class UserLoginPage {
 
                 } else {
                     // Display an error if the login fails
-                    errorLabel.setText("Error logging in");
+                    errorLabel.setText("Invalid User or Password!");
                 }
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());

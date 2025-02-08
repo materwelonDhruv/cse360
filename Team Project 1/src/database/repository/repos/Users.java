@@ -22,12 +22,16 @@ public class Users extends Repository<User> {
         String hashed = PasswordUtil.hashPassword(plain);
         user.setPassword(hashed);
 
-        String sql = "INSERT INTO Users (userName, password, email, roles) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Users "
+                + "(userName, firstName, lastName, password, email, roles) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
-            pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getEmail());
-            pstmt.setInt(4, user.getRoles());// store the roles bit field
+            pstmt.setString(2, user.getFirstName());
+            pstmt.setString(3, user.getLastName());
+            pstmt.setString(4, user.getPassword());
+            pstmt.setString(5, user.getEmail());
+            pstmt.setInt(6, user.getRoles());// store the roles bit field
         });
 
         if (generatedId > 0) {
@@ -56,14 +60,14 @@ public class Users extends Repository<User> {
 
     @Override
     public User build(ResultSet rs) throws SQLException {
-        User u = new User(
-
-        rs.getString("userName"),
-        rs.getString("password"),
-        rs.getString("email"),
-        rs.getInt("roles") // read roles from the new column
-        );
+        User u = new User();
         u.setId(rs.getInt("userID"));
+        u.setUserName(rs.getString("userName"));
+        u.setFirstName(rs.getString("firstName"));
+        u.setLastName(rs.getString("lastName"));
+        u.setPassword(rs.getString("password"));
+        u.setEmail(rs.getString("email"));
+        u.setRoles(rs.getInt("roles")); // read roles from the new column
         return u;
     }
 
@@ -73,13 +77,17 @@ public class Users extends Repository<User> {
         String hashed = PasswordUtil.hashPassword(user.getPassword());
         user.setPassword(hashed);
 
-        String sql = "UPDATE Users SET userName = ?, password = ?, email = ?, roles = ?, inviteUsed = ? WHERE userID = ?";
+        String sql = "UPDATE Users SET userName = ?, "
+                + "firstName = ?, lastName = ?, "
+                + "password = ?, email = ?, roles = ? WHERE userID = ?";
         int rows = executeUpdate(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
-            pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getEmail());
-            pstmt.setInt(4, user.getRoles());
-            pstmt.setInt(6, user.getId());
+            pstmt.setString(2, user.getFirstName());
+            pstmt.setString(3, user.getLastName());
+            pstmt.setString(4, user.getPassword());
+            pstmt.setString(5, user.getEmail());
+            pstmt.setInt(6, user.getRoles());
+            pstmt.setInt(7, user.getId());
         });
         return rows > 0 ? user : null;
     }

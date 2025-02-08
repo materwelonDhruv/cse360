@@ -4,7 +4,7 @@ public class PasswordValidator {
 
     private enum State { START, PROCESSING, DONE }
 
-    private static final String SPECIAL_CHARS = "~`!@#$%^&*()_-+={}[]|:;\"'<>,.?/";
+    private static final String SPECIAL_CHARS = "!@#$%&";
 
     public static String evaluatePassword(String input) {
         if (input == null || input.isEmpty()) {

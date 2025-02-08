@@ -13,22 +13,14 @@ public class RolesUtil {
      * @param rolesInt decimal string representing bitwise roles
      * @return an array of Roles that are set in the given string
      */
-    public static Roles[] parseRoles(int rolesInt) {
+    public static Roles[] intToRoles(int rolesInt) {
         if (rolesInt == 0 || rolesInt < 0) {
-            return new Roles[0];
-        }
-
-        int permissions;
-        try {
-            permissions = rolesInt;
-        } catch (NumberFormatException e) {
-            // If the input cannot be parsed as an int, treat as no roles
             return new Roles[0];
         }
 
         List<Roles> result = new ArrayList<>();
         for (Roles r : Roles.values()) {
-            if ((permissions & r.getBit()) == r.getBit()) {
+            if ((rolesInt & r.getBit()) == r.getBit()) {
                 result.add(r);
             }
         }
@@ -60,12 +52,7 @@ public class RolesUtil {
      * @param requiredRole role to check for
      */
     public static boolean hasRole(Roles[] roles, Roles requiredRole) {
-        for (Roles r : roles) {
-            if (r == requiredRole) {
-                return true;
-            }
-        }
-        return false;
+        return hasRole(rolesToInt(roles), requiredRole);
     }
 
     /**
@@ -75,6 +62,15 @@ public class RolesUtil {
      */
     public static boolean hasRole(Roles role, Roles requiredRole) {
         return role == requiredRole;
+    }
+
+    /**
+     * Checks if the provided roles integer contains the specified role.
+     * @param rolesInt integer representing the combined bitwise roles.
+     * @param requiredRole role to check for.
+     */
+    public static boolean hasRole(int rolesInt, Roles requiredRole) {
+        return (rolesInt & requiredRole.getBit()) == requiredRole.getBit();
     }
 
     /**
@@ -111,5 +107,33 @@ public class RolesUtil {
         String restOfRole = fullCapsRole.substring(1).toLowerCase();
 
         return firstLetter + restOfRole;
+    }
+
+    /**
+     * Add a role to a given integer representing the combined bitwise roles.
+     * @param rolesInt integer representing the combined bitwise roles
+     * @param role role to add
+     * @return integer with the added role
+     */
+    public static int addRole(int rolesInt, Roles role) {
+        if (hasRole(rolesInt, role)) {
+            return rolesInt;
+        }
+
+        return rolesInt | role.getBit();
+    }
+
+    /**
+     * Remove a role from a given integer representing the combined bitwise roles.
+     * @param rolesInt integer representing the combined bitwise roles
+     * @param role role to remove
+     * @return integer with the removed role
+     */
+    public static int removeRole(int rolesInt, Roles role) {
+        if (!hasRole(rolesInt, role)) {
+            return rolesInt;
+        }
+
+        return rolesInt & ~role.getBit();
     }
 }

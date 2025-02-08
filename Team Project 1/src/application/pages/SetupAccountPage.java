@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import src.database.model.entities.Invite;
 import src.database.model.entities.User;
 import src.utils.Helpers;
+import src.validators.EmailValidator;
 import src.validators.PasswordValidator;
 import src.validators.UsernameValidator;
 
@@ -35,14 +36,6 @@ public class SetupAccountPage {
      */
     public void show(Stage primaryStage) {
         // Input fields for userName, password, and invitation code
-        TextField firstNameField = new TextField();
-        firstNameField.setPromptText("Enter first name");
-        firstNameField.setMaxWidth(250);
-
-        TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Enter last name");
-        lastNameField.setMaxWidth(250);
-
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter userName");
         userNameField.setMaxWidth(250);
@@ -54,6 +47,14 @@ public class SetupAccountPage {
         TextField emailField = new TextField();
         emailField.setPromptText("Enter Email");
         emailField.setMaxWidth(250);
+
+        TextField firstNameField = new TextField();
+        firstNameField.setPromptText("Enter first name");
+        firstNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        lastNameField.setPromptText("Enter last name");
+        lastNameField.setMaxWidth(250);
 
         TextField inviteCodeField = new TextField();
         inviteCodeField.setPromptText("Enter InvitationCode");
@@ -67,14 +68,35 @@ public class SetupAccountPage {
 
         setupButton.setOnAction(_ -> {
             // Retrieve user input
+            String userName = userNameField.getText();
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
-            String userName = userNameField.getText();
             String password = passwordField.getText();
             String email = emailField.getText();
             String code = inviteCodeField.getText();
 
             try {
+                //validate username
+                String UsernameCheck = UsernameValidator.validateUserName(userName);
+                if(!UsernameCheck.isEmpty()) {
+                    errorLabel.setText(UsernameCheck);
+                    return;
+                }
+
+                //validate password
+                String passwordCheck = PasswordValidator.evaluatePassword(password);
+                if(!passwordCheck.isEmpty()) {
+                    errorLabel.setText(passwordCheck);
+                    return;
+                }
+
+                //validate email
+                String emailCheck = EmailValidator.validateEmail(email);
+                if(!emailCheck.isEmpty()) {
+                    errorLabel.setText(emailCheck);
+                    return;
+                }
+
                 // Check if the user already exists
                 if (!context.users().doesUserExist(userName)) {
 
@@ -87,7 +109,7 @@ public class SetupAccountPage {
                         // Check if the invite is less than a day old
                         if (Helpers.getCurrentTimeInSeconds() - invite.getCreatedAt() < 86400) {
                             // Create a new user and register them in the database
-                            User user = new User(userName, password, email, invite.getRoles());
+                            User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
                             context.users().create(user);
 
                             // Navigate to the Welcome Login Page
@@ -110,7 +132,7 @@ public class SetupAccountPage {
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        layout.getChildren().addAll(firstNameField, lastNameField,emailField, userNameField, passwordField, inviteCodeField, setupButton, errorLabel);
+        layout.getChildren().addAll(userNameField,firstNameField,lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
 
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Account Setup");

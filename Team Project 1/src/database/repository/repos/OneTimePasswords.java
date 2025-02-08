@@ -4,8 +4,8 @@ import src.database.model.entities.OneTimePassword;
 import src.database.repository.Repository;
 import src.utils.PasswordUtil;
 
-import java.sql.ResultSet;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -48,7 +48,8 @@ public class OneTimePasswords extends Repository<OneTimePassword> {
     public List<OneTimePassword> getAll() {
         String sql = "SELECT * FROM OneTimePasswords";
         return queryForList(sql,
-                pstmt -> {}, // no parameters
+                pstmt -> {
+                }, // no parameters
                 this::build
         );
     }
@@ -84,31 +85,41 @@ public class OneTimePasswords extends Repository<OneTimePassword> {
     }
 
     /**
-     * Checks if the provided OTP is valid for the given otpID.
+     * Checks if the provided OTP is valid for the given targetID.
      * <pre>
-     * - Only works if the OTP is not already used.
-     * - If verification succeeds, marks it as used and returns true.
+     * - Selects all OTPs where targetID = ? and isUsed = FALSE.
+     * - For each, if PasswordUtil.verifyPassword(stored, provided) returns true,
+     *   it marks that OTP as used (UPDATE) and returns true.
      * - Otherwise, returns false.
      * </pre>
      */
-    public boolean check(int otpId, String providedOtp) {
-        String sql = "SELECT otpValue, isUsed FROM OneTimePasswords WHERE otpID = ?";
-        Boolean result = queryForObject(sql,
-                pstmt -> pstmt.setInt(1, otpId),
-                rs -> {
-                    if (rs.getBoolean("isUsed")) {
-                        return false;
-                    }
-                    String storedHash = rs.getString("otpValue");
-                    if (PasswordUtil.verifyPassword(storedHash, providedOtp)) {
-                        // Mark as used
-                        String updateSql = "UPDATE OneTimePasswords SET isUsed = TRUE WHERE otpID = ?";
-                        int rows = executeUpdate(updateSql, pstmt2 -> pstmt2.setInt(1, otpId));
-                        return rows > 0;
-                    }
-                    return false;
-                }
+    public boolean check(int targetId, String providedOtp) {
+        String sql = "SELECT otpID, otpValue FROM OneTimePasswords WHERE targetID = ? AND isUsed = FALSE";
+
+        // Helper class to store OTP records.
+        class OTPRecord {
+            final int otpID;
+            final String otpValue;
+
+            OTPRecord(int id, String value) {
+                this.otpID = id;
+                this.otpValue = value;
+            }
+        }
+        // Query for all OTP records for the target.
+        List<OTPRecord> otpRecords = queryForList(sql,
+                pstmt -> pstmt.setInt(1, targetId),
+                rs -> new OTPRecord(rs.getInt("otpID"), rs.getString("otpValue"))
         );
-        return result != null && result;
+        for (OTPRecord record : otpRecords) {
+            if (PasswordUtil.verifyPassword(record.otpValue, providedOtp)) {
+                // Mark this OTP as used
+                String updateSql = "UPDATE OneTimePasswords SET isUsed = TRUE WHERE otpID = ?";
+                int rows = executeUpdate(updateSql, pstmt -> pstmt.setInt(1, record.otpID));
+                return rows > 0;
+            }
+        }
+        return false;
     }
+
 }

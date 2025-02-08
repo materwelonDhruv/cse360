@@ -26,14 +26,6 @@ public class AdminSetupPage {
 
     public void show(Stage primaryStage) {
         // Input fields for userName and password
-        TextField firstNameField = new TextField();
-        firstNameField.setPromptText("Enter first name");
-        firstNameField.setMaxWidth(250);
-
-        TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Enter last name");
-        lastNameField.setMaxWidth(250);
-
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter Admin userName");
         userNameField.setMaxWidth(250);
@@ -46,19 +38,27 @@ public class AdminSetupPage {
         emailField.setPromptText("Enter Email");
         emailField.setMaxWidth(250);
 
+        TextField firstNameField = new TextField();
+        firstNameField.setPromptText("Enter Admin first name");
+        firstNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        lastNameField.setPromptText("Enter Admin userName");
+        lastNameField.setMaxWidth(250);
+
         Button setupButton = new Button("Setup");
 
         setupButton.setOnAction(_ -> {
             // Retrieve user input
-            String firstName = firstNameField.getText();
-            String lastName = lastNameField.getText();
             String userName = userNameField.getText();
             String password = passwordField.getText();
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
             String email = emailField.getText();
 
             try {
                 // Create a new User object with admin role and register in the database
-                User user = new User(userName, password, email, Roles.ADMIN.getBit());
+                User user = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
                 context.users().create(user);
                 System.out.println("Administrator setup completed.");
 
@@ -70,7 +70,7 @@ public class AdminSetupPage {
             }
         });
 
-        VBox layout = new VBox(10,firstNameField,lastNameField,emailField, userNameField, passwordField, setupButton);
+        VBox layout = new VBox(10, userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
         primaryStage.setScene(new Scene(layout, 800, 400));

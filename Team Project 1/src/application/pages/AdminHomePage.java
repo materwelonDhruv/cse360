@@ -25,12 +25,13 @@ public class AdminHomePage {
 		this.context = AppContext.getInstance();
 	}
 	public void show(Stage primaryStage, User user) {
-		VBox layout = new VBox();
+		VBox layout = new VBox(15);
 
-		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+		layout.setStyle("-fx-alignment: center; -fx-padding: 15;");
 
 		// label to display the welcome message for the admin
 		Label adminLabel = new Label("Hello, Admin!");
+
 		Button userButton = new Button("Show Users");
 		Button logoutButton = new Button("Logout");
 		Button inviteButton = new Button("Invite");
