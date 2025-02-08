@@ -109,14 +109,18 @@ public class Invites extends Repository<Invite> {
      * @param code the invite code to check
      * @return the invite, or null if not found
      */
-    public boolean findInvite(String code) {
+    public Invite findInvite(String code) {
         String sql = "SELECT * FROM Invites WHERE code = ? AND ? - createdAt < 86400";
-        return queryForObject(sql,
+
+        Invite invite = queryForObject(sql,
                 pstmt -> {
                     pstmt.setString(1, code);
                     pstmt.setLong(2, Helpers.getCurrentTimeInSeconds());
                 },
-                rs -> rs.getInt(1)
-        ) != null;
+                this::build
+        );
+
+        delete(invite.getId());
+        return invite;
     }
 }

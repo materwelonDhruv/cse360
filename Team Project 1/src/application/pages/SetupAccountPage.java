@@ -10,7 +10,6 @@ import javafx.stage.Stage;
 import src.application.AppContext;
 import src.database.model.entities.Invite;
 import src.database.model.entities.User;
-import src.utils.Helpers;
 import src.validators.EmailValidator;
 import src.validators.PasswordValidator;
 import src.validators.UsernameValidator;
@@ -112,24 +111,16 @@ public class SetupAccountPage {
 
                 // Check if the user already exists
                 if (!context.users().doesUserExist(userName)) {
+                    // Find the invitation code in the database
+                    Invite invite = context.invites().findInvite(code);
 
                     // Validate the invitation code
-                    Invite invite = context.invites().findInvite(code);
                     if (invite != null) {
-                        // delete the invitation from the database
-                        context.invites().delete(invite.getId());
+                        User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
+                        context.users().create(user);
 
-                        // Check if the invite is less than a day old
-                        if (Helpers.getCurrentTimeInSeconds() - invite.getCreatedAt() < 86400) {
-                            // Create a new user and register them in the database
-                            User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
-                            context.users().create(user);
-
-                            // Navigate to the Welcome Login Page
-                            new WelcomeLoginPage().show(primaryStage, user);
-                        } else {
-                            errorLabel.setText("Invitation is expired");
-                        }
+                        // Navigate to the Welcome Login Page
+                        new WelcomeLoginPage().show(primaryStage, user);
                     } else {
                         errorLabel.setText("Invitation code does not exist or is expired");
                     }
