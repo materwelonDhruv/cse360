@@ -20,7 +20,7 @@ import java.sql.SQLException;
 public class UserHomePage {
 
 	public void show(Stage primaryStage, User user, Roles role) {
-		VBox layout = new VBox();
+		VBox layout = new VBox(10);
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
 
 		// Label to display Hello user
