@@ -114,7 +114,7 @@ public class SetupAccountPage {
                 if (!context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
-                    Invite invite = context.invites().getInviteFromCode(code);
+                    Invite invite = context.invites().findInvite(code);
                     if (invite != null) {
                         // delete the invitation from the database
                         context.invites().delete(invite.getId());
