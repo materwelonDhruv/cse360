@@ -18,17 +18,9 @@ public class RolesUtil {
             return new Roles[0];
         }
 
-        int permissions;
-        try {
-            permissions = rolesInt;
-        } catch (NumberFormatException e) {
-            // If the input cannot be parsed as an int, treat as no roles
-            return new Roles[0];
-        }
-
         List<Roles> result = new ArrayList<>();
         for (Roles r : Roles.values()) {
-            if ((permissions & r.getBit()) == r.getBit()) {
+            if ((rolesInt & r.getBit()) == r.getBit()) {
                 result.add(r);
             }
         }
@@ -60,12 +52,7 @@ public class RolesUtil {
      * @param requiredRole role to check for
      */
     public static boolean hasRole(Roles[] roles, Roles requiredRole) {
-        for (Roles r : roles) {
-            if (r == requiredRole) {
-                return true;
-            }
-        }
-        return false;
+        return hasRole(rolesToInt(roles), requiredRole);
     }
 
     /**
@@ -82,7 +69,7 @@ public class RolesUtil {
      * @param rolesInt integer representing the combined bitwise roles.
      * @param requiredRole role to check for.
      */
-    private static boolean hasRole(int rolesInt, Roles requiredRole) {
+    public static boolean hasRole(int rolesInt, Roles requiredRole) {
         return (rolesInt & requiredRole.getBit()) == requiredRole.getBit();
     }
 

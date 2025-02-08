@@ -21,7 +21,7 @@ import src.utils.permissions.Roles;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static src.utils.permissions.RolesUtil.*;
+import static src.utils.permissions.RolesUtil.intToRoles;
 
 public class AdminUserPage {
 	private final AppContext context;
@@ -82,10 +82,10 @@ public class AdminUserPage {
 			public ObservableValue<String> call(TableColumn.CellDataFeatures<User,String> param) {
 				User user = param.getValue();
 				int roles = user.getRoles();
-				Roles[] roleList = intToRoles(roles);
+				Roles[] roleList = parseRoles(roles);
 				String out = "";
                 for (Roles value : roleList) {
-                    out = out.concat(roleName(value));
+                    out = out.concat(value.toString());
                 }
 				return new SimpleStringProperty(out);
 			}
@@ -93,9 +93,9 @@ public class AdminUserPage {
 		TableColumn<User,String> emailCol = new TableColumn<>("email");
 		emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
 		TableColumn<User,String> fnameCol = new TableColumn<>("First Name");
-		fnameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+		//emailCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 		TableColumn<User,String> lnameCol = new TableColumn<>("Last Name");
-		lnameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+		//emailCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         //Load the columns into TableView
         userBox.getColumns().setAll(userNameCol,roleCol,emailCol,fnameCol,lnameCol);
 
