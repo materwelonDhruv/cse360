@@ -3,8 +3,6 @@ package src.database.model.entities;
 import src.database.model.BaseEntity;
 import src.utils.Helpers;
 
-import java.security.SecureRandom;
-
 public class Invite extends BaseEntity {
     private String code;
     private Integer userId; // The user who created the invite
@@ -27,6 +25,7 @@ public class Invite extends BaseEntity {
     public String getCode() {
         return code;
     }
+
     public void setCode(String code) {
         this.code = code;
     }
@@ -34,6 +33,7 @@ public class Invite extends BaseEntity {
     public Integer getUserId() {
         return userId;
     }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -41,6 +41,7 @@ public class Invite extends BaseEntity {
     public int getRoles() {
         return roles;
     }
+
     public void setRoles(int roles) {
         this.roles = roles;
     }

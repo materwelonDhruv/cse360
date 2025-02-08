@@ -1,11 +1,13 @@
 package src.application.pages;
 
-import src.application.AppContext;
-
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import src.application.AppContext;
 import src.database.model.entities.Invite;
 import src.database.model.entities.User;
 import src.utils.Helpers;
@@ -78,21 +80,21 @@ public class SetupAccountPage {
             try {
                 //validate username
                 String UsernameCheck = UsernameValidator.validateUserName(userName);
-                if(!UsernameCheck.isEmpty()) {
+                if (!UsernameCheck.isEmpty()) {
                     errorLabel.setText(UsernameCheck);
                     return;
                 }
 
                 //validate password
                 String passwordCheck = PasswordValidator.evaluatePassword(password);
-                if(!passwordCheck.isEmpty()) {
+                if (!passwordCheck.isEmpty()) {
                     errorLabel.setText(passwordCheck);
                     return;
                 }
 
                 //validate email
                 String emailCheck = EmailValidator.validateEmail(email);
-                if(!emailCheck.isEmpty()) {
+                if (!emailCheck.isEmpty()) {
                     errorLabel.setText(emailCheck);
                     return;
                 }
@@ -101,7 +103,7 @@ public class SetupAccountPage {
                 if (!context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
-                    Invite invite = context.invites().getInviteFromCode(code);
+                    Invite invite = context.invites().findInvite(code);
                     if (invite != null) {
                         // delete the invitation from the database
                         context.invites().delete(invite.getId());
@@ -132,7 +134,7 @@ public class SetupAccountPage {
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        layout.getChildren().addAll(userNameField,firstNameField,lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
+        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
 
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Account Setup");

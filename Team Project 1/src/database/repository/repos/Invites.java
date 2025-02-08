@@ -4,8 +4,8 @@ import src.database.model.entities.Invite;
 import src.database.repository.Repository;
 import src.utils.Helpers;
 
-import java.sql.ResultSet;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
@@ -48,7 +48,8 @@ public class Invites extends Repository<Invite> {
     public List<Invite> getAll() {
         String sql = "SELECT * FROM Invites";
         return queryForList(sql,
-                pstmt -> {},
+                pstmt -> {
+                },
                 this::build
         );
     }
@@ -95,6 +96,7 @@ public class Invites extends Repository<Invite> {
 
     /**
      * Find an invitation by its code.
+     *
      * @param userId the user ID to search for
      * @return the invite id, or null if not found
      */
@@ -107,11 +109,13 @@ public class Invites extends Repository<Invite> {
     }
 
     /**
-     * find an invite from its code
+     * Find an invite from its code
+     *
      * @param code the invite code to check
      * @return the invite, or null if not found
+     * TODO: This method needs to delete the invite if found or is expired. It should also return boolean and not the invite.
      */
-    public Invite getInviteFromCode(String code) {
+    public Invite findInvite(String code) {
         String sql = "SELECT * FROM Invites WHERE code = ?";
         return queryForObject(sql,
                 pstmt -> pstmt.setString(1, code),
