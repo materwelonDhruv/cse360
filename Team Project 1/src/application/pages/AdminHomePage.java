@@ -52,6 +52,14 @@ public class AdminHomePage {
 			}
 		});
 
+		otpButton.setOnAction(_->{
+			try{
+				new SetPassPage().show(primaryStage,user);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
 		logoutButton.setOnAction(a -> {
 			try {
 				new UserLoginPage().show(primaryStage);
