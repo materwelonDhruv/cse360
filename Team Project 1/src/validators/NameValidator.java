@@ -1,17 +1,12 @@
 package src.validators;
 
-public class UsernameValidator {
-    public static String validateUserName(String input) {
+public class NameValidator {
+
+    public static String validateName(String input) {
         if (input == null || input.isEmpty()) {
-            return "Username is empty";
+            return "Name is empty";
         }
         int length = input.length();
-        if (length < 6) {
-            return "Username must be at least 6 characters";
-        }
-        if (length > 18) {
-            return "Username must be no more than 18 characters";
-        }
         State state = State.START;
         for (int i = 0; i < length; i++) {
             char c = input.charAt(i);
@@ -20,11 +15,11 @@ public class UsernameValidator {
                     if (Character.isLetter(c)) {
                         state = State.VALID;
                     } else {
-                        return "Username must start with a letter";
+                        return "Name must start with a letter";
                     }
                     break;
                 case VALID:
-                    if (Character.isLetterOrDigit(c) || c == '_' || c == '.') {
+                    if (Character.isLetter(c)) {
                         // Remain in VALID state.
                     } else {
                         state = State.ERROR;
@@ -34,7 +29,7 @@ public class UsernameValidator {
                     break;
             }
             if (state == State.ERROR) {
-                return "Invalid character in username: " + c;
+                return "Invalid character in name: " + c;
             }
         }
         return "";
