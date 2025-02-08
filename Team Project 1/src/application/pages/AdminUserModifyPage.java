@@ -66,7 +66,7 @@ public class AdminUserModifyPage {
         });
         //set initial checkbox values
         userRoleAdmin.selectedProperty().set(hasRole(roles, Roles.ADMIN));
-        userRoleReviewer.selectedProperty().set(hasRole(roles, Roles.INSTRUCTOR));
+        userRoleInstructor.selectedProperty().set(hasRole(roles, Roles.INSTRUCTOR));
         userRoleStudent.selectedProperty().set(hasRole(roles, Roles.STUDENT));
         userRoleReviewer.selectedProperty().set(hasRole(roles, Roles.REVIEWER));
         userRoleStaff.selectedProperty().set(hasRole(roles, Roles.STAFF));
@@ -74,44 +74,50 @@ public class AdminUserModifyPage {
         EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
                 if (event.getSource() instanceof CheckBox checkBox) {
-                    if (roles.length == 2) {
-
-                    }
                     //Remove/add roles
                     if ("Admin".equals(checkBox.getText())) {
                         if (!checkBox.isSelected()) {
-                            adminRoleRemovalConfirm(primaryStage, currentUser);
+                            adminRoleRemovalConfirm(primaryStage, currentUser, checkBox);
                             user.setRoles(removeRole(roleInt, Roles.ADMIN));
                         } else {
                             user.setRoles(addRole(roleInt, Roles.ADMIN));
                         }
-                    } else if ("Instructor".equals(checkBox.getText())) {
+                        context.users().update(user);
+                    }
+                    if ("Instructor".equals(checkBox.getText())) {
                         if (!checkBox.isSelected()) {
                             user.setRoles(removeRole(roleInt, Roles.INSTRUCTOR));
                         } else {
                             user.setRoles(addRole(roleInt, Roles.INSTRUCTOR));
                         }
-                    } else if ("Student".equals(checkBox.getText())) {
+                        context.users().update(user);
+                    }
+                    if ("Student".equals(checkBox.getText())) {
                         if (!checkBox.isSelected()) {
                             user.setRoles(removeRole(roleInt, Roles.STUDENT));
                         } else {
                             user.setRoles(addRole(roleInt, Roles.STUDENT));
                         }
-                    } else if ("Reviewer".equals(checkBox.getText())) {
+                        context.users().update(user);
+                    }
+                    if ("Reviewer".equals(checkBox.getText())) {
                         if (!checkBox.isSelected()) {
                             user.setRoles(removeRole(roleInt, Roles.REVIEWER));
                         } else {
                             user.setRoles(addRole(roleInt, Roles.REVIEWER));
                         }
-                    } else if ("Staff".equals(checkBox.getText())) {
+                        context.users().update(user);
+                    }
+                    if ("Staff".equals(checkBox.getText())) {
                         if (!checkBox.isSelected()) {
                             user.setRoles(removeRole(roleInt, Roles.STAFF));
                         } else {
                             user.setRoles(addRole(roleInt, Roles.STAFF));
                         }
+                        context.users().update(user);
                     }
-                    context.users().update(user);
                 }
+                event.consume();
             }
         };
 
@@ -157,7 +163,7 @@ public class AdminUserModifyPage {
         primaryStage.setTitle("Admin Page");
     }
 
-    public void adminRoleRemovalConfirm(Stage primaryStage, User currentUser) {
+    public void adminRoleRemovalConfirm(Stage primaryStage, User currentUser, CheckBox checkBox) {
         int roleInt = user.getRoles();
         ArrayList<User> list = (ArrayList<User>) context.users().getAll();
         //count all admins in the system
@@ -172,6 +178,8 @@ public class AdminUserModifyPage {
                 if (count > 1) {
                     user.setRoles(removeRole(roleInt, Roles.ADMIN));
                     context.users().update(user);
+                    System.out.println("Current User ID: " + currentUser.getId());
+                    System.out.println("Target User ID: " + user.getId());
                     if (currentUser.getId() == user.getId()) {
                         new UserHomePage().show(primaryStage, user, Roles.USER);
                     }
@@ -179,6 +187,7 @@ public class AdminUserModifyPage {
                 //if
                 else {
                     adminError.show();
+                    checkBox.selectedProperty().set(true);
                 }
             } else if (response == ButtonType.CANCEL) {
                 adminConfirm.close();
@@ -186,13 +195,10 @@ public class AdminUserModifyPage {
         });
     }
 
-    public void oneRoleRemoval(Stage primaryStage, User currentUser) {
-        int roleInt = user.getRoles();
-        ArrayList<User> list = (ArrayList<User>) context.users().getAll();
-        //count all admins in the system
-        int count = (int) list.stream().filter(value -> hasRole(value.getRoles(), Roles.ADMIN)).count();
-        //declare and instantiate  Alerts for later use
-        Alert adminError = new Alert(AlertType.ERROR, "You cannot remove the last role from this user!");
-        adminError.show();
+    public void oneRoleRemoval(Roles[] roles) {
+        if (roles.length == 1) {
+            Alert adminError = new Alert(AlertType.ERROR, "You cannot remove the last role from this user!");
+            adminError.show();
+        }
     }
 }

@@ -31,12 +31,14 @@ public class SetupAccountPage {
         this.context = AppContext.getInstance();
     }
 
+
     /**
      * Displays the Setup Account page in the provided stage.
      *
      * @param primaryStage The primary stage where the scene will be displayed.
      */
     public void show(Stage primaryStage) {
+
         // Input fields for userName, password, and invitation code
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter userName");
@@ -65,6 +67,15 @@ public class SetupAccountPage {
         // Label to display error messages for invalid input or registration issues
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
+        //Back button
+        Button backButton = new Button("Back");
+        backButton.setOnAction(a -> {
+            try {
+                new SetupLoginSelectionPage().show(primaryStage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Button setupButton = new Button("Setup");
 
@@ -103,7 +114,7 @@ public class SetupAccountPage {
                 if (!context.users().doesUserExist(userName)) {
 
                     // Validate the invitation code
-                    Invite invite = context.invites().findInvite(code);
+                    Invite invite = context.invites().getInviteFromCode(code);
                     if (invite != null) {
                         // delete the invitation from the database
                         context.invites().delete(invite.getId());
@@ -134,7 +145,7 @@ public class SetupAccountPage {
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel);
+        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel, backButton);
 
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Account Setup");

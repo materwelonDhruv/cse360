@@ -21,6 +21,8 @@ public class Users extends Repository<User> {
         String plain = user.getPassword();
         String hashed = PasswordUtil.hashPassword(plain);
         user.setPassword(hashed);
+        System.out.println("User created: " + plain);
+        System.out.println("User created: " + hashed);
 
         String sql = "INSERT INTO Users "
                 + "(userName, firstName, lastName, password, email, roles) "
@@ -107,6 +109,7 @@ public class Users extends Repository<User> {
                 pstmt -> pstmt.setString(1, userName),
                 rs -> rs.getString("password")
         );
+        System.out.println(storedHash + "\n " + plainPassword);
         return storedHash != null && PasswordUtil.verifyPassword(storedHash, plainPassword);
     }
 
