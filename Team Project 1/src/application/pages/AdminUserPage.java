@@ -21,7 +21,7 @@ import src.utils.permissions.Roles;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static src.utils.permissions.RolesUtil.parseRoles;
+import static src.utils.permissions.RolesUtil.intToRoles;
 
 public class AdminUserPage {
 	private final AppContext context;
@@ -82,7 +82,7 @@ public class AdminUserPage {
 			public ObservableValue<String> call(TableColumn.CellDataFeatures<User,String> param) {
 				User user = param.getValue();
 				int roles = user.getRoles();
-				Roles[] roleList = parseRoles(roles);
+				Roles[] roleList = intToRoles(roles);
 				String out = "";
                 for (Roles value : roleList) {
                     out = out.concat(value.toString());

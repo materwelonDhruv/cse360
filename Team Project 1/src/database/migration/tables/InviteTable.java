@@ -25,7 +25,6 @@ public class InviteTable extends BaseTable {
 
     @Override
     public String[] getInlineConstraints() {
-        // Keep your inline FK statement here:
         return new String[] {
                 "CONSTRAINT fk_userID FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE"
         };

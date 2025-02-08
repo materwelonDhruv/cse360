@@ -39,7 +39,7 @@ public class SchemaManager {
             System.out.println("=== Table: " + tableName + " ===");
 
             // Log column details from INFORMATION_SCHEMA.COLUMNS
-            String colQuery = "SELECT COLUMN_NAME, TYPE_NAME, CHARACTER_MAXIMUM_LENGTH " +
+            String colQuery = "SELECT COLUMN_NAME, DATA_TYPE AS TYPE_NAME, CHARACTER_MAXIMUM_LENGTH " +
                     "FROM INFORMATION_SCHEMA.COLUMNS " +
                     "WHERE TABLE_NAME = ? AND TABLE_SCHEMA = SCHEMA() " +
                     "ORDER BY ORDINAL_POSITION";
