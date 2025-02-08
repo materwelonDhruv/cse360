@@ -109,7 +109,6 @@ public class Users extends Repository<User> {
                 pstmt -> pstmt.setString(1, userName),
                 rs -> rs.getString("password")
         );
-        System.out.println(storedHash + "\n " + plainPassword);
         return storedHash != null && PasswordUtil.verifyPassword(storedHash, plainPassword);
     }
 
