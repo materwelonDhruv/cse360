@@ -79,8 +79,7 @@ public class Users extends Repository<User> {
 
         String sql = "UPDATE Users SET userName = ?, "
                 + "firstName = ?, lastName = ?, "
-                + "password = ?, email = ?, roles = ?, "
-                + "inviteUsed = ? WHERE userID = ?";
+                + "password = ?, email = ?, roles = ?";
         int rows = executeUpdate(sql, pstmt -> {
             pstmt.setString(1, user.getUserName());
             pstmt.setString(2, user.getFirstName());
