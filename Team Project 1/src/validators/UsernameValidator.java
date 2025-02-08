@@ -2,8 +2,6 @@ package src.validators;
 
 public class UsernameValidator {
 
-    private enum State { START, VALID, ERROR }
-
     public static String validateUserName(String input) {
         if (input == null || input.isEmpty()) {
             return "Username is empty";
@@ -15,7 +13,6 @@ public class UsernameValidator {
         if (length > 18) {
             return "Username must be no more than 18 characters";
         }
-
         State state = State.START;
         for (int i = 0; i < length; i++) {
             char c = input.charAt(i);
@@ -43,4 +40,6 @@ public class UsernameValidator {
         }
         return "";
     }
+
+    private enum State {START, VALID, ERROR}
 }
