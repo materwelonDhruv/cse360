@@ -10,7 +10,7 @@ public class Helpers {
     public static String generateRandomCode(int length, boolean highSecurity) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         if (highSecurity) {
-            chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+            chars += "!@#$%&";
         }
         StringBuilder sb = new StringBuilder();
         SecureRandom random = new SecureRandom();
