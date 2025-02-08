@@ -1,7 +1,6 @@
 package src.database.migration;
 
 import src.database.migration.tables.*;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,7 +14,10 @@ public class SchemaManager {
     private final List<BaseTable> tables = new ArrayList<>();
 
     public SchemaManager() {
+        // Users always need to be created first because of FK constraints
         tables.add(new UserTable());
+
+        // Other tables
         tables.add(new InviteTable());
         tables.add(new OneTimePasswordTable());
     }
