@@ -2,13 +2,11 @@ package src.validators;
 
 public class PasswordValidator {
 
-    private enum State { START, PROCESSING, DONE }
-
     private static final String SPECIAL_CHARS = "!@#$%&";
 
-    public static String evaluatePassword(String input) {
+    public static void validatePassword(String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
-            return "Password is empty";
+            throw new IllegalArgumentException("Password is empty");
         }
 
         State state = State.START;
@@ -27,13 +25,13 @@ public class PasswordValidator {
             } else if (SPECIAL_CHARS.indexOf(c) >= 0) {
                 hasSpecial = true;
             } else {
-                return "Password contains invalid character: " + c;
+                throw new IllegalArgumentException("Password contains invalid character: " + c);
             }
         }
         state = State.DONE;
 
         if (length < 8) {
-            return "Password must be at least 8 characters";
+            throw new IllegalArgumentException("Password must be at least 8 characters");
         }
 
         StringBuilder errors = new StringBuilder();
@@ -42,6 +40,10 @@ public class PasswordValidator {
         if (!hasDigit) errors.append("Missing numeric digit. ");
         if (!hasSpecial) errors.append("Missing special character. ");
 
-        return errors.toString().trim();
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(errors.toString().trim());
+        }
     }
+
+    private enum State {START, PROCESSING, DONE}
 }

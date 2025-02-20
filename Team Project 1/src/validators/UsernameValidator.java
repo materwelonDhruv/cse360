@@ -1,16 +1,16 @@
 package src.validators;
 
 public class UsernameValidator {
-    public static String validateUserName(String input) {
+    public static void validateUserName(String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
-            return "Username is empty";
+            throw new IllegalArgumentException("Username is empty");
         }
         int length = input.length();
         if (length < 6) {
-            return "Username must be at least 6 characters";
+            throw new IllegalArgumentException("Username must be at least 6 characters");
         }
         if (length > 18) {
-            return "Username must be no more than 18 characters";
+            throw new IllegalArgumentException("Username must be no more than 18 characters");
         }
         State state = State.START;
         for (int i = 0; i < length; i++) {
@@ -20,7 +20,7 @@ public class UsernameValidator {
                     if (Character.isLetter(c)) {
                         state = State.VALID;
                     } else {
-                        return "Username must start with a letter";
+                        throw new IllegalArgumentException("Username must start with a letter");
                     }
                     break;
                 case VALID:
@@ -34,10 +34,9 @@ public class UsernameValidator {
                     break;
             }
             if (state == State.ERROR) {
-                return "Invalid character in username: " + c;
+                throw new IllegalArgumentException("Invalid character in username: " + c);
             }
         }
-        return "";
     }
 
     private enum State {START, VALID, ERROR}

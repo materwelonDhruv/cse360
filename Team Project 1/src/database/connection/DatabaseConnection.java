@@ -5,15 +5,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
+    private static final String DEFAULT_DB_URL = "jdbc:h2:~/FoundationDatabase";
+    private static final String DB_URL = System.getProperty("db.url", DEFAULT_DB_URL);
     private static final String JDBC_DRIVER = "org.h2.Driver";
-    private static final String DB_URL      = "jdbc:h2:~/FoundationDatabase";
-    private static final String USER        = "sa";
-    private static final String PASS        = "";
+    private static final String USER = "sa";
+    private static final String PASS = "";
 
     private static Connection connection;
     private static boolean initialized = false;
 
-    private DatabaseConnection() {}
+    private DatabaseConnection() {
+    }
 
     /**
      * Ensures a connection to H2.
@@ -22,7 +24,7 @@ public class DatabaseConnection {
         if (!initialized) {
             try {
                 Class.forName(JDBC_DRIVER);
-                System.out.println("Connecting to database...");
+                System.out.println("Connecting to database with URL: " + DB_URL);
                 connection = DriverManager.getConnection(DB_URL, USER, PASS);
                 System.out.println("Connected to database.");
 
@@ -62,4 +64,13 @@ public class DatabaseConnection {
             System.out.println("Database cleared.");
         }
     }
+
+    /**
+     * Resets the connection to null and sets initialized to false.
+     */
+    public static void resetConnection() {
+        connection = null;
+        initialized = false;
+    }
+
 }

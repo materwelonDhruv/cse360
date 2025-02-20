@@ -1,11 +1,11 @@
 package src.application;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import src.database.connection.DatabaseConnection;
 import src.database.migration.SchemaManager;
 import src.database.repository.repos.*;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class AppContext {
     private static AppContext INSTANCE;
@@ -15,6 +15,8 @@ public class AppContext {
     private final Users userRepository;
     private final Invites inviteRepository;
     private final OneTimePasswords otpRepository;
+    private final Questions questionRepository;
+    private final Answers answerRepository;
 
     public AppContext() throws SQLException {
         // 1) Initialize the DB connection and schema manager
@@ -32,6 +34,8 @@ public class AppContext {
         this.userRepository = new Users(connection);
         this.inviteRepository = new Invites(connection);
         this.otpRepository = new OneTimePasswords(connection);
+        this.questionRepository = new Questions(connection);
+        this.answerRepository = new Answers(connection);
     }
 
     /**
@@ -63,8 +67,17 @@ public class AppContext {
         return connection;
     }
 
+    public Questions questions() {
+        return questionRepository;
+    }
+
+    public Answers answers() {
+        return answerRepository;
+    }
+
     /**
      * Closes the connection to the database.
+     *
      * @throws SQLException if the connection cannot be closed.
      */
     public void closeConnection() throws SQLException {
