@@ -1,41 +1,68 @@
 package src.tests;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import src.validators.NameValidator;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NameValidatorTest {
 
     @Test
     public void testEmptyName() {
-        assertEquals("Name is empty", NameValidator.validateName(""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("");
+        }, "Should throw for empty name");
     }
 
     @Test
     public void testNullName() {
-        assertEquals("Name is empty", NameValidator.validateName(null));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName(null);
+        }, "Should throw for null name");
     }
 
     @Test
     public void testNameStartsWithNonLetter() {
-        assertEquals("Name must start with a letter", NameValidator.validateName("1John"));
-        assertEquals("Name must start with a letter", NameValidator.validateName("_Jane"));
-        assertEquals("Name must start with a letter", NameValidator.validateName("-Alice"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("1John");
+        }, "Should throw for name starting with a non-letter");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("_Jane");
+        }, "Should throw for name starting with a non-letter");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("-Alice");
+        }, "Should throw for name starting with a non-letter");
     }
 
     @Test
     public void testNameWithInvalidCharacter() {
-        assertTrue(NameValidator.validateName("John123").contains("Invalid character"), "Should detect an invalid character");
-        assertTrue(NameValidator.validateName("Alice!").contains("Invalid character"), "Should detect an invalid character");
-        assertTrue(NameValidator.validateName("Bob@").contains("Invalid character"), "Should detect an invalid character");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("John123");
+        }, "Should throw for invalid character in name");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("Alice!");
+        }, "Should throw for invalid character in name");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            NameValidator.validateName("Bob@");
+        }, "Should throw for invalid character in name");
     }
 
     @Test
     public void testValidNames() {
-        assertEquals("", NameValidator.validateName("John"));
-        assertEquals("", NameValidator.validateName("Alice"));
-        assertEquals("", NameValidator.validateName("Michael"));
+        Assertions.assertDoesNotThrow(() -> {
+            NameValidator.validateName("John");
+        }, "Name should be valid");
+
+        Assertions.assertDoesNotThrow(() -> {
+            NameValidator.validateName("Alice");
+        }, "Name should be valid");
+
+        Assertions.assertDoesNotThrow(() -> {
+            NameValidator.validateName("Michael");
+        }, "Name should be valid");
     }
 }

@@ -1,49 +1,64 @@
 package src.tests.password;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import src.validators.PasswordValidator;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PasswordValidatorTest {
 
     @Test
+    @Order(1)
     public void testEmptyPassword() {
-        assertEquals("Password is empty", PasswordValidator.evaluatePassword(""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            PasswordValidator.validatePassword("");
+        }, "Should throw for empty password");
     }
 
     @Test
+    @Order(2)
     public void testValidPassword() {
-        String result = PasswordValidator.evaluatePassword("Abcdef1!");
-        assertEquals("", result, "Password should be valid");
+        Assertions.assertDoesNotThrow(() -> {
+            PasswordValidator.validatePassword("Abcdef1!");
+        }, "Password should be valid");
     }
 
     @Test
+    @Order(3)
     public void testMissingUppercase() {
-        String result = PasswordValidator.evaluatePassword("abcdef1!");
-        assertTrue(result.contains("Missing uppercase"), "Should indicate missing uppercase");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            PasswordValidator.validatePassword("abcdef1!");
+        }, "Should throw for missing uppercase");
     }
 
     @Test
+    @Order(4)
     public void testMissingLowercase() {
-        String result = PasswordValidator.evaluatePassword("ABCDEF1!");
-        assertTrue(result.contains("Missing lowercase"), "Should indicate missing lowercase");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            PasswordValidator.validatePassword("ABCDEF1!");
+        }, "Should throw for missing lowercase");
     }
 
     @Test
+    @Order(5)
     public void testMissingDigit() {
-        String result = PasswordValidator.evaluatePassword("Abcdefg!");
-        assertTrue(result.contains("Missing numeric"), "Should indicate missing numeric digit");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            PasswordValidator.validatePassword("Abcdefg!");
+        }, "Should throw for missing numeric digit");
     }
 
     @Test
+    @Order(6)
     public void testMissingSpecial() {
-        String result = PasswordValidator.evaluatePassword("Abcdef12");
-        assertTrue(result.contains("Missing special"), "Should indicate missing special character");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            PasswordValidator.validatePassword("Abcdef12");
+        }, "Should throw for missing special character");
     }
 
     @Test
+    @Order(7)
     public void testTooShortPassword() {
-        String result = PasswordValidator.evaluatePassword("Ab1!");
-        assertTrue(result.contains("at least 8"), "Should indicate password is too short");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            PasswordValidator.validatePassword("Ab1!");
+        }, "Should throw for password too short");
     }
 }
