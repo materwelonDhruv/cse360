@@ -89,24 +89,27 @@ public class SetupAccountPage {
 
             try {
                 //validate username
-                String UsernameCheck = UsernameValidator.validateUserName(userName);
-                if (!UsernameCheck.isEmpty()) {
-                    errorLabel.setText(UsernameCheck);
-                    return;
+                try {
+                    UsernameValidator.validateUserName(userName);
+                } catch (IllegalArgumentException e) {
+                    errorLabel.setText(e.getMessage());
                 }
+//
 
                 //validate password
-                String passwordCheck = PasswordValidator.evaluatePassword(password);
-                if (!passwordCheck.isEmpty()) {
-                    errorLabel.setText(passwordCheck);
-                    return;
+                try {
+                    PasswordValidator.validatePassword(password);
+
+                } catch (IllegalArgumentException e) {
+                    errorLabel.setText(e.getMessage());
                 }
 
                 //validate email
-                String emailCheck = EmailValidator.validateEmail(email);
-                if (!emailCheck.isEmpty()) {
-                    errorLabel.setText(emailCheck);
-                    return;
+                try {
+                    EmailValidator.validateEmail(email);
+
+                } catch (IllegalArgumentException e) {
+                    errorLabel.setText(e.getMessage());
                 }
 
                 // Check if the user already exists
