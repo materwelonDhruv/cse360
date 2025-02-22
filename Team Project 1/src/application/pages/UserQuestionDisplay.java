@@ -27,11 +27,7 @@ public class UserQuestionDisplay {
         //Setup back button
         Button backButton = new Button("Back");
         backButton.setOnAction(a -> {
-            try {
-                new SetupLoginSelectionPage().show(primaryStage);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            new UserHomePage().show(primaryStage, user, userCurrentRole);
         });
         hBox.getChildren().add(backButton);
 

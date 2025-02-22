@@ -83,7 +83,7 @@ public class UserHomePage {
         Button questionDisplayButton = new Button("Your Homepage");
         questionDisplayButton.setOnAction(e -> {
             try {
-                new UserQuestionDisplay().show(primaryStage, user, selectedRole[0]);
+                new UserQuestionDisplay().show(primaryStage, user, userCurrentRole);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
