@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import src.application.AppContext;
 import src.database.model.entities.User;
 import src.database.repository.repos.OneTimePasswords;
+import src.utils.permissions.Roles;
+import src.utils.permissions.RolesUtil;
 
 import java.sql.SQLException;
 
@@ -71,20 +73,47 @@ public class UserLoginPage {
                     OneTimePasswords otpRepo = context.oneTimePasswords();
                     boolean otpValid = otpRepo.check(user.getId(), password);
                     if (otpValid) {
-                        // If one-time password is valid, bring user to welcome page
-                        WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
-                        welcomeLoginPage.show(primaryStage, user);
-                        return;
+                        Roles[] roles = RolesUtil.intToRoles(user.getRoles());
+                        if (roles.length > 1) {
+                            WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
+                            welcomeLoginPage.show(primaryStage, user);
+                        } else {
+                            if (RolesUtil.hasRole(roles, Roles.ADMIN)) {
+                                AdminHomePage adminHomePage = new AdminHomePage();
+                                adminHomePage.show(primaryStage, user);
+                            } else {
+                                UserHomePage userHomePage = new UserHomePage();
+                                userHomePage.show(primaryStage, user, roles[0]);
+                            }
+                        }
                     } else {
                         //If one-time password does not match, tell user either the password or one-time password is wrong
                         errorLabel.setText("Invalid Password or OTP!");
-                        return;
                     }
                 }
 
+                //get all the assigned roles
+                int roleInt = user.getRoles();
+                Roles[] roles = RolesUtil.intToRoles(roleInt);
+
                 // If retrieved password matches stored user password, bring user to welcome page
-                WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
-                welcomeLoginPage.show(primaryStage, user);
+                if (roles.length == 1) {
+                    if (RolesUtil.hasRole(roles, Roles.ADMIN)) {
+                        AdminHomePage adminHomePage = new AdminHomePage();
+                        adminHomePage.show(primaryStage, user);
+                    } else {
+                        UserHomePage userHomePage = new UserHomePage();
+                        userHomePage.show(primaryStage, user, roles[0]);
+                    }
+                } else {
+                    if (RolesUtil.hasRole(roles, Roles.ADMIN)) {
+                        AdminHomePage adminHomePage = new AdminHomePage();
+                        adminHomePage.show(primaryStage, user);
+                    } else {
+                        WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage();
+                        welcomeLoginPage.show(primaryStage, user);
+                    }
+                }
 
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
