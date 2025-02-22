@@ -79,7 +79,17 @@ public class UserHomePage {
                 throw new RuntimeException(ex);
             }
         });
-        layout.getChildren().addAll(userLabel, roleLabel, logoutButton);
+        //Button to test QuestionDisplay
+        Button questionDisplayButton = new Button("Your Homepage");
+        questionDisplayButton.setOnAction(e -> {
+            try {
+                new UserQuestionDisplay().show(primaryStage, user, selectedRole[0]);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        layout.getChildren().addAll(userLabel, roleLabel, logoutButton, questionDisplayButton);
 
         //Don't show the menubar and goButton if only 1 role is assigned
         if (allRoles.length > 1) {
