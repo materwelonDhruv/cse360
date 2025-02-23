@@ -20,6 +20,8 @@ public class SchemaManager {
         // Other tables
         tables.add(new InviteTable());
         tables.add(new OneTimePasswordTable());
+        tables.add(new QuestionsTable());
+        tables.add(new AnswersTable());
     }
 
     public void syncTables(Connection connection) throws SQLException {
