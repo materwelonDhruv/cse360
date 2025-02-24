@@ -73,11 +73,14 @@ public class UserQuestionDisplay {
             });
             return row;
         });
+        //Populate columns
         TableColumn<Question, String> questionIDCol = new TableColumn<>("QuestionID");
         questionIDCol.setCellValueFactory(new PropertyValueFactory<>("questionID"));
-        TableColumn<Question, String> userCol = new TableColumn<>("User");
-        userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
-        userQuestionTable.getColumns().addAll(questionIDCol, userCol);
+        TableColumn<Question, String> titleCol = new TableColumn<>("Title");
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        TableColumn<Question, String> timeCol = new TableColumn<>("Time");
+        timeCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        userQuestionTable.getColumns().addAll(questionIDCol, titleCol, timeCol);
         //Add tables to scene
         splitPane.getItems().addAll(userQuestionTable, PMTable);
         Scene userScene = new Scene(scene, 800, 400);
