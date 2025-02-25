@@ -1,9 +1,9 @@
-package src.tests.database.tests;
+package tests.database.tests;
 
 import org.junit.jupiter.api.*;
-import src.database.model.entities.User;
-import src.database.repository.repos.Users;
-import src.tests.database.BaseDatabaseTest;
+import database.model.entities.User;
+import database.repository.repos.Users;
+import tests.database.BaseDatabaseTest;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
-package src.database.repository;
+package database.repository;
 
-import src.database.model.BaseEntity;
+import database.model.BaseEntity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,30 +15,6 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
     protected Repository(Connection connection) throws SQLException {
         // Store a single DB connection to be used by all operations in the subclass
         this.connection = connection;
-    }
-
-    /**
-     * Functional interface for an operation returning a result (possibly a query).
-     */
-    @FunctionalInterface
-    protected interface SqlOperation<R> {
-        R execute() throws SQLException;
-    }
-
-    /**
-     * Functional interface for setting parameters in a PreparedStatement.
-     */
-    @FunctionalInterface
-    protected interface SqlConsumer {
-        void accept(PreparedStatement pstmt) throws SQLException;
-    }
-
-    /**
-     * Functional interface for mapping a single row in a ResultSet to some object.
-     */
-    @FunctionalInterface
-    protected interface SqlFunction<R> {
-        R apply(ResultSet rs) throws SQLException;
     }
 
     /**
@@ -152,5 +128,29 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
     @Override
     public void delete(int id) throws SQLException {
         throw new UnsupportedOperationException("delete method not implemented");
+    }
+
+    /**
+     * Functional interface for an operation returning a result (possibly a query).
+     */
+    @FunctionalInterface
+    protected interface SqlOperation<R> {
+        R execute() throws SQLException;
+    }
+
+    /**
+     * Functional interface for setting parameters in a PreparedStatement.
+     */
+    @FunctionalInterface
+    protected interface SqlConsumer {
+        void accept(PreparedStatement pstmt) throws SQLException;
+    }
+
+    /**
+     * Functional interface for mapping a single row in a ResultSet to some object.
+     */
+    @FunctionalInterface
+    protected interface SqlFunction<R> {
+        R apply(ResultSet rs) throws SQLException;
     }
 }

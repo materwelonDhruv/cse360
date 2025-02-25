@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,11 +8,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.Answer;
-import src.database.model.entities.Question;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
+import application.AppContext;
+import database.model.entities.Answer;
+import database.model.entities.Question;
+import database.model.entities.User;
+import utils.permissions.Roles;
 
 import java.sql.SQLException;
 import java.util.List;

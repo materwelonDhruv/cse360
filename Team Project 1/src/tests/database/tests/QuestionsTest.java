@@ -1,51 +1,57 @@
-package src.tests.database.tests;
+package tests.database.tests;
 
+import database.model.entities.Message;
+import database.model.entities.Question;
+import database.model.entities.User;
+import database.repository.repos.Questions;
+import database.repository.repos.Users;
 import org.junit.jupiter.api.*;
-import src.database.model.entities.Question;
-import src.database.model.entities.User;
-import src.database.repository.repos.Questions;
-import src.database.repository.repos.Users;
-import src.tests.database.BaseDatabaseTest;
+import tests.database.BaseDatabaseTest;
 
+import java.sql.Timestamp;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class QuestionsTest extends BaseDatabaseTest {
 
     private static Questions questionsRepo;
+    private static Users userRepo;
+    private static Timestamp now;
 
     @BeforeAll
     public static void setupQuestions() {
-        // Create users for the questions
-        Users userRepo = appContext.users();
+        now = new Timestamp(System.currentTimeMillis());
+        userRepo = appContext.users();
+        // Create two users
         User user1 = new User("qUser1", "Question", "Asker", "somePassword", "asker@example.com", 0);
         userRepo.create(user1);
-
         User user2 = new User("qUser2", "Another", "Asker", "somePassword", "asker2@example.com", 0);
         userRepo.create(user2);
 
-        // Now get the questions repo
         questionsRepo = appContext.questions();
     }
 
     @Test
     @Order(1)
     public void testCreateQuestion() {
-        Question q = new Question(1, "JUnit Title", "JUnit Content");
+        Message msg = new Message(1, "JUnit Content");
+        Question q = new Question(msg, "JUnit Title");
         Question created = questionsRepo.create(q);
 
-        Assertions.assertNotNull(created.getId(), "Question ID should be generated");
-        Assertions.assertEquals(1, created.getUserId());
-        Assertions.assertEquals("JUnit Title", created.getTitle());
-        Assertions.assertEquals("JUnit Content", created.getContent());
+        assertNotNull(created.getId(), "Question ID should be generated");
+        assertEquals(1, created.getMessage().getUserId());
+        assertEquals("JUnit Title", created.getTitle());
+        assertEquals("JUnit Content", created.getMessage().getContent());
     }
 
     @Test
     @Order(2)
     public void testGetQuestionById() {
         Question fetched = questionsRepo.getById(1);
-        Assertions.assertNotNull(fetched, "Should find a question with ID=1");
-        Assertions.assertEquals("JUnit Title", fetched.getTitle());
+        assertNotNull(fetched, "Should fetch question with ID=1");
+        assertEquals("JUnit Title", fetched.getTitle());
     }
 
     @Test
@@ -53,25 +59,25 @@ public class QuestionsTest extends BaseDatabaseTest {
     public void testUpdateQuestion() {
         Question existing = questionsRepo.getById(1);
         existing.setTitle("Updated Title");
-        existing.setContent("Updated Content");
-
+        existing.getMessage().setContent("Updated Content");
         Question updated = questionsRepo.update(existing);
-        Assertions.assertEquals("Updated Title", updated.getTitle());
-        Assertions.assertEquals("Updated Content", updated.getContent());
+        assertEquals("Updated Title", updated.getTitle());
+        assertEquals("Updated Content", updated.getMessage().getContent());
     }
 
     @Test
     @Order(4)
     public void testGetAllQuestions() {
         List<Question> all = questionsRepo.getAll();
-        Assertions.assertFalse(all.isEmpty(), "At least one question should exist");
+        assertFalse(all.isEmpty(), "At least one question should exist");
     }
 
     @Test
     @Order(5)
     public void testNegativeUserId() {
-        Question invalid = new Question(0, "No user", "Should fail");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Message invalidMsg = new Message(0, "No user");
+        Question invalid = new Question(invalidMsg, "Should fail");
+        assertThrows(IllegalArgumentException.class, () -> {
             questionsRepo.create(invalid);
         }, "Should throw for invalid userID=0");
     }
@@ -79,8 +85,9 @@ public class QuestionsTest extends BaseDatabaseTest {
     @Test
     @Order(6)
     public void testNegativeEmptyTitle() {
-        Question invalid = new Question(1, "", "Empty title");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Message msg = new Message(1, "Content for empty title");
+        Question invalid = new Question(msg, "");
+        assertThrows(IllegalArgumentException.class, () -> {
             questionsRepo.create(invalid);
         }, "Should throw for empty title");
     }
@@ -90,53 +97,67 @@ public class QuestionsTest extends BaseDatabaseTest {
     public void testDeleteQuestion() {
         questionsRepo.delete(1);
         Question deleted = questionsRepo.getById(1);
-        Assertions.assertNull(deleted, "Question #1 should be deleted");
+        assertNull(deleted, "Question #1 should be deleted");
     }
 
     @Test
     @Order(8)
-    public void testSearchQuestions() {
+    public void testSearchQuestions() throws Exception {
         // Create questions with "test" keyword and one without
-        Question q1 = new Question(1, "Test question one", "This is a test content");
-        Question q2 = new Question(1, "Another test", "More testing here");
-        Question q3 = new Question(1, "Different topic", "No keyword here");
-        questionsRepo.create(q1);
-        questionsRepo.create(q2);
-        questionsRepo.create(q3);
+        Message msg1 = new Message(1, "This is a test content");
+        Message msg2 = new Message(1, "More testing here");
+        Message msg3 = new Message(1, "No keyword here");
+        questionsRepo.create(new Question(msg1, "Test question one"));
+        questionsRepo.create(new Question(msg2, "Another test"));
+        questionsRepo.create(new Question(msg3, "Different topic"));
 
-        // Search for "test" (case-insensitive)
         List<Question> results = questionsRepo.searchQuestions("test");
-        Assertions.assertTrue(results.size() >= 2, "Expected at least two questions containing 'test'");
+        assertTrue(results.size() >= 2, "Expected at least two questions containing 'test'");
         for (Question q : results) {
-            boolean containsKeyword = q.getTitle().toLowerCase().contains("test")
-                    || q.getContent().toLowerCase().contains("test");
-            Assertions.assertTrue(containsKeyword, "Each returned question must contain 'test'");
+            String combined = q.getTitle().toLowerCase() + " " + q.getMessage().getContent().toLowerCase();
+            assertTrue(combined.contains("test"), "Each question must contain 'test'");
         }
     }
 
     @Test
     @Order(9)
     public void testGetQuestionsByUser() {
-        // Create a question for userID = 2
-        Question q = new Question(2, "User specific question", "Content by user 2");
+        Message msg = new Message(2, "Content by user 2");
+        Question q = new Question(msg, "User specific question");
         questionsRepo.create(q);
 
         List<Question> results = questionsRepo.getQuestionsByUser(2);
-        Assertions.assertFalse(results.isEmpty(), "Expected at least one question for userID=2");
+        assertFalse(results.isEmpty(), "Expected at least one question for userID=2");
         for (Question ques : results) {
-            Assertions.assertEquals(2, ques.getUserId(), "Each returned question should belong to userID=2");
+            assertEquals(2, ques.getMessage().getUserId(), "Each question should belong to userID=2");
         }
     }
 
     @Test
     @Order(10)
     public void testGetUnansweredQuestions() {
-        // Create a new question that has no answers.
-        Question q = new Question(1, "Unanswered question", "Content unanswered");
+        Message msg = new Message(1, "Unanswered content");
+        Question q = new Question(msg, "Unanswered question");
         questionsRepo.create(q);
 
         List<Question> unanswered = questionsRepo.getUnansweredQuestions();
         boolean found = unanswered.stream().anyMatch(question -> question.getTitle().equals("Unanswered question"));
-        Assertions.assertTrue(found, "The unanswered question should be returned by getUnansweredQuestions");
+        assertTrue(found, "Unanswered question should be returned by getUnansweredQuestions");
+    }
+
+    @Test
+    @Order(11)
+    public void testUpdateQuestionTitle() {
+        Question existing = questionsRepo.getById(2);
+        Question updated = questionsRepo.updateQuestionTitle(existing.getId(), "New Title");
+        assertEquals("New Title", updated.getTitle());
+    }
+
+    @Test
+    @Order(12)
+    public void testUpdateQuestionContent() {
+        Question existing = questionsRepo.getById(2);
+        Question updated = questionsRepo.updateQuestionContent(existing.getId(), "New Content");
+        assertEquals("New Content", updated.getMessage().getContent());
     }
 }

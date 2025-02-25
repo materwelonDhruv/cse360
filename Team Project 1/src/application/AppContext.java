@@ -1,8 +1,8 @@
-package src.application;
+package application;
 
-import src.database.connection.DatabaseConnection;
-import src.database.migration.SchemaManager;
-import src.database.repository.repos.*;
+import database.connection.DatabaseConnection;
+import database.migration.SchemaManager;
+import database.repository.repos.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,10 +13,13 @@ public class AppContext {
     private final Connection connection;
 
     private final Users userRepository;
+    private final Messages messageRepository;
     private final Invites inviteRepository;
     private final OneTimePasswords otpRepository;
     private final Questions questionRepository;
     private final Answers answerRepository;
+    private final PrivateMessages privateMessagesRepository;
+    private final ReadMessages readMessagesRepository;
 
     public AppContext() throws SQLException {
         // 1) Initialize the DB connection and schema manager
@@ -32,10 +35,13 @@ public class AppContext {
 
         // 4) Initialize repositories with the connection (injected)
         this.userRepository = new Users(connection);
+        this.messageRepository = new Messages(connection);
         this.inviteRepository = new Invites(connection);
         this.otpRepository = new OneTimePasswords(connection);
         this.questionRepository = new Questions(connection);
         this.answerRepository = new Answers(connection);
+        this.privateMessagesRepository = new PrivateMessages(connection);
+        this.readMessagesRepository = new ReadMessages(connection);
     }
 
     /**
@@ -73,6 +79,18 @@ public class AppContext {
 
     public Answers answers() {
         return answerRepository;
+    }
+
+    public Messages messages() {
+        return messageRepository;
+    }
+
+    public PrivateMessages privateMessages() {
+        return privateMessagesRepository;
+    }
+
+    public ReadMessages readMessages() {
+        return readMessagesRepository;
     }
 
     /**

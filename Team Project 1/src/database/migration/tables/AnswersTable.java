@@ -1,14 +1,10 @@
-package src.database.migration.tables;
+package database.migration.tables;
 
-import src.database.migration.BaseTable;
+import database.migration.BaseTable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Creates or syncs the Answers table.
- * An Answer can reference either a Question (top-level answer) or another Answer (threaded reply).
- */
 public class AnswersTable extends BaseTable {
 
     @Override
@@ -20,19 +16,17 @@ public class AnswersTable extends BaseTable {
     public Map<String, String> getExpectedColumns() {
         Map<String, String> cols = new LinkedHashMap<>();
         cols.put("answerID", "INT AUTO_INCREMENT PRIMARY KEY");
-        cols.put("userID", "INT NOT NULL");
-        cols.put("content", "TEXT NOT NULL");
-        cols.put("questionID", "INT NULL");
-        cols.put("parentAnswerID", "INT NULL");
-        cols.put("createdAt", "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
-        cols.put(("isPinned"), "BOOLEAN NOT NULL DEFAULT FALSE");
+        cols.put("messageID", "INT UNIQUE NOT NULL");  // References Messages table
+        cols.put("questionID", "INT NULL");            // If top-level answer
+        cols.put("parentAnswerID", "INT NULL");         // For threaded replies
+        cols.put("isPinned", "BOOLEAN NOT NULL DEFAULT FALSE");
         return cols;
     }
 
     @Override
     public String[] getInlineConstraints() {
         return new String[]{
-                "CONSTRAINT fk_answerUser FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE",
+                "CONSTRAINT fk_answerMessage FOREIGN KEY (messageID) REFERENCES Messages(messageID) ON DELETE CASCADE",
                 "CONSTRAINT fk_questionID FOREIGN KEY (questionID) REFERENCES Questions(questionID) ON DELETE CASCADE",
                 "CONSTRAINT fk_parentAnswerID FOREIGN KEY (parentAnswerID) REFERENCES Answers(answerID) ON DELETE CASCADE"
         };

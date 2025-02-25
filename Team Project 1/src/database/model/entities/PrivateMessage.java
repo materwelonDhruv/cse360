@@ -1,40 +1,28 @@
-package src.database.model.entities;
+package database.model.entities;
 
-import src.database.model.BaseEntity;
-
-import java.sql.Timestamp;
+import database.model.BaseEntity;
 
 public class PrivateMessage extends BaseEntity {
-    private int userId;             // new field referencing Users(userID)
-    private String content;
-    private Integer questionId;     // can be null
-    private Timestamp createdAt;
-
-    public PrivateMessage(int userId, String content, Integer questionId, Timestamp createdAt) {
-        this.userId = userId;
-        this.content = content;
-        this.questionId = questionId;
-        this.createdAt = createdAt;
-    }
+    private Message message;   // Underlying message
+    private Integer questionId;
 
     public PrivateMessage() {
-
     }
 
-    public int getUserId() {
-        return userId;
+    /**
+     * Creates a new PrivateMessage (no existing ID).
+     */
+    public PrivateMessage(Message message, Integer questionId) {
+        this.message = message;
+        this.questionId = questionId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public Message getMessage() {
+        return message;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
     public Integer getQuestionId() {
@@ -44,13 +32,4 @@ public class PrivateMessage extends BaseEntity {
     public void setQuestionId(Integer questionId) {
         this.questionId = questionId;
     }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
 }

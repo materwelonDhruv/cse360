@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,9 +7,9 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
-import src.utils.permissions.RolesUtil;
+import database.model.entities.User;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 import java.sql.SQLException;
 

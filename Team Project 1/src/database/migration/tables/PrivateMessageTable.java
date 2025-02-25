@@ -1,6 +1,6 @@
-package src.database.migration.tables;
+package database.migration.tables;
 
-import src.database.migration.BaseTable;
+import database.migration.BaseTable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,17 +16,16 @@ public class PrivateMessageTable extends BaseTable {
     public Map<String, String> getExpectedColumns() {
         Map<String, String> cols = new LinkedHashMap<>();
         cols.put("privateMessageID", "INT AUTO_INCREMENT PRIMARY KEY");
-        cols.put("userID", "INT NOT NULL");
-        cols.put("content", "TEXT NOT NULL");
+        cols.put("messageID", "INT UNIQUE NOT NULL");  // References Messages table
         cols.put("questionID", "INT NOT NULL");
-        cols.put("createdAt", "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
         return cols;
     }
 
     @Override
     public String[] getInlineConstraints() {
         return new String[]{
-                "CONSTRAINT fk_questionUser FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE"
+                "CONSTRAINT fk_privateMessage FOREIGN KEY (messageID) REFERENCES Messages(messageID) ON DELETE CASCADE",
+                "CONSTRAINT fk_privateQuestion FOREIGN KEY (questionID) REFERENCES Questions(questionID) ON DELETE CASCADE"
         };
     }
 }

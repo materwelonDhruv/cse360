@@ -1,6 +1,4 @@
-package src;
-
-import src.application.StartCSE360;
+import application.StartCSE360;
 
 public class App {
     public static void main(String[] args) {

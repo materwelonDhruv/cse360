@@ -1,8 +1,9 @@
-package src.validators;
+package validators;
 
-import src.database.model.entities.Answer;
-import src.database.model.entities.PrivateMessage;
-import src.database.model.entities.Question;
+import database.model.entities.Answer;
+import database.model.entities.Message;
+import database.model.entities.PrivateMessage;
+import database.model.entities.Question;
 
 public class EntityValidator {
     private final static int MIN_TITLE_LENGTH = 5;
@@ -17,18 +18,16 @@ public class EntityValidator {
         if (question == null) {
             throw new IllegalArgumentException("Question cannot be null.");
         }
-        if (question.getUserId() <= 0) {
+        if (question.getMessage().getUserId() <= 0) {
             throw new IllegalArgumentException("A valid userID is required for a question.");
         }
         if (question.getTitle() == null || question.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Question title cannot be empty.");
         }
-        if (question.getContent() == null || question.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("Question content cannot be empty.");
-        }
+        validateMessageContent(question.getMessage().getContent());
 
         validateLength(question.getTitle(), MIN_TITLE_LENGTH, MAX_TITLE_LENGTH, "Question title must be between 5 and 100 characters.");
-        validateLength(question.getContent(), MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH, "Question content must be between 10 and 2000 characters.");
+        validateLength(question.getMessage().getContent(), MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH, "Question content must be between 10 and 2000 characters.");
     }
 
     /**
@@ -38,12 +37,10 @@ public class EntityValidator {
         if (answer == null) {
             throw new IllegalArgumentException("Answer cannot be null.");
         }
-        if (answer.getUserId() <= 0) {
+        if (answer.getMessage().getUserId() <= 0) {
             throw new IllegalArgumentException("A valid userID is required for an answer.");
         }
-        if (answer.getContent() == null || answer.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("Answer content cannot be empty.");
-        }
+        validateMessageContent(answer.getMessage().getContent());
         // Must reference exactly one of questionId or parentAnswerId
         boolean hasQuestion = (answer.getQuestionId() != null);
         boolean hasParent = (answer.getParentAnswerId() != null);
@@ -54,7 +51,7 @@ public class EntityValidator {
             throw new IllegalArgumentException("An answer must reference either a question OR another answer.");
         }
 
-        validateLength(answer.getContent(), MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH, "Answer content must be between 10 and 2000 characters.");
+        validateLength(answer.getMessage().getContent(), MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH, "Answer content must be between 10 and 2000 characters.");
     }
 
     /**
@@ -70,14 +67,28 @@ public class EntityValidator {
         if (privateMessage == null) {
             throw new IllegalArgumentException("PrivateMessage cannot be null.");
         }
-        if (privateMessage.getUserId() <= 0) {
+        if (privateMessage.getMessage().getUserId() <= 0) {
             throw new IllegalArgumentException("A valid userID is required for a private message.");
         }
-        if (privateMessage.getContent() == null || privateMessage.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("Private message content cannot be empty.");
-        }
+        validateMessageContent(privateMessage.getMessage().getContent());
         if (privateMessage.getQuestionId() == null) {
             throw new IllegalArgumentException("Private message question ID cannot be null.");
+        }
+    }
+
+    public static void validateMessage(Message message) {
+        if (message == null) {
+            throw new IllegalArgumentException("Message cannot be null.");
+        }
+        if (message.getUserId() <= 0) {
+            throw new IllegalArgumentException("A valid userID is required for a message.");
+        }
+        validateMessageContent(message.getContent());
+    }
+
+    public static void validateMessageContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("Message content cannot be empty.");
         }
     }
 }

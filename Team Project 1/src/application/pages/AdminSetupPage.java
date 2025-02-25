@@ -1,12 +1,12 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
+import application.AppContext;
+import database.model.entities.User;
+import utils.permissions.Roles;
 
 import java.sql.SQLException;
 

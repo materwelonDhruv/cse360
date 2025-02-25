@@ -1,4 +1,4 @@
-package src.database.repository;
+package database.repository;
 
 /**
  * A runtime exception that wraps any SQLException or data access error.

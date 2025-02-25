@@ -1,7 +1,7 @@
-package src.tests.password;
+package tests.password;
 
 import org.junit.jupiter.api.*;
-import src.validators.PasswordValidator;
+import validators.PasswordValidator;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PasswordValidatorTest {

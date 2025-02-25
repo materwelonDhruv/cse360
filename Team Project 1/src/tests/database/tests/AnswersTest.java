@@ -1,121 +1,129 @@
-package src.tests.database.tests;
+package tests.database.tests;
 
+import database.model.entities.Answer;
+import database.model.entities.Message;
+import database.model.entities.Question;
+import database.model.entities.User;
+import database.repository.repos.Answers;
+import database.repository.repos.Questions;
+import database.repository.repos.Users;
 import org.junit.jupiter.api.*;
-import src.database.model.entities.Answer;
-import src.database.model.entities.Question;
-import src.database.model.entities.User;
-import src.database.repository.repos.Answers;
-import src.database.repository.repos.Questions;
-import src.database.repository.repos.Users;
-import src.tests.database.BaseDatabaseTest;
+import tests.database.BaseDatabaseTest;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AnswersTest extends BaseDatabaseTest {
 
     private static Answers answersRepo;
+    private static Questions questionsRepo;
+    private static Users userRepo;
 
     @BeforeAll
     public static void setupAnswers() {
-        // 1) Create two users: userID=1 (question owner), userID=2 (answer owner)
-        Users userRepo = appContext.users();
-
+        userRepo = appContext.users();
+        // Create two users: one for questions (ID=1) and one for answers (ID=2)
         User questionUser = new User("answerTestQ", "Question", "Owner", "pwQ", "question@example.com", 0);
         userRepo.create(questionUser);
-
         User answerUser = new User("answerTestA", "Answer", "Owner", "pwA", "answer@example.com", 0);
         userRepo.create(answerUser);
 
-        // 2) Create a sample question so that answer references are valid
-        Questions questionsRepo = appContext.questions();
-        Question q = new Question(1, "What is JUnit?", "Explain in detail"); // userID=1
-        questionsRepo.create(q);
+        // Create a sample question so that answer references are valid.
+        questionsRepo = appContext.questions();
+        Question q = new Question(new Message(1, "What is JUnit?"), "What is JUnit?");
+        questionsRepo.create(q); // Assume questionID = generated value (likely 1)
 
-        // 3) Answers repository
         answersRepo = appContext.answers();
     }
 
     @Test
     @Order(1)
     public void testCreateTopLevelAnswer() {
-        // userID=2 is answering questionID=1
-        Answer ans = new Answer(2, "JUnit is a testing framework.", 1, null);
+        // Top-level answer: Message with userID=2, questionId=1, no parent.
+        Message msg = new Message(2, "JUnit is a testing framework.");
+        Answer ans = new Answer(msg, 1, null, false);
         Answer created = answersRepo.create(ans);
 
-        Assertions.assertNotNull(created.getId());
-        Assertions.assertEquals(2, created.getUserId());
-        Assertions.assertEquals("JUnit is a testing framework.", created.getContent());
-        Assertions.assertEquals(1, created.getQuestionId());
-        Assertions.assertNull(created.getParentAnswerId());
+        assertNotNull(created.getId(), "Answer ID should be generated");
+        assertEquals(2, created.getMessage().getUserId());
+        assertEquals("JUnit is a testing framework.", created.getMessage().getContent());
+        assertEquals(1, created.getQuestionId());
+        assertNull(created.getParentAnswerId());
     }
 
     @Test
     @Order(2)
     public void testCreateNestedAnswer() {
-        // userID=2 replying to answerID=1
-        Answer reply = new Answer(2, "Yes, JUnit 5 is the latest version!", null, 1);
+        // Nested answer: reply to answer with ID=1 (parentAnswerID=1), questionId is null.
+        Message msg = new Message(2, "Reply: JUnit 5 is the latest version!");
+        Answer reply = new Answer(msg, null, 1, false);
         Answer created = answersRepo.create(reply);
 
-        Assertions.assertNotNull(created.getId());
-        Assertions.assertEquals(2, created.getUserId());
-        Assertions.assertNull(created.getQuestionId());
-        Assertions.assertEquals(1, created.getParentAnswerId());
+        assertNotNull(created.getId(), "Nested Answer ID should be generated");
+        assertEquals(2, created.getMessage().getUserId());
+        assertNull(created.getQuestionId());
+        assertEquals(1, created.getParentAnswerId());
     }
 
     @Test
     @Order(3)
     public void testFetchAnswer() {
         Answer fetched = answersRepo.getById(1);
-        Assertions.assertNotNull(fetched, "Should fetch an existing answer");
-        Assertions.assertEquals(1, fetched.getId());
-        Assertions.assertEquals("JUnit is a testing framework.", fetched.getContent());
+        assertNotNull(fetched, "Should fetch existing answer");
+        assertEquals(1, fetched.getId());
+        assertEquals("JUnit is a testing framework.", fetched.getMessage().getContent());
     }
 
     @Test
     @Order(4)
     public void testUpdateAnswer() {
         Answer existing = answersRepo.getById(1);
-        existing.setContent("JUnit is a popular testing framework for Java.");
+        // Update content via underlying Message
+        existing.getMessage().setContent("JUnit is a popular testing framework for Java.");
         Answer updated = answersRepo.update(existing);
-
-        Assertions.assertEquals("JUnit is a popular testing framework for Java.", updated.getContent());
+        assertEquals("JUnit is a popular testing framework for Java.", updated.getMessage().getContent());
     }
 
     @Test
     @Order(5)
-    public void testPinMessage() {
+    public void testTogglePin() {
         Answer a = answersRepo.getById(1);
-
-        // Pin the answer
-        a.setIsPinned(true);
-
-        Answer updated = answersRepo.update(a);
-
-        Assertions.assertTrue(updated.getIsPinned(), "Answer should be pinned");
+        boolean initialPin = a.getIsPinned();
+        Answer toggled = answersRepo.togglePin(a.getId());
+        assertEquals(!initialPin, toggled.getIsPinned(), "Pinned state should toggle");
     }
 
     @Test
     @Order(6)
-    public void testGetAnswersByQuestionId() {
-        List<Answer> answers = answersRepo.getAnswersByQuestionId(1);
-        Assertions.assertFalse(answers.isEmpty(), "Should have at least one top-level answer");
-        Assertions.assertEquals(1, answers.get(0).getQuestionId());
+    public void testUpdateAnswerContent() {
+        Answer a = answersRepo.getById(1);
+        Answer updated = answersRepo.updateAnswerContent(a.getId(), "Updated answer content.");
+        assertEquals("Updated answer content.", updated.getMessage().getContent());
     }
 
     @Test
     @Order(7)
-    public void testGetRepliesByAnswerId() {
-        List<Answer> replies = answersRepo.getRepliesByAnswerId(1);
-        Assertions.assertFalse(replies.isEmpty(), "Should have at least one reply");
-        Assertions.assertEquals(1, replies.get(0).getParentAnswerId());
+    public void testGetAnswersByUser() {
+        // Create an additional answer for userID=2.
+        Message msg = new Message(2, "Another answer from user 2");
+        Answer a = new Answer(msg, 1, null, false);
+        answersRepo.create(a);
+
+        List<Answer> results = answersRepo.getAnswersByUser(2);
+        assertFalse(results.isEmpty(), "Expected at least one answer by userID=2");
+        for (Answer ans : results) {
+            assertEquals(2, ans.getMessage().getUserId(), "Answer should be by userID=2");
+        }
     }
 
     @Test
     @Order(8)
     public void testNegativeUserId() {
-        Answer invalid = new Answer(0, "Content", 1, null);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Message invalidMsg = new Message(0, "Content");
+        Answer invalid = new Answer(invalidMsg, 1, null, false);
+        assertThrows(IllegalArgumentException.class, () -> {
             answersRepo.create(invalid);
         }, "Expected exception for invalid userID=0");
     }
@@ -123,9 +131,9 @@ public class AnswersTest extends BaseDatabaseTest {
     @Test
     @Order(9)
     public void testNegativeEmptyContent() {
-        // userID=2, but content is empty
-        Answer invalid = new Answer(2, "", 1, null);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Message invalidMsg = new Message(2, "");
+        Answer invalid = new Answer(invalidMsg, 1, null, false);
+        assertThrows(IllegalArgumentException.class, () -> {
             answersRepo.create(invalid);
         }, "Expected exception for empty content");
     }
@@ -133,11 +141,12 @@ public class AnswersTest extends BaseDatabaseTest {
     @Test
     @Order(10)
     public void testCreateAnswerWithBothQuestionAndParentFails() {
-        // userID=2
-        Answer invalid = new Answer(2, "Invalid answer", 1, 2);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Message msg = new Message(2, "Invalid answer");
+        // Both questionId and parentAnswerId set should be invalid.
+        Answer invalid = new Answer(msg, 1, 2, false);
+        assertThrows(IllegalArgumentException.class, () -> {
             answersRepo.create(invalid);
-        }, "Should throw for referencing both questionID and parentAnswerID");
+        }, "Should throw for both questionID and parentAnswerID set");
     }
 
     @Test
@@ -145,42 +154,24 @@ public class AnswersTest extends BaseDatabaseTest {
     public void testDeleteAnswer() {
         answersRepo.delete(1);
         Answer deleted = answersRepo.getById(1);
-        Assertions.assertNull(deleted, "Answer #1 should be deleted");
+        assertNull(deleted, "Answer #1 should be deleted");
     }
 
     @Test
     @Order(12)
-    public void testSearchAnswers() {
-        // Create several answers with the keyword "search"
-        Answer a1 = new Answer(2, "This answer is for search test", 1, null);
-        Answer a2 = new Answer(2, "Another answer with SEARCH keyword", 1, null);
-        Answer a3 = new Answer(2, "Irrelevant answer", 1, null);
-
-        answersRepo.create(a1);
-        answersRepo.create(a2);
-        answersRepo.create(a3);
+    public void testSearchAnswers() throws Exception {
+        Message msg1 = new Message(2, "This answer is for search test");
+        Message msg2 = new Message(2, "Another answer with SEARCH keyword");
+        Message msg3 = new Message(2, "Irrelevant answer");
+        answersRepo.create(new Answer(msg1, 1, null, false));
+        answersRepo.create(new Answer(msg2, 1, null, false));
+        answersRepo.create(new Answer(msg3, 1, null, false));
 
         List<Answer> results = answersRepo.searchAnswers("search");
-
-        Assertions.assertTrue(results.size() >= 2, "Expected at least two answers containing 'search'");
+        assertTrue(results.size() >= 2, "Expected at least two answers containing 'search'");
         for (Answer a : results) {
-            Assertions.assertTrue(a.getContent().toLowerCase().contains("search"),
-                    "Each returned answer must contain the keyword 'search'");
-        }
-    }
-
-
-    @Test
-    @Order(13)
-    public void testGetAnswersByUser() {
-        // Create an answer for userID = 2
-        Answer a = new Answer(2, "Answer from user 2", 1, null);
-        answersRepo.create(a);
-
-        List<Answer> results = answersRepo.getAnswersByUser(2);
-        Assertions.assertFalse(results.isEmpty(), "Expected at least one answer by userID=2");
-        for (Answer ans : results) {
-            Assertions.assertEquals(2, ans.getUserId(), "Each returned answer should be posted by userID=2");
+            assertTrue(a.getMessage().getContent().toLowerCase().contains("search"),
+                    "Each answer must contain 'search'");
         }
     }
 }

@@ -1,4 +1,4 @@
-package src.utils.permissions;
+package utils.permissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,8 @@ public class RolesUtil {
 
     /**
      * Checks if the given Roles array contains the specified role.
-     * @param roles array of Roles user has
+     *
+     * @param roles        array of Roles user has
      * @param requiredRole role to check for
      */
     public static boolean hasRole(Roles[] roles, Roles requiredRole) {
@@ -57,7 +58,8 @@ public class RolesUtil {
 
     /**
      * Checks if the provided role is the required role.
-     * @param role user's role
+     *
+     * @param role         user's role
      * @param requiredRole role to check for
      */
     public static boolean hasRole(Roles role, Roles requiredRole) {
@@ -66,7 +68,8 @@ public class RolesUtil {
 
     /**
      * Checks if the provided roles integer contains the specified role.
-     * @param rolesInt integer representing the combined bitwise roles.
+     *
+     * @param rolesInt     integer representing the combined bitwise roles.
      * @param requiredRole role to check for.
      */
     public static boolean hasRole(int rolesInt, Roles requiredRole) {
@@ -75,7 +78,8 @@ public class RolesUtil {
 
     /**
      * Checks if the given Roles array contains all the specified roles.
-     * @param roles array of Roles user has
+     *
+     * @param roles         array of Roles user has
      * @param requiredRoles array of Roles to check for
      */
     public static boolean hasAllRoles(Roles[] roles, Roles[] requiredRoles) {
@@ -89,7 +93,8 @@ public class RolesUtil {
 
     /**
      * Checks if the given Roles array contains any of the specified roles.
-     * @param roles array of Roles user has
+     *
+     * @param roles         array of Roles user has
      * @param requiredRoles array of Roles to check for
      */
     public static boolean hasAnyRole(Roles[] roles, Roles[] requiredRoles) {
@@ -111,8 +116,9 @@ public class RolesUtil {
 
     /**
      * Add a role to a given integer representing the combined bitwise roles.
+     *
      * @param rolesInt integer representing the combined bitwise roles
-     * @param role role to add
+     * @param role     role to add
      * @return integer with the added role
      */
     public static int addRole(int rolesInt, Roles role) {
@@ -125,8 +131,9 @@ public class RolesUtil {
 
     /**
      * Remove a role from a given integer representing the combined bitwise roles.
+     *
      * @param rolesInt integer representing the combined bitwise roles
-     * @param role role to remove
+     * @param role     role to remove
      * @return integer with the removed role
      */
     public static int removeRole(int rolesInt, Roles role) {

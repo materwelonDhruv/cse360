@@ -1,4 +1,4 @@
-package src.utils.permissions;
+package utils.permissions;
 
 public enum Roles {
     USER(1),

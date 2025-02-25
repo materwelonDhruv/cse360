@@ -1,6 +1,6 @@
-package src.database.migration;
+package database.migration;
 
-import src.utils.TableSyncUtil;
+import utils.TableSyncUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,7 +24,7 @@ public abstract class BaseTable {
 
     /**
      * Inline constraints (e.g. foreign keys). For example:
-     *   "CONSTRAINT fk_userID FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE"
+     * "CONSTRAINT fk_userID FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE"
      * Each string in this array is appended to the CREATE TABLE statement after the columns.
      * Return an empty array if no inline constraints.
      */
