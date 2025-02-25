@@ -5,26 +5,27 @@ import database.migration.BaseTable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class QuestionsTable extends BaseTable {
+public class MessagesTable extends BaseTable {
 
     @Override
     public String getTableName() {
-        return "Questions";
+        return "Messages";
     }
 
     @Override
     public Map<String, String> getExpectedColumns() {
         Map<String, String> cols = new LinkedHashMap<>();
-        cols.put("questionID", "INT AUTO_INCREMENT PRIMARY KEY");
-        cols.put("messageID", "INT UNIQUE NOT NULL");  // References Messages table
-        cols.put("title", "VARCHAR(255) NOT NULL");
+        cols.put("messageID", "INT AUTO_INCREMENT PRIMARY KEY");
+        cols.put("userID", "INT NOT NULL");
+        cols.put("content", "TEXT NOT NULL");
+        cols.put("createdAt", "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
         return cols;
     }
 
     @Override
     public String[] getInlineConstraints() {
         return new String[]{
-                "CONSTRAINT fk_questionMessage FOREIGN KEY (messageID) REFERENCES Messages(messageID) ON DELETE CASCADE"
+                "CONSTRAINT fk_messageUser FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE"
         };
     }
 }

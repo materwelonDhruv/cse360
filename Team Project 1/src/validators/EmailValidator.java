@@ -1,4 +1,4 @@
-package src.validators;
+package validators;
 
 public class EmailValidator {
 

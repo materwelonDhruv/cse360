@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,9 +10,9 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.OneTimePassword;
-import src.database.model.entities.User;
+import application.AppContext;
+import database.model.entities.OneTimePassword;
+import database.model.entities.User;
 
 import java.sql.SQLException;
 

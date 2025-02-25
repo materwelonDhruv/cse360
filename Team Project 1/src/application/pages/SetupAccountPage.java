@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,12 +7,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.Invite;
-import src.database.model.entities.User;
-import src.validators.EmailValidator;
-import src.validators.PasswordValidator;
-import src.validators.UsernameValidator;
+import application.AppContext;
+import database.model.entities.Invite;
+import database.model.entities.User;
+import validators.EmailValidator;
+import validators.PasswordValidator;
+import validators.UsernameValidator;
 
 import java.sql.SQLException;
 

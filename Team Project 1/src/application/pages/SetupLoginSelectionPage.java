@@ -1,6 +1,6 @@
-package src.application.pages;
+package application.pages;
 
-import src.application.AppContext;
+import application.AppContext;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;

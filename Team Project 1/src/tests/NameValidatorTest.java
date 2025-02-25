@@ -1,8 +1,8 @@
-package src.tests;
+package tests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import src.validators.NameValidator;
+import validators.NameValidator;
 
 public class NameValidatorTest {
 

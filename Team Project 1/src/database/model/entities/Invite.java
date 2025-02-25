@@ -1,7 +1,7 @@
-package src.database.model.entities;
+package database.model.entities;
 
-import src.database.model.BaseEntity;
-import src.utils.Helpers;
+import database.model.BaseEntity;
+import utils.Helpers;
 
 public class Invite extends BaseEntity {
     private String code;

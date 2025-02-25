@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -7,15 +7,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
-import src.utils.permissions.RolesUtil;
+import application.AppContext;
+import database.model.entities.User;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static src.utils.permissions.RolesUtil.*;
+import static utils.permissions.RolesUtil.*;
 
 /**
  * AdminPage class represents the user interface for the admin user.

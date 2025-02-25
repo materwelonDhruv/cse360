@@ -1,6 +1,6 @@
-package src.database.model.entities;
+package database.model.entities;
 
-import src.database.model.BaseEntity;
+import database.model.BaseEntity;
 
 public class User extends BaseEntity {
     private String userName;

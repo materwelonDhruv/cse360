@@ -1,11 +1,11 @@
-package src.application;
+package application;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.pages.FirstPage;
-import src.application.pages.SetupLoginSelectionPage;
+import application.pages.FirstPage;
+import application.pages.SetupLoginSelectionPage;
 
 import java.sql.SQLException;
 

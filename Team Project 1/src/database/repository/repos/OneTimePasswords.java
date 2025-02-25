@@ -1,8 +1,8 @@
-package src.database.repository.repos;
+package database.repository.repos;
 
-import src.database.model.entities.OneTimePassword;
-import src.database.repository.Repository;
-import src.utils.PasswordUtil;
+import database.model.entities.OneTimePassword;
+import database.repository.Repository;
+import utils.PasswordUtil;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

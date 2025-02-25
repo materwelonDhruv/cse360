@@ -1,18 +1,16 @@
-package src.application.pages;
+package application.pages;
 
-import javafx.application.Platform;
+import application.AppContext;
+
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.User;
-import src.database.repository.DataAccessException;
-import src.utils.permissions.Roles;
-import src.utils.permissions.RolesUtil;
+import javafx.application.Platform;
+import database.model.entities.User;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
+import database.repository.DataAccessException;
 
 import java.sql.SQLException;
 
@@ -58,7 +56,22 @@ public class WelcomeLoginPage {
             Platform.exit(); // Exit the JavaFX application
         });
 
-        
+        //Just show continue button to your page if only 1 role assigned
+        if (roles.length == 1) {
+            if (RolesUtil.hasRole(roles, Roles.ADMIN)) {
+                continueButton.setOnAction(e -> {
+                    try {
+                        new AdminHomePage().show(primaryStage, user);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+            } else {
+                continueButton.setOnAction(e -> {
+                    new UserHomePage().show(primaryStage, user, roles[0]);
+                });
+            }
+        }
         // Dropdown menu to choose from all the assigned roles
         MenuButton roleMenu = new MenuButton("Select Role");
 

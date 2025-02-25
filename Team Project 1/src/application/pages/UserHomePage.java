@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,9 +7,9 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
-import src.utils.permissions.RolesUtil;
+import database.model.entities.User;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 import java.sql.SQLException;
 
@@ -79,7 +79,17 @@ public class UserHomePage {
                 throw new RuntimeException(ex);
             }
         });
-        layout.getChildren().addAll(userLabel, roleLabel, logoutButton);
+        //Button to test QuestionDisplay
+        Button questionDisplayButton = new Button("Your Homepage");
+        questionDisplayButton.setOnAction(e -> {
+            try {
+                new UserQuestionDisplay().show(primaryStage, user, userCurrentRole);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        layout.getChildren().addAll(userLabel, roleLabel, logoutButton, questionDisplayButton);
 
         //Don't show the menubar and goButton if only 1 role is assigned
         if (allRoles.length > 1) {

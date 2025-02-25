@@ -1,52 +1,32 @@
-package src.database.model.entities;
+package database.model.entities;
 
-import src.database.model.BaseEntity;
+import database.model.BaseEntity;
 
-import java.sql.Timestamp;
-
-/**
- * Represents a row in the Answers table.
- * An Answer can either link to a Question OR another Answer (parentAnswerId).
- */
 public class Answer extends BaseEntity {
-    private int userId;             // new field referencing Users(userID)
-    private String content;
-    private Integer questionId;     // can be null
-    private Integer parentAnswerId; // can be null
-    private Timestamp createdAt;
+    private Message message;        // Underlying message
+    private Integer questionId;     // If top-level answer (optional)
+    private Integer parentAnswerId; // For nested replies (optional)
+    private boolean isPinned;
 
     public Answer() {
     }
 
     /**
-     * @param userId         - user posting this answer
-     * @param content        - the answer text
-     * @param questionId     - if this is a top-level answer
-     * @param parentAnswerId - if this is a reply to another answer
+     * Creates a new Answer with no existing answerID.
      */
-    public Answer(int userId, String content, Integer questionId, Integer parentAnswerId) {
-        this.userId = userId;
-        this.content = content;
+    public Answer(Message message, Integer questionId, Integer parentAnswerId, boolean isPinned) {
+        this.message = message;
         this.questionId = questionId;
         this.parentAnswerId = parentAnswerId;
+        this.isPinned = isPinned;
     }
 
-    // Getters & setters
-
-    public int getUserId() {
-        return userId;
+    public Message getMessage() {
+        return message;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
     public Integer getQuestionId() {
@@ -65,11 +45,11 @@ public class Answer extends BaseEntity {
         this.parentAnswerId = parentAnswerId;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
+    public boolean getIsPinned() {
+        return isPinned;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
+    public void setPinned(boolean pinned) {
+        this.isPinned = pinned;
     }
 }

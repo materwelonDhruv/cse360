@@ -1,7 +1,7 @@
-package src.tests;
+package tests;
 
 import org.junit.jupiter.api.*;
-import src.validators.UsernameValidator;
+import validators.UsernameValidator;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UsernameValidatorTest {

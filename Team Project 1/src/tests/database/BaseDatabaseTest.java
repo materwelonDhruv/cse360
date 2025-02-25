@@ -1,9 +1,9 @@
-package src.tests.database;
+package tests.database;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import src.application.AppContext;
-import src.database.connection.DatabaseConnection;
+import application.AppContext;
+import database.connection.DatabaseConnection;
 
 import java.sql.SQLException;
 

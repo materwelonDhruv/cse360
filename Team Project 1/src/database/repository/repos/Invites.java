@@ -1,8 +1,8 @@
-package src.database.repository.repos;
+package database.repository.repos;
 
-import src.database.model.entities.Invite;
-import src.database.repository.Repository;
-import src.utils.Helpers;
+import database.model.entities.Invite;
+import database.repository.Repository;
+import utils.Helpers;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

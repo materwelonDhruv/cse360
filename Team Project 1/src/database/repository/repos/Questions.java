@@ -1,8 +1,10 @@
-package src.database.repository.repos;
+package database.repository.repos;
 
-import src.database.model.entities.Question;
-import src.database.repository.Repository;
-import src.validators.EntityValidator;
+import database.model.entities.Message;
+import database.model.entities.Question;
+import database.repository.Repository;
+import utils.SearchUtil;
+import validators.EntityValidator;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,21 +13,27 @@ import java.util.List;
 
 public class Questions extends Repository<Question> {
 
+    private final Messages messagesRepo;
+
     public Questions(Connection connection) throws SQLException {
         super(connection);
+        this.messagesRepo = new Messages(connection);
     }
 
     @Override
     public Question create(Question question) {
-        EntityValidator.validateQuestion(question); // NEW: validate input
+        EntityValidator.validateQuestion(question);
+        Message msg = question.getMessage();
+        if (msg == null) {
+            throw new IllegalArgumentException("Question must have a Message");
+        }
+        messagesRepo.create(msg); // sets msg.id
 
-        String sql = "INSERT INTO Questions (userID, title, content) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Questions (messageID, title) VALUES (?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
-            pstmt.setInt(1, question.getUserId());
+            pstmt.setInt(1, msg.getId());
             pstmt.setString(2, question.getTitle());
-            pstmt.setString(3, question.getContent());
         });
-
         if (generatedId > 0) {
             question.setId(generatedId);
         }
@@ -34,7 +42,13 @@ public class Questions extends Repository<Question> {
 
     @Override
     public Question getById(int id) {
-        String sql = "SELECT * FROM Questions WHERE questionID = ?";
+        String sql =
+                "SELECT q.questionID, q.title, " +
+                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
+                        "FROM Questions q " +
+                        "JOIN Messages m ON q.messageID = m.messageID " +
+                        "WHERE q.questionID = ?";
+
         return queryForObject(sql,
                 pstmt -> pstmt.setInt(1, id),
                 this::build
@@ -43,7 +57,12 @@ public class Questions extends Repository<Question> {
 
     @Override
     public List<Question> getAll() {
-        String sql = "SELECT * FROM Questions";
+        String sql =
+                "SELECT q.questionID, q.title, " +
+                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
+                        "FROM Questions q " +
+                        "JOIN Messages m ON q.messageID = m.messageID";
+
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
@@ -52,66 +71,100 @@ public class Questions extends Repository<Question> {
     public Question build(ResultSet rs) throws SQLException {
         Question question = new Question();
         question.setId(rs.getInt("questionID"));
-        question.setUserId(rs.getInt("userID"));
         question.setTitle(rs.getString("title"));
-        question.setContent(rs.getString("content"));
-        question.setCreatedAt(rs.getTimestamp("createdAt"));
+
+        Message msg = new Message();
+        msg.setId(rs.getInt("msg_id"));
+        msg.setUserId(rs.getInt("msg_userID"));
+        msg.setContent(rs.getString("msg_content"));
+        msg.setCreatedAt(rs.getTimestamp("msg_createdAt"));
+
+        question.setMessage(msg);
         return question;
     }
 
     @Override
     public Question update(Question question) {
         EntityValidator.validateQuestion(question);
+        if (question.getMessage() == null) {
+            throw new IllegalArgumentException("Question must have a Message");
+        }
+        // Only content is updated in Messages
+        messagesRepo.update(question.getMessage());
 
-        String sql = "UPDATE Questions SET userID = ?, title = ?, content = ? WHERE questionID = ?";
+        String sql = "UPDATE Questions SET title = ? WHERE questionID = ?";
         int rows = executeUpdate(sql, pstmt -> {
-            pstmt.setInt(1, question.getUserId());
-            pstmt.setString(2, question.getTitle());
-            pstmt.setString(3, question.getContent());
-            pstmt.setInt(4, question.getId());
+            pstmt.setString(1, question.getTitle());
+            pstmt.setInt(2, question.getId());
         });
-
         return rows > 0 ? question : null;
     }
 
     @Override
     public void delete(int id) {
+        // Only delete from Questions; message row is removed by cascade if set up
         String sql = "DELETE FROM Questions WHERE questionID = ?";
         executeUpdate(sql, pstmt -> pstmt.setInt(1, id));
     }
 
-    // ------------------------------------------------------------------------
-    // Additional methods:
-
     /**
-     * Returns questions whose title or content contains the given keyword (case-insensitive).
-     */
-    public List<Question> searchQuestions(String keyword) {
-        String sql = "SELECT * FROM Questions " +
-                "WHERE LOWER(title) LIKE ? OR LOWER(content) LIKE ?";
-        String param = "%" + keyword.toLowerCase() + "%";
-
-        return queryForList(sql, pstmt -> {
-            pstmt.setString(1, param);
-            pstmt.setString(2, param);
-        }, this::build);
-    }
-
-    /**
-     * Returns all questions asked by a specific userID.
+     * Returns questions posted by a particular user.
      */
     public List<Question> getQuestionsByUser(int userId) {
-        String sql = "SELECT * FROM Questions WHERE userID = ?";
+        String sql =
+                "SELECT q.questionID, q.title, " +
+                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
+                        "FROM Questions q " +
+                        "JOIN Messages m ON q.messageID = m.messageID " +
+                        "WHERE m.userID = ?";
+
         return queryForList(sql, pstmt -> pstmt.setInt(1, userId), this::build);
     }
 
     /**
-     * Returns all questions that currently have no answers.
+     * Searches questions by fuzzy-matching both title and content.
+     */
+    public List<Question> searchQuestions(String keyword) throws Exception {
+        // Basic approach: retrieve all, then do fuzzy filter in-memory
+        List<Question> all = getAll();
+        return SearchUtil.fullTextSearch(all, keyword,
+                q -> q.getTitle() + " " + q.getMessage().getContent()
+        );
+    }
+
+    /**
+     * Updates only the title of an existing question.
+     */
+    public Question updateQuestionTitle(int questionId, String newTitle) {
+        Question existing = getById(questionId);
+        if (existing == null) return null;
+        existing.setTitle(newTitle);
+        return update(existing);
+    }
+
+    /**
+     * Updates only the content of the question's underlying message.
+     */
+    public Question updateQuestionContent(int questionId, String newContent) {
+        Question existing = getById(questionId);
+        if (existing == null) return null;
+        existing.getMessage().setContent(newContent);
+        return update(existing);
+    }
+
+    /**
+     * Returns questions that have not been answered yet.
+     *
+     * @return List of unanswered questions
      */
     public List<Question> getUnansweredQuestions() {
-        String sql = "SELECT q.* FROM Questions q " +
-                "LEFT JOIN Answers a ON q.questionID = a.questionID " +
-                "WHERE a.answerID IS NULL";
+        String sql =
+                "SELECT q.questionID, q.title, " +
+                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
+                        "FROM Questions q " +
+                        "JOIN Messages m ON q.messageID = m.messageID " +
+                        "LEFT JOIN Answers a ON q.questionID = a.questionID " +
+                        "WHERE a.answerID IS NULL";
         return queryForList(sql, pstmt -> {
         }, this::build);
     }

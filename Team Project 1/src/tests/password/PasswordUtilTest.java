@@ -1,7 +1,7 @@
-package src.tests.password;
+package tests.password;
 
 import org.junit.jupiter.api.Test;
-import src.utils.PasswordUtil;
+import utils.PasswordUtil;
 
 import static org.junit.jupiter.api.Assertions.*;
 

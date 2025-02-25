@@ -1,4 +1,4 @@
-package src.application.pages;
+package application.pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -6,9 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.User;
-import src.validators.PasswordValidator;
+import application.AppContext;
+import database.model.entities.User;
+import validators.PasswordValidator;
 
 import java.sql.SQLException;
 

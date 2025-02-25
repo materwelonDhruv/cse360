@@ -1,4 +1,4 @@
-package src.validators;
+package validators;
 
 public class UsernameValidator {
     public static void validateUserName(String input) throws IllegalArgumentException {

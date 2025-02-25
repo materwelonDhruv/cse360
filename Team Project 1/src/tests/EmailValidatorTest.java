@@ -1,8 +1,8 @@
-package src.tests;
+package tests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import src.validators.EmailValidator;
+import validators.EmailValidator;
 
 public class EmailValidatorTest {
 
