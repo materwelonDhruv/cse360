@@ -1,6 +1,9 @@
 package src.database.migration;
 
-import src.database.migration.tables.*;
+import src.database.migration.tables.InviteTable;
+import src.database.migration.tables.OneTimePasswordTable;
+import src.database.migration.tables.PrivateMessageTable;
+import src.database.migration.tables.UserTable;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,8 +23,9 @@ public class SchemaManager {
         // Other tables
         tables.add(new InviteTable());
         tables.add(new OneTimePasswordTable());
-        tables.add(new QuestionsTable());
-        tables.add(new AnswersTable());
+        //tables.add(new AnswersTable());
+        //tables.add(new QuestionsTable());
+        tables.add(new PrivateMessageTable());
     }
 
     public void syncTables(Connection connection) throws SQLException {

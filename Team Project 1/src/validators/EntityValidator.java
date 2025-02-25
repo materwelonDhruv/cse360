@@ -1,6 +1,7 @@
 package src.validators;
 
 import src.database.model.entities.Answer;
+import src.database.model.entities.PrivateMessage;
 import src.database.model.entities.Question;
 
 public class EntityValidator {
@@ -62,6 +63,21 @@ public class EntityValidator {
     private static void validateLength(String value, int min, int max, String message) {
         if (value == null || value.length() < min || value.length() > max) {
             throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void validatePrivateMessage(PrivateMessage privateMessage) {
+        if (privateMessage == null) {
+            throw new IllegalArgumentException("PrivateMessage cannot be null.");
+        }
+        if (privateMessage.getUserId() <= 0) {
+            throw new IllegalArgumentException("A valid userID is required for a private message.");
+        }
+        if (privateMessage.getContent() == null || privateMessage.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("Private message content cannot be empty.");
+        }
+        if (privateMessage.getQuestionId() == null) {
+            throw new IllegalArgumentException("Private message question ID cannot be null.");
         }
     }
 }
