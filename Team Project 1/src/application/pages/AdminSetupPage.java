@@ -1,80 +1,103 @@
 package application.pages;
 
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import application.AppContext;
+import application.framework.*;
 import database.model.entities.User;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
-
-import java.sql.SQLException;
+import validators.EmailValidator;
+import validators.PasswordValidator;
+import validators.UsernameValidator;
 
 /**
- * The SetupAdmin class handles the setup process for creating an administrator
- * account.
- * This is intended to be used by the first user to initialize the system with
- * admin credentials.
+ * SetupAccountPage class handles the account setup process for new users.
+ * Users provide their userName, password, and a valid invitation code to register.
+ * This page is used to initialize the system with admin credentials.
  */
-public class AdminSetupPage {
+@Route(MyPages.ADMIN_SETUP)
+@View(title = "Administrator Setup")
+public class AdminSetupPage extends BasePage {
 
-    private final AppContext context;
-
-    public AdminSetupPage() throws SQLException {
-        this.context = AppContext.getInstance();
+    public AdminSetupPage() {
+        super();
     }
 
-    public void show(Stage primaryStage) {
-        // Input fields for userName and password
-        TextField userNameField = new TextField();
-        userNameField.setPromptText("Enter Admin userName");
-        userNameField.setMaxWidth(250);
+    @Override
+    public Pane createView() {
+        // Create a vertically aligned layout with consistent padding and centering.
+        VBox layout = new VBox(10);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter Password");
-        passwordField.setMaxWidth(250);
+        // Create input fields using UIFactory.
+        TextField userNameField = UIFactory.createTextField("Enter Admin userName", 250);
+        TextField firstNameField = UIFactory.createTextField("Enter Admin first name", 250);
+        TextField lastNameField = UIFactory.createTextField("Enter Admin last name", 250);
+        TextField emailField = UIFactory.createTextField("Enter Email", 250);
+        // For a real password field, consider using UIFactory.createPasswordField(...).
+        TextField passwordField = UIFactory.createTextField("Enter Password", 250);
+        TextField inviteCodeField = UIFactory.createTextField("Enter Invitation Code", 250);
 
-        TextField emailField = new TextField();
-        emailField.setPromptText("Enter Email");
-        emailField.setMaxWidth(250);
+        // Create an error label.
+        Label errorLabel = UIFactory.createLabel("", null, null);
+        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
 
-        TextField firstNameField = new TextField();
-        firstNameField.setPromptText("Enter Admin first name");
-        firstNameField.setMaxWidth(250);
-
-        TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Enter Admin userName");
-        lastNameField.setMaxWidth(250);
-
-        Button setupButton = new Button("Setup");
-
-        setupButton.setOnAction(_ -> {
-            // Retrieve user input
+        // Create Setup and Back buttons.
+        Button setupButton = UIFactory.createButton("Setup", e -> {
             String userName = userNameField.getText();
-            String password = passwordField.getText();
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
+            String password = passwordField.getText();
             String email = emailField.getText();
+            String code = inviteCodeField.getText();
 
+            // Validate user input.
             try {
-                // Create a new User object with admin role and register in the database
-                User user = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
-                context.users().create(user);
-                System.out.println("Administrator setup completed.");
+                UsernameValidator.validateUserName(userName);
+            } catch (IllegalArgumentException ex) {
+                errorLabel.setText(ex.getMessage());
+                return;
+            }
+            try {
+                PasswordValidator.validatePassword(password);
+            } catch (IllegalArgumentException ex) {
+                errorLabel.setText(ex.getMessage());
+                return;
+            }
+            try {
+                EmailValidator.validateEmail(email);
+            } catch (IllegalArgumentException ex) {
+                errorLabel.setText(ex.getMessage());
+                return;
+            }
 
-                // Navigate to the Welcome Login Page
-                new WelcomeLoginPage().show(primaryStage, user);
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
-                e.printStackTrace();
+            // Check if the user already exists.
+            if (!context.users().doesUserExist(userName)) {
+                // Find the invitation code in the database.
+                var invite = context.invites().findInvite(code);
+                if (invite != null) {
+                    // Create a new admin user.
+                    User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
+                    context.users().create(adminUser);
+                    // Set active user in session.
+                    SessionContext.setActiveUser(adminUser);
+                    // Navigate to welcome page.
+                    context.router().navigate(MyPages.WELCOME_LOGIN);
+                } else {
+                    errorLabel.setText("Invitation code does not exist or is expired");
+                }
+            } else {
+                errorLabel.setText("This userName is taken! Please use another.");
             }
         });
 
-        VBox layout = new VBox(10, userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
+        Button backButton = UIFactory.createButton("Back", e -> {
+            context.router().navigate(MyPages.SETUP_LOGIN);
+        });
 
-        primaryStage.setScene(new Scene(layout, 800, 400));
-        primaryStage.setTitle("Administrator Setup");
-        primaryStage.show();
+        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel, backButton);
+        return layout;
     }
 }

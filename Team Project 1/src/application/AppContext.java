@@ -1,17 +1,26 @@
 package application;
 
+import application.framework.PageRouter;
 import database.connection.DatabaseConnection;
 import database.migration.SchemaManager;
 import database.repository.repos.*;
+import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Centralized application context for database and routing.
+ */
 public class AppContext {
     private static AppContext INSTANCE;
 
     private final Connection connection;
 
+    // Single, shared PageRouter so all pages can navigate.
+    private final PageRouter router;
+
+    // Repositories:
     private final Users userRepository;
     private final Messages messageRepository;
     private final Invites inviteRepository;
@@ -21,19 +30,25 @@ public class AppContext {
     private final PrivateMessages privateMessagesRepository;
     private final ReadMessages readMessagesRepository;
 
-    public AppContext() throws SQLException {
-        // 1) Initialize the DB connection and schema manager
+    /**
+     * Private constructor sets up the DB connection, runs migrations, and
+     * creates the single PageRouter for the entire app.
+     *
+     * @param primaryStage The main JavaFX stage that the router will control.
+     * @throws SQLException if DB initialization fails
+     */
+    private AppContext(Stage primaryStage) throws SQLException {
+        // 1) Initialize DB and schema
         DatabaseConnection.initialize();
         SchemaManager schemaManager = new SchemaManager();
         this.connection = DatabaseConnection.getConnection();
 
-        // 2) Run any migrations or schema sync if necessary
+        // 2) Sync DB schema
         schemaManager.syncTables(connection);
-
-        // 3) Inspect database tables
+        // 3) Inspect tables
         schemaManager.inspectTables(connection);
 
-        // 4) Initialize repositories with the connection (injected)
+        // 4) Build repositories
         this.userRepository = new Users(connection);
         this.messageRepository = new Messages(connection);
         this.inviteRepository = new Invites(connection);
@@ -42,22 +57,54 @@ public class AppContext {
         this.answerRepository = new Answers(connection);
         this.privateMessagesRepository = new PrivateMessages(connection);
         this.readMessagesRepository = new ReadMessages(connection);
+
+        // 5) Create the PageRouter ONCE, passing the main stage
+        if (primaryStage != null) {
+            this.router = new PageRouter(primaryStage);
+        } else {
+            this.router = null;
+        }
     }
 
     /**
-     * Global access point to the AppContext.
+     * Global access to AppContext with a single Stage.
+     * If not initialized, create it. Otherwise, return existing.
      */
-    public static synchronized AppContext getInstance() throws SQLException {
+    public static synchronized AppContext getInstance(Stage primaryStage) throws SQLException {
         if (INSTANCE == null) {
-            INSTANCE = new AppContext();
+            INSTANCE = new AppContext(primaryStage);
         }
         return INSTANCE;
     }
 
-    // -- Getters for each repository:
+    /**
+     * Global access to AppContext without a primary stage.
+     * If not initialized, create it. Otherwise, return existing.
+     */
+    public static synchronized AppContext getInstance() throws SQLException {
+        if (INSTANCE == null) {
+            INSTANCE = new AppContext(null);
+        }
+        return INSTANCE;
+    }
+
+    // Access to the single PageRouter
+    public PageRouter router() {
+        if (router == null) {
+            throw new IllegalStateException("PageRouter is not available. AppContext was initialized without a primary stage.");
+        }
+
+        return router;
+    }
+
+    // Repositories:
 
     public Users users() {
         return userRepository;
+    }
+
+    public Messages messages() {
+        return messageRepository;
     }
 
     public Invites invites() {
@@ -68,21 +115,12 @@ public class AppContext {
         return otpRepository;
     }
 
-    // -- Getters for the connection:
-    public Connection getConnection() {
-        return connection;
-    }
-
     public Questions questions() {
         return questionRepository;
     }
 
     public Answers answers() {
         return answerRepository;
-    }
-
-    public Messages messages() {
-        return messageRepository;
     }
 
     public PrivateMessages privateMessages() {
@@ -93,10 +131,12 @@ public class AppContext {
         return readMessagesRepository;
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     /**
-     * Closes the connection to the database.
-     *
-     * @throws SQLException if the connection cannot be closed.
+     * Closes the database connection if needed.
      */
     public void closeConnection() throws SQLException {
         DatabaseConnection.closeConnection();
