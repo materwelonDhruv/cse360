@@ -25,6 +25,7 @@ public class AnswersTable extends BaseTable {
         cols.put("questionID", "INT NULL");
         cols.put("parentAnswerID", "INT NULL");
         cols.put("createdAt", "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        cols.put(("isPinned"), "BOOLEAN NOT NULL DEFAULT FALSE");
         return cols;
     }
 

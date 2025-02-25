@@ -85,6 +85,7 @@ public class Answers extends Repository<Answer> {
         }
 
         answer.setCreatedAt(rs.getTimestamp("createdAt"));
+        answer.setIsPinned(rs.getBoolean("isPinned"));
         return answer;
     }
 

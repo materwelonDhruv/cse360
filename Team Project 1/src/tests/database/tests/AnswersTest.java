@@ -84,6 +84,19 @@ public class AnswersTest extends BaseDatabaseTest {
 
     @Test
     @Order(5)
+    public void testPinMessage() {
+        Answer a = answersRepo.getById(1);
+
+        // Pin the answer
+        a.setIsPinned(true);
+
+        Answer updated = answersRepo.update(a);
+
+        Assertions.assertTrue(updated.getIsPinned(), "Answer should be pinned");
+    }
+
+    @Test
+    @Order(6)
     public void testGetAnswersByQuestionId() {
         List<Answer> answers = answersRepo.getAnswersByQuestionId(1);
         Assertions.assertFalse(answers.isEmpty(), "Should have at least one top-level answer");
@@ -91,7 +104,7 @@ public class AnswersTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testGetRepliesByAnswerId() {
         List<Answer> replies = answersRepo.getRepliesByAnswerId(1);
         Assertions.assertFalse(replies.isEmpty(), "Should have at least one reply");
@@ -99,7 +112,7 @@ public class AnswersTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     public void testNegativeUserId() {
         Answer invalid = new Answer(0, "Content", 1, null);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -108,7 +121,7 @@ public class AnswersTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testNegativeEmptyContent() {
         // userID=2, but content is empty
         Answer invalid = new Answer(2, "", 1, null);
@@ -118,7 +131,7 @@ public class AnswersTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void testCreateAnswerWithBothQuestionAndParentFails() {
         // userID=2
         Answer invalid = new Answer(2, "Invalid answer", 1, 2);
@@ -128,7 +141,7 @@ public class AnswersTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void testDeleteAnswer() {
         answersRepo.delete(1);
         Answer deleted = answersRepo.getById(1);
@@ -136,7 +149,7 @@ public class AnswersTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void testSearchAnswers() {
         // Create several answers with the keyword "search"
         Answer a1 = new Answer(2, "This answer is for search test", 1, null);
@@ -158,7 +171,7 @@ public class AnswersTest extends BaseDatabaseTest {
 
 
     @Test
-    @Order(12)
+    @Order(13)
     public void testGetAnswersByUser() {
         // Create an answer for userID = 2
         Answer a = new Answer(2, "Answer from user 2", 1, null);
@@ -170,5 +183,4 @@ public class AnswersTest extends BaseDatabaseTest {
             Assertions.assertEquals(2, ans.getUserId(), "Each returned answer should be posted by userID=2");
         }
     }
-
 }

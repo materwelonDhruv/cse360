@@ -14,6 +14,7 @@ public class Answer extends BaseEntity {
     private Integer questionId;     // can be null
     private Integer parentAnswerId; // can be null
     private Timestamp createdAt;
+    private boolean isPinned;
 
     public Answer() {
     }
@@ -71,5 +72,13 @@ public class Answer extends BaseEntity {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean getIsPinned() {
+        return isPinned;
+    }
+
+    public void setIsPinned(boolean isPinned) {
+        this.isPinned = isPinned;
     }
 }
