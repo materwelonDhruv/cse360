@@ -67,14 +67,14 @@ public abstract class BasePage {
         if (this.getClass().isAnnotationPresent(View.class)) {
             return this.getClass().getAnnotation(View.class).width();
         }
-        return 800;
+        return DesignGuide.DEFAULT_WIDTH;
     }
 
     public int getHeight() {
         if (this.getClass().isAnnotationPresent(View.class)) {
             return this.getClass().getAnnotation(View.class).height();
         }
-        return 400;
+        return DesignGuide.DEFAULT_HEIGHT;
     }
 
     public boolean isResizable() {

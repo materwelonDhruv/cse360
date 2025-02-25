@@ -10,9 +10,9 @@ import java.lang.annotation.RetentionPolicy;
 public @interface View {
     String title() default "";
 
-    int width() default 800;
+    int width() default DesignGuide.DEFAULT_WIDTH;
 
-    int height() default 400;
+    int height() default DesignGuide.DEFAULT_HEIGHT;
 
     boolean resizable() default true;
 }
