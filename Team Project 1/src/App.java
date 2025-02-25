@@ -1,7 +1,7 @@
-import application.StartCSE360;
+import application.InstantiateApp;
 
 public class App {
     public static void main(String[] args) {
-        StartCSE360.main(args);
+        InstantiateApp.main(args);
     }
 }
