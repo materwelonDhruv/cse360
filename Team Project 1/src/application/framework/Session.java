@@ -8,6 +8,7 @@ import database.model.entities.User;
 public class Session {
 
     private User activeUser;
+    private int currentRole;
 
     public Session() {
     }
@@ -17,11 +18,19 @@ public class Session {
         if (activeUser == null) {
             throw new IllegalStateException("No active user");
         }
-        
+
         return activeUser;
     }
 
     public void setActiveUser(User user) {
         activeUser = user;
+    }
+
+    public int getCurrentRole() {
+        return currentRole;
+    }
+
+    public void setCurrentRole(int role) {
+        currentRole = role;
     }
 }
