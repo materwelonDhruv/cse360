@@ -87,8 +87,7 @@ public class WelcomeLoginPage extends BasePage {
             roleMenu = null;
         }
 
-        layout.getChildren().add(welcomeLabel);
-        layout.getChildren().add(continueButton);
+        layout.getChildren().addAll(welcomeLabel, continueButton);
         if (roleMenu != null) {
             layout.getChildren().add(roleMenu);
         }

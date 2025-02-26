@@ -45,7 +45,7 @@ public class UserLoginPage extends BasePage {
 
             boolean userValid = context.users().validateLogin(userName, password);
             if (!userValid) {
-                // Try one-time password
+                //Try one-time password
                 var otpRepo = context.oneTimePasswords();
                 boolean otpValid = otpRepo.check(user.getId(), password);
                 if (otpValid) {

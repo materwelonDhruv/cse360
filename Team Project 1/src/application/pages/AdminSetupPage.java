@@ -38,7 +38,6 @@ public class AdminSetupPage extends BasePage {
         TextField emailField = UIFactory.createTextField("Enter Email", 250);
         // For a real password field, consider using UIFactory.createPasswordField(...).
         TextField passwordField = UIFactory.createTextField("Enter Password", 250);
-        TextField inviteCodeField = UIFactory.createTextField("Enter Invitation Code", 250);
 
         // Create an error label.
         Label errorLabel = UIFactory.createLabel("", null, null);
@@ -51,7 +50,6 @@ public class AdminSetupPage extends BasePage {
             String lastName = lastNameField.getText();
             String password = passwordField.getText();
             String email = emailField.getText();
-            String code = inviteCodeField.getText();
 
             // Validate user input.
             try {
@@ -73,31 +71,20 @@ public class AdminSetupPage extends BasePage {
                 return;
             }
 
-            // Check if the user already exists.
-            if (!context.users().doesUserExist(userName)) {
-                // Find the invitation code in the database.
-                var invite = context.invites().findInvite(code);
-                if (invite != null) {
-                    // Create a new admin user.
-                    User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
-                    context.users().create(adminUser);
-                    // Set active user in session.
-                    SessionContext.setActiveUser(adminUser);
-                    // Navigate to welcome page.
-                    context.router().navigate(MyPages.WELCOME_LOGIN);
-                } else {
-                    errorLabel.setText("Invitation code does not exist or is expired");
-                }
-            } else {
-                errorLabel.setText("This userName is taken! Please use another.");
-            }
+            User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
+            context.users().create(adminUser);
+            // Set active user in session.
+            SessionContext.setActiveUser(adminUser);
+            // Navigate to welcome page.
+            context.router().navigate(MyPages.WELCOME_LOGIN);
+
         });
 
         Button backButton = UIFactory.createButton("Back", e -> {
             context.router().navigate(MyPages.SETUP_LOGIN);
         });
 
-        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel, backButton);
+        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton, errorLabel, backButton);
         return layout;
     }
 }
