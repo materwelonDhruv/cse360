@@ -13,6 +13,11 @@ import java.util.List;
 
 public class Answers extends Repository<Answer> {
     private final Messages messagesRepo;
+    private final String baseJoinQuery =
+            "SELECT a.answerID, a.questionID, a.parentAnswerID, a.isPinned, " +
+                    "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
+                    "FROM Answers a " +
+                    "JOIN Messages m ON a.messageID = m.messageID ";
 
     public Answers(Connection connection) throws SQLException {
         super(connection);
@@ -51,12 +56,7 @@ public class Answers extends Repository<Answer> {
 
     @Override
     public Answer getById(int id) {
-        String sql =
-                "SELECT a.answerID, a.questionID, a.parentAnswerID, a.isPinned, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Answers a " +
-                        "JOIN Messages m ON a.messageID = m.messageID " +
-                        "WHERE a.answerID = ?";
+        String sql = baseJoinQuery + "WHERE a.answerID = ?";
 
         return queryForObject(sql,
                 pstmt -> pstmt.setInt(1, id),
@@ -66,11 +66,7 @@ public class Answers extends Repository<Answer> {
 
     @Override
     public List<Answer> getAll() {
-        String sql =
-                "SELECT a.answerID, a.questionID, a.parentAnswerID, a.isPinned, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Answers a " +
-                        "JOIN Messages m ON a.messageID = m.messageID";
+        String sql = baseJoinQuery;
 
         return queryForList(sql, pstmt -> {
         }, this::build);
@@ -136,12 +132,7 @@ public class Answers extends Repository<Answer> {
      * Returns answers posted by a particular user (filter by message's userID).
      */
     public List<Answer> getAnswersByUser(int userId) {
-        String sql =
-                "SELECT a.answerID, a.questionID, a.parentAnswerID, a.isPinned, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Answers a " +
-                        "JOIN Messages m ON a.messageID = m.messageID " +
-                        "WHERE m.userID = ?";
+        String sql = baseJoinQuery + "WHERE m.userID = ?";
 
         return queryForList(sql, pstmt -> pstmt.setInt(1, userId), this::build);
     }
