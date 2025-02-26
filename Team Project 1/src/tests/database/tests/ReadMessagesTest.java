@@ -18,13 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ReadMessagesTest extends BaseDatabaseTest {
 
     private static ReadMessages readMessagesRepo;
-    private static Users userRepo;
     private static Questions questionsRepo;
     private static int testUserId;
 
     @BeforeAll
     public static void setupReadMessages() {
-        userRepo = appContext.users();
+        Users userRepo = appContext.users();
         // Create a test user.
         User user = new User("readTestUser", "Test", "User", "password", "readtest@example.com", 0);
         userRepo.create(user);
