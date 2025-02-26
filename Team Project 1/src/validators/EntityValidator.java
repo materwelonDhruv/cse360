@@ -74,6 +74,18 @@ public class EntityValidator {
         if (privateMessage.getQuestionId() == null) {
             throw new IllegalArgumentException("Private message question ID cannot be null.");
         }
+
+        // Must reference exactly one of questionId or parentPrivateMessageId
+        boolean hasQuestion = (privateMessage.getQuestionId() != null);
+        boolean hasParent = (privateMessage.getParentPrivateMessageId() != null);
+        if (hasQuestion && hasParent) {
+            throw new IllegalArgumentException("A private message must reference either a question OR another private message, not both.");
+        }
+        if (!hasQuestion && !hasParent) {
+            throw new IllegalArgumentException("A private message must reference either a question OR another private message.");
+        }
+
+        validateLength(privateMessage.getMessage().getContent(), MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH, "Private message content must be between 10 and 2000 characters.");
     }
 
     public static void validateMessage(Message message) {

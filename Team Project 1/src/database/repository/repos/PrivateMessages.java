@@ -28,7 +28,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
         }
         messagesRepo.create(msg);
 
-        String sql = "INSERT INTO PrivateMessages (messageID, questionID) VALUES (?, ?)";
+        String sql = "INSERT INTO PrivateMessages (messageID, questionID, parentPrivateMessageID) VALUES (?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
             pstmt.setInt(1, msg.getId());
             if (pm.getQuestionId() != null) {
@@ -36,7 +36,13 @@ public class PrivateMessages extends Repository<PrivateMessage> {
             } else {
                 pstmt.setNull(2, java.sql.Types.INTEGER);
             }
+            if (pm.getParentPrivateMessageId() != null) {
+                pstmt.setInt(3, pm.getParentPrivateMessageId());
+            } else {
+                pstmt.setNull(3, java.sql.Types.INTEGER);
+            }
         });
+
         if (generatedId > 0) {
             pm.setId(generatedId);
         }
@@ -46,7 +52,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
     @Override
     public PrivateMessage getById(int id) {
         String sql =
-                "SELECT pm.privateMessageID, pm.questionID, " +
+                "SELECT pm.privateMessageID, pm.questionID, pm.parentPrivateMessageID, " +
                         "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
                         "FROM PrivateMessages pm " +
                         "JOIN Messages m ON pm.messageID = m.messageID " +
@@ -61,7 +67,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
     @Override
     public List<PrivateMessage> getAll() {
         String sql =
-                "SELECT pm.privateMessageID, pm.questionID, " +
+                "SELECT pm.privateMessageID, pm.questionID, pm.parentPrivateMessageID, " +
                         "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
                         "FROM PrivateMessages pm " +
                         "JOIN Messages m ON pm.messageID = m.messageID";
@@ -86,6 +92,9 @@ public class PrivateMessages extends Repository<PrivateMessage> {
         int qId = rs.getInt("questionID");
         pm.setQuestionId(!rs.wasNull() ? qId : null);
 
+        int parentPrivateMessageId = rs.getInt("parentPrivateMessageID");
+        pm.setParentPrivateMessageId(!rs.wasNull() ? parentPrivateMessageId : null);
+
         return pm;
     }
 
@@ -97,14 +106,19 @@ public class PrivateMessages extends Repository<PrivateMessage> {
         }
         messagesRepo.update(pm.getMessage());
 
-        String sql = "UPDATE PrivateMessages SET questionID = ? WHERE privateMessageID = ?";
+        String sql = "UPDATE PrivateMessages SET questionID = ?, parentPrivateMessageID = ? WHERE privateMessageID = ?";
         int rows = executeUpdate(sql, pstmt -> {
             if (pm.getQuestionId() != null) {
                 pstmt.setInt(1, pm.getQuestionId());
             } else {
                 pstmt.setNull(1, java.sql.Types.INTEGER);
             }
-            pstmt.setInt(2, pm.getId());
+            if (pm.getParentPrivateMessageId() != null) {
+                pstmt.setInt(2, pm.getParentPrivateMessageId());
+            } else {
+                pstmt.setNull(2, java.sql.Types.INTEGER);
+            }
+            pstmt.setInt(3, pm.getId());
         });
         return rows > 0 ? pm : null;
     }
@@ -121,7 +135,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
      */
     public List<PrivateMessage> getPrivateMessagesByUser(int userId) {
         String sql =
-                "SELECT pm.privateMessageID, pm.questionID, " +
+                "SELECT pm.privateMessageID, pm.questionID, pm.parentPrivateMessageID, " +
                         "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
                         "FROM PrivateMessages pm " +
                         "JOIN Messages m ON pm.messageID = m.messageID " +
