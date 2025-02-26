@@ -1,6 +1,5 @@
 package application.pages;
 
-import application.AppContext;
 import application.framework.*;
 import database.model.entities.Message;
 import database.model.entities.Question;
@@ -16,7 +15,6 @@ import javafx.util.Pair;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,18 +27,19 @@ public class UserHomePage extends BasePage {
     //max length for number of characters in the text field
     private static final int MAX_LENGTH = 300;
     private final int currentlySelectedQuestionId = -1;
-    private final TextField questionTitleInput = UIFactory.createTextField("Enter the title", 400);
-    private final TextField questionInput = UIFactory.createTextField("Enter question", 600);
-    private final TextField answerInput = UIFactory.createTextField("Enter answer", 80);
+    private final TextField questionTitleInput = UIFactory.createTextField("Enter the title", f ->
+            f.minWidth(200).maxWidth(600).minChars(5).maxChars(10));
+    private final TextField questionInput = UIFactory.createTextField("Enter question", f ->
+            f.minWidth(200).maxWidth(600).minChars(10).maxChars(MAX_LENGTH));
     //Question and Answers list to store and
     //interact with each element in the list -- questions and answers
     private final ListView<Pair<Integer, String>> questionListView = new ListView<>();
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
     Questions questions;
-    private Stage answerStage;
     private Stage questionStage;
+    private Stage answerStage;
 
-    public UserHomePage(AppContext context) throws IOException {
+    public UserHomePage() {
         super();
 
     }
@@ -55,29 +54,28 @@ public class UserHomePage extends BasePage {
         // Retrieve the active user from session.
         User user = SessionContext.getActiveUser();
         if (user == null) {
-            return new VBox(UIFactory.createLabel("No active user found."));
+            return new VBox(new Label("No active user found."));
         }
 
-
         // Greeting and role display.
-        Label userLabel = UIFactory.createLabel("Hello, " + user.getUserName() + "!");
+        Label userLabel = UIFactory.createLabel("Hello, " + user.getFirstName() + "!");
         int roleInt = user.getRoles();
         Roles[] allRoles = RolesUtil.intToRoles(roleInt);
         // Assume primary role is the first one.
         Roles userCurrentRole = (allRoles.length > 0) ? allRoles[0] : null;
-        Label roleLabel = UIFactory.createLabel("Role: " + userCurrentRole);
+        Label roleLabel = UIFactory.createLabel("Role: " + userCurrentRole, f ->
+                f.style("-fx-font-weight: bold;"));
 
         // Create Logout and Question Display buttons.
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage",
-                e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
+        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
 
         //Add button to add a question
-        Button addQuestionButton = UIFactory.createButton("Add question", e -> ShowQuestionWindow());
+        Button addQuestionButton = UIFactory.createButton("Add question", e -> e.onAction(a -> ShowQuestionWindow()));
 
         createQuestionStage(user.getId());
 
-        layout.getChildren().addAll(userLabel, roleLabel, addQuestionButton, logoutButton, questionDisplayButton, questionListView);
+        layout.getChildren().addAll(userLabel, roleLabel, questionDisplayButton, addQuestionButton, logoutButton, questionListView);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
@@ -93,14 +91,13 @@ public class UserHomePage extends BasePage {
                     roleMenu.getItems().add(roleItem);
                 }
             }
-            Button goButton = UIFactory.createButton("Go", e ->
-                    e.routeToPage(
-                            (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN))
-                                    ? MyPages.ADMIN_HOME
-                                    : MyPages.USER_HOME,
-                            context
-                    )
-            );
+            Button goButton = UIFactory.createButton("Go", e -> {
+                if (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
+                    context.router().navigate(MyPages.ADMIN_HOME);
+                } else if (selectedRole[0] != null) {
+                    context.router().navigate(MyPages.USER_HOME);
+                }
+            });
             layout.getChildren().addAll(roleMenu, goButton);
         }
         return layout;
@@ -111,13 +108,13 @@ public class UserHomePage extends BasePage {
         questionStage.initModality(Modality.NONE);
 
         //UI for question window
-        Label questionContent = UIFactory.createLabel("Question", "-fx-font-size: 16px;", null);
-        Label questonTitle = UIFactory.createLabel("Title", "-fx-font-size: 16px;", null);
-        Button createButton = UIFactory.createButton("Add Question", e -> addQuestion(userID));
-        Button closeButton = UIFactory.createButton("Close", e -> questionStage.close());
+        Label questionContent = UIFactory.createLabel("Question", f -> f.style("-fx-font-weight: bold;"));
+        Label questionTitle = UIFactory.createLabel("Title", f -> f.style("-fx-font-weight: bold;"));
+        Button createButton = UIFactory.createButton("Add Question", e -> e.onAction(a -> addQuestion(userID)));
+        Button closeButton = UIFactory.createButton("Close", e -> e.onAction(a -> questionStage.close()));
 
 
-        VBox questionLayout = new VBox(10, questionTitleInput, questionTitleInput, questionContent, questionInput, createButton, closeButton);
+        VBox questionLayout = new VBox(10, questionTitle, questionTitleInput, questionContent, questionInput, createButton, closeButton);
         questionStage.setScene(new Scene(questionLayout, 300, 400));
     }
 
@@ -147,7 +144,13 @@ public class UserHomePage extends BasePage {
         if (!content.isEmpty()) {
             Message message = new Message(userID, content);
             Question newQuestion = new Question(message, title);
-            Question createdQuestion = context.questions().create(newQuestion);
+
+            Question createdQuestion = null;
+            try {
+                createdQuestion = context.questions().create(newQuestion);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(e);
+            }
             questionListView.getItems().add(new Pair<>(createdQuestion.getId(), createdQuestion.getTitle()));
             questionInput.clear();
         }
