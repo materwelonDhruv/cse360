@@ -1,6 +1,7 @@
 package application.framework;
 
 import database.model.entities.User;
+import utils.permissions.Roles;
 
 /**
  * Holds application-wide session info
@@ -8,7 +9,7 @@ import database.model.entities.User;
 public class Session {
 
     private User activeUser;
-    private int currentRole;
+    private Roles currentRole;
 
     public Session() {
     }
@@ -26,11 +27,11 @@ public class Session {
         activeUser = user;
     }
 
-    public int getCurrentRole() {
+    public Roles getCurrentRole() {
         return currentRole;
     }
 
-    public void setCurrentRole(int role) {
+    public void setCurrentRole(Roles role) {
         currentRole = role;
     }
 }
