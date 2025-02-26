@@ -1,8 +1,9 @@
 package application.pages;
 
 import application.framework.*;
-import database.model.entities.Answer;
+import database.model.entities.PrivateMessage;
 import database.model.entities.Question;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -10,6 +11,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import java.sql.Timestamp;
 
 /**
  * UserQuestionDisplay page shows the current user's questions
@@ -30,7 +33,7 @@ public class UserQuestionDisplay extends BasePage {
         VBox container = new VBox(15);
         container.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        // Create a split pane: left for Questions, right for Answers (future use)
+        // Create a split pane: left for Questions, right for Private Messages (future use)
         SplitPane splitPane = new SplitPane();
 
         // Create table for user's questions
@@ -48,25 +51,37 @@ public class UserQuestionDisplay extends BasePage {
                     Question q = row.getItem();
                     System.out.println("Load details for: " + q.getTitle());
                     // TODO: Navigate to question detail page
+                    //context.router().navigate();
                 }
             });
             return row;
         });
 
-        // Populate columns using UIFactory (if needed, otherwise create directly)
+        // Populate columns using CellValueFactory (if needed, otherwise use PropertyValueFactory)
         TableColumn<Question, String> idCol = new TableColumn<>("QuestionID");
-        idCol.setCellValueFactory(new PropertyValueFactory<>("questionID"));
+        idCol.setCellValueFactory(param -> {
+            Question q = param.getValue();
+            int questionInt = q.getId();
+            return new SimpleStringProperty(String.valueOf(questionInt).trim());
+        });
+
         TableColumn<Question, String> titleCol = new TableColumn<>("Title");
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+
         TableColumn<Question, String> timeCol = new TableColumn<>("Time");
-        timeCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        timeCol.setCellValueFactory(param -> {
+            Question q = param.getValue();
+            Timestamp timestamp = q.getMessage().getCreatedAt();
+            return new SimpleStringProperty(timestamp.toString());
+        });
+
         questionTable.getColumns().addAll(idCol, titleCol, timeCol);
 
         // Placeholder for Answer table; will be populated later
-        TableView<Answer> answerTable = new TableView<>();
+        TableView<PrivateMessage> privateMessageTable = new TableView<>();
 
         // Add tables to the split pane
-        splitPane.getItems().addAll(questionTable, answerTable);
+        splitPane.getItems().addAll(questionTable, privateMessageTable);
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);

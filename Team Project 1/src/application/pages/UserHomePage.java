@@ -69,13 +69,14 @@ public class UserHomePage extends BasePage {
         // Create Logout and Question Display buttons.
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
         Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
-
+        //TODO: add this button to the class that displays Question details, and ensure it passes the specific Question object in
+        Button privateMessageButton = UIFactory.createButton("Send Private Message", e -> e.routeToPage(MyPages.PRIVATE_MESSAGE, context));
         //Add button to add a question
         Button addQuestionButton = UIFactory.createButton("Add question", e -> e.onAction(a -> ShowQuestionWindow()));
 
         createQuestionStage(user.getId());
 
-        layout.getChildren().addAll(userLabel, roleLabel, questionDisplayButton, addQuestionButton, logoutButton, questionListView);
+        layout.getChildren().addAll(userLabel, roleLabel, questionDisplayButton, privateMessageButton, addQuestionButton, logoutButton, questionListView);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
