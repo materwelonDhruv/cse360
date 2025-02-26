@@ -16,7 +16,7 @@ public class Messages extends Repository<Message> {
     }
 
     @Override
-    public Message create(Message msg) {
+    public Message create(Message msg) throws IllegalArgumentException {
         EntityValidator.validateMessage(msg);
         String sql = "INSERT INTO Messages (userID, content, createdAt) VALUES (?, ?, ?)";
         int generatedId = executeInsert(sql, pstmt -> {
@@ -60,7 +60,7 @@ public class Messages extends Repository<Message> {
      * Only updates the content field.
      */
     @Override
-    public Message update(Message msg) {
+    public Message update(Message msg) throws IllegalArgumentException {
         EntityValidator.validateMessageContent(msg.getContent());
         String sql = "UPDATE Messages SET content = ? WHERE messageID = ?";
         int rows = executeUpdate(sql, pstmt -> {
