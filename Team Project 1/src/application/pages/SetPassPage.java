@@ -31,7 +31,8 @@ public class SetPassPage extends BasePage {
         VBox layout = new VBox(15);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        Label titleLabel = UIFactory.createLabel("Set user's one-time password", DesignGuide.TITLE_LABEL, null);
+        Label titleLabel = UIFactory.createLabel("Set user's one-time password",
+                l -> l.style(DesignGuide.TITLE_LABEL));
 
         // Create and populate the user selection ChoiceBox.
         ChoiceBox<String> userDropBox = new ChoiceBox<>();
@@ -44,23 +45,29 @@ public class SetPassPage extends BasePage {
             targetID = context.users().getByUsername(targetUser).getId();
         });
 
-        Label passLabel = UIFactory.createLabel("", null, null);
+        Label passLabel = UIFactory.createLabel("");
 
-        Button setOTPButton = UIFactory.createButton("Set Password", e -> {
-            // Generate one-time password using current active user's ID as the issuer.
-            OneTimePassword newPass = new OneTimePassword(SessionContext.getActiveUser().getId(), targetID);
-            context.oneTimePasswords().create(newPass);
-            passLabel.setText(newPass.getPlainOtp());
-            System.out.println("New password: " + newPass.getPlainOtp());
-        });
-        
+        Button setOTPButton = UIFactory.createButton("Set One-Time Password",
+                e -> handleSetOneTimePassword(passLabel));
+
         Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText);
 
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.ADMIN_HOME);
-        });
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
         layout.getChildren().addAll(titleLabel, userDropBox, passLabel, setOTPButton, copyButton, backButton);
         return layout;
+    }
+
+    private void handleSetOneTimePassword(Label passLabel) {
+        if (targetUser == null || targetID == 0) {
+            passLabel.setText("Please select a user first.");
+            return;
+        }
+
+        // Generate one-time password using current active user's ID as the issuer.
+        OneTimePassword newPass = new OneTimePassword(SessionContext.getActiveUser().getId(), targetID);
+        context.oneTimePasswords().create(newPass);
+        passLabel.setText(newPass.getPlainOtp());
+        System.out.println("New password: " + newPass.getPlainOtp());
     }
 }

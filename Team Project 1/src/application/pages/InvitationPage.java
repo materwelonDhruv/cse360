@@ -34,67 +34,71 @@ public class InvitationPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Title and instructions
-        Label titleLabel = UIFactory.createLabel("Invite", DesignGuide.TITLE_LABEL, null);
-        Label instructions = UIFactory.createLabel("Select the roles that the invited user should receive:", null, null);
+        Label titleLabel = UIFactory.createLabel("Invite");
+        Label instructions = UIFactory.createLabel("Select the roles that the invited user should receive:");
 
         // Role selection: create checkboxes using UIFactory
-        CheckBox adminCb = UIFactory.createCheckBox("Admin", false);
-        CheckBox studentCb = UIFactory.createCheckBox("Student", false);
-        CheckBox reviewerCb = UIFactory.createCheckBox("Reviewer", false);
-        CheckBox instructorCb = UIFactory.createCheckBox("Instructor", false);
-        CheckBox staffCb = UIFactory.createCheckBox("Staff", false);
+        CheckBox adminCb = UIFactory.createCheckBox("Admin");
+        CheckBox studentCb = UIFactory.createCheckBox("Student");
+        CheckBox reviewerCb = UIFactory.createCheckBox("Reviewer");
+        CheckBox instructorCb = UIFactory.createCheckBox("Instructor");
+        CheckBox staffCb = UIFactory.createCheckBox("Staff");
 
         HBox roleBox = new HBox(10);
         roleBox.setStyle(DesignGuide.CENTER_ALIGN);
         roleBox.getChildren().addAll(adminCb, studentCb, reviewerCb, instructorCb, staffCb);
 
         // Label to display generated invitation code
-        Label inviteCodeLabel = UIFactory.createLabel("", null, null);
+        Label inviteCodeLabel = UIFactory.createLabel("");
 
         // Create a reusable copy button instance for the invitation code
         Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText);
 
         // Button to generate the invitation code
-        Button generateBtn = UIFactory.createButton("Generate Invitation Code", e -> {
-            List<Roles> roleList = new ArrayList<>();
-            if (adminCb.isSelected()) roleList.add(Roles.ADMIN);
-            if (studentCb.isSelected()) roleList.add(Roles.STUDENT);
-            if (reviewerCb.isSelected()) roleList.add(Roles.REVIEWER);
-            if (instructorCb.isSelected()) roleList.add(Roles.INSTRUCTOR);
-            if (staffCb.isSelected()) roleList.add(Roles.STAFF);
-
-            if (!roleList.isEmpty()) {
-                // Use the active user from session as the issuer
-                User currentUser = SessionContext.getActiveUser();
-                Invite invite = new Invite(currentUser.getId());
-                int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
-                invite.setRoles(roleInt);
-                context.invites().create(invite);
-                inviteCodeLabel.setText(invite.getCode());
-
-                // If copy button not yet in layout, add it; else reset its text.
-                if (copyButton.getParent() == null) {
-                    layout.getChildren().add(copyButton);
-                } else {
-                    copyButton.setText("Copy Code To Clipboard");
-                    copyButton.setDisable(false);
-                }
-            } else {
-                inviteCodeLabel.setText("Select at least one role!");
-            }
-        });
+        Button generateBtn = UIFactory.createButton("Generate Invitation Code",
+                e -> e.onAction(
+                        a -> handleGenerateInvitation(
+                                adminCb, studentCb, reviewerCb, instructorCb, staffCb, inviteCodeLabel, copyButton, layout
+                        )
+                )
+        );
 
         // Back button navigates to Admin Home
-        Button backButton = UIFactory.createButton("Back", e -> {
-            try {
-                context.router().navigate(MyPages.ADMIN_HOME);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
         // Assemble layout
         layout.getChildren().addAll(titleLabel, instructions, roleBox, generateBtn, inviteCodeLabel, backButton);
         return layout;
+    }
+
+    private void handleGenerateInvitation(CheckBox adminCb, CheckBox studentCb, CheckBox reviewerCb,
+                                          CheckBox instructorCb, CheckBox staffCb,
+                                          Label inviteCodeLabel, Button copyButton, VBox layout) {
+        List<Roles> roleList = new ArrayList<>();
+        if (adminCb.isSelected()) roleList.add(Roles.ADMIN);
+        if (studentCb.isSelected()) roleList.add(Roles.STUDENT);
+        if (reviewerCb.isSelected()) roleList.add(Roles.REVIEWER);
+        if (instructorCb.isSelected()) roleList.add(Roles.INSTRUCTOR);
+        if (staffCb.isSelected()) roleList.add(Roles.STAFF);
+
+        if (!roleList.isEmpty()) {
+            // Use the active user from session as the issuer
+            User currentUser = SessionContext.getActiveUser();
+            Invite invite = new Invite(currentUser.getId());
+            int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
+            invite.setRoles(roleInt);
+            context.invites().create(invite);
+            inviteCodeLabel.setText(invite.getCode());
+
+            // If copy button not yet in layout, add it; else reset its text.
+            if (copyButton.getParent() == null) {
+                layout.getChildren().add(copyButton);
+            } else {
+                copyButton.setText("Copy Code To Clipboard");
+                copyButton.setDisable(false);
+            }
+        } else {
+            inviteCodeLabel.setText("Select at least one role!");
+        }
     }
 }

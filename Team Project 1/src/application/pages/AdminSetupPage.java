@@ -32,72 +32,66 @@ public class AdminSetupPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Create input fields using UIFactory.
-        TextField userNameField = UIFactory.createTextField("Enter Admin userName", 250);
-        TextField firstNameField = UIFactory.createTextField("Enter Admin first name", 250);
-        TextField lastNameField = UIFactory.createTextField("Enter Admin last name", 250);
-        TextField emailField = UIFactory.createTextField("Enter Email", 250);
-        // For a real password field, consider using UIFactory.createPasswordField(...).
-        TextField passwordField = UIFactory.createTextField("Enter Password", 250);
-        TextField inviteCodeField = UIFactory.createTextField("Enter Invitation Code", 250);
+        TextField userNameField = UIFactory.createTextField("Enter Admin userName",
+                f -> f.maxWidth(250).minChars(16).maxChars(18));
+        TextField firstNameField = UIFactory.createTextField("Enter Admin first name",
+                f -> f.maxWidth(250).minChars(1).maxChars(50));
+        TextField lastNameField = UIFactory.createTextField("Enter Admin last name",
+                f -> f.maxWidth(250).minChars(1).maxChars(50));
+        TextField emailField = UIFactory.createTextField("Enter Email",
+                f -> f.maxWidth(250).minChars(5).maxChars(50));
+        TextField passwordField = UIFactory.createPasswordField("Enter Password",
+                p -> p.maxWidth(250).minChars(8).maxChars(30));
 
         // Create an error label.
-        Label errorLabel = UIFactory.createLabel("", null, null);
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
+        Label errorLabel = UIFactory.createLabel("",
+                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
 
         // Create Setup and Back buttons.
-        Button setupButton = UIFactory.createButton("Setup", e -> {
-            String userName = userNameField.getText();
-            String firstName = firstNameField.getText();
-            String lastName = lastNameField.getText();
-            String password = passwordField.getText();
-            String email = emailField.getText();
-            String code = inviteCodeField.getText();
+        // Create Setup button using UIFactory with reduced nesting
+        Button setupButton = UIFactory.createButton("Setup",
+                e -> e.onAction(a -> handleSetup(userNameField, firstNameField, lastNameField, passwordField, emailField, errorLabel))
+        );
 
-            // Validate user input.
-            try {
-                UsernameValidator.validateUserName(userName);
-            } catch (IllegalArgumentException ex) {
-                errorLabel.setText(ex.getMessage());
-                return;
-            }
-            try {
-                PasswordValidator.validatePassword(password);
-            } catch (IllegalArgumentException ex) {
-                errorLabel.setText(ex.getMessage());
-                return;
-            }
-            try {
-                EmailValidator.validateEmail(email);
-            } catch (IllegalArgumentException ex) {
-                errorLabel.setText(ex.getMessage());
-                return;
-            }
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
 
-            // Check if the user already exists.
-            if (!context.users().doesUserExist(userName)) {
-                // Find the invitation code in the database.
-                var invite = context.invites().findInvite(code);
-                if (invite != null) {
-                    // Create a new admin user.
-                    User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
-                    context.users().create(adminUser);
-                    // Set active user in session.
-                    SessionContext.setActiveUser(adminUser);
-                    // Navigate to welcome page.
-                    context.router().navigate(MyPages.WELCOME_LOGIN);
-                } else {
-                    errorLabel.setText("Invitation code does not exist or is expired");
-                }
-            } else {
-                errorLabel.setText("This userName is taken! Please use another.");
-            }
-        });
-
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.SETUP_LOGIN);
-        });
-
-        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel, backButton);
+        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton, errorLabel, backButton);
         return layout;
+    }
+
+    private void handleSetup(TextField userNameField, TextField firstNameField, TextField lastNameField,
+                             TextField passwordField, TextField emailField, Label errorLabel) {
+        String userName = userNameField.getText();
+        String firstName = firstNameField.getText();
+        String lastName = lastNameField.getText();
+        String password = passwordField.getText();
+        String email = emailField.getText();
+
+        // Validate user input.
+        try {
+            UsernameValidator.validateUserName(userName);
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
+            return;
+        }
+        try {
+            PasswordValidator.validatePassword(password);
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
+            return;
+        }
+        try {
+            EmailValidator.validateEmail(email);
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
+            return;
+        }
+
+        User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
+        context.users().create(adminUser);
+        // Set active user in session.
+        SessionContext.setActiveUser(adminUser);
+        // Navigate to welcome page.
+        context.router().navigate(MyPages.WELCOME_LOGIN);
     }
 }

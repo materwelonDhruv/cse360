@@ -24,13 +24,13 @@ public class AdminHomePage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
 
-        Label adminLabel = UIFactory.createLabel("Hello, Admin!", DesignGuide.TITLE_LABEL, null);
+        Label adminLabel = UIFactory.createLabel("Hello, Admin!");
 
         // Navigation buttons using UIFactory; navigation via the shared router.
-        Button userButton = UIFactory.createButton("Show Users", e -> context.router().navigate(MyPages.ADMIN_USER));
-        Button inviteButton = UIFactory.createButton("Invite", e -> context.router().navigate(MyPages.INVITATION));
-        Button otpButton = UIFactory.createButton("Set user OTP", e -> context.router().navigate(MyPages.SET_PASS));
-        Button logoutButton = UIFactory.createButton("Logout", e -> context.router().navigate(MyPages.USER_LOGIN));
+        Button userButton = UIFactory.createButton("Show Users", e -> e.routeToPage(MyPages.ADMIN_USER, context));
+        Button inviteButton = UIFactory.createButton("Invite", e -> e.routeToPage(MyPages.INVITATION, context));
+        Button otpButton = UIFactory.createButton("Set user OTP", e -> e.routeToPage(MyPages.SET_PASS, context));
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
         layout.getChildren().addAll(adminLabel, userButton, inviteButton, otpButton, logoutButton);
         return layout;

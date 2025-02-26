@@ -1,5 +1,6 @@
 package application.framework;
 
+import application.AppContext;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
@@ -122,6 +123,8 @@ public final class UIFactory {
                 textField.textProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue.length() > maxChars) {
                         textField.setText(oldValue);
+                        textField.setStyle("-fx-border-color: red;");
+                        textField.setTooltip(new Tooltip("Maximum " + maxChars + " characters allowed"));
                     }
                 });
             }
@@ -129,6 +132,7 @@ public final class UIFactory {
                 textField.textProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue.length() < minChars) {
                         textField.setStyle("-fx-border-color: red;");
+                        textField.setTooltip(new Tooltip("Minimum " + minChars + " characters required"));
                     } else {
                         textField.setStyle("");
                     }
@@ -150,22 +154,32 @@ public final class UIFactory {
             return this;
         }
 
+        public ButtonBuilder routeToPage(MyPages page, AppContext context) {
+            button.setOnAction(e -> context.router().navigate(page));
+            return this;
+        }
+
         public Button build() {
             return button;
         }
+
+        public Button getSource() {
+            return button;
+        }
+
+        public ButtonBuilder disable() {
+            button.setDisable(true);
+            return this;
+        }
     }
 
-    public static class PasswordFieldBuilder {
+    public static class PasswordFieldBuilder extends TextFieldBuilder {
         private final PasswordField passwordField;
 
         public PasswordFieldBuilder(String prompt) {
+            super(prompt);
             passwordField = new PasswordField();
             passwordField.setPromptText(prompt);
-        }
-
-        public PasswordFieldBuilder maxWidth(double width) {
-            passwordField.setMaxWidth(width);
-            return this;
         }
 
         public PasswordField build() {
@@ -178,6 +192,7 @@ public final class UIFactory {
 
         public LabelBuilder(String text) {
             label = new Label(text);
+            label.setStyle(DesignGuide.TITLE_LABEL);
         }
 
         public LabelBuilder style(String style) {
@@ -212,12 +227,13 @@ public final class UIFactory {
         }
     }
 
-    public static class CopyButtonBuilder {
+    public static class CopyButtonBuilder extends ButtonBuilder {
         private final Button button;
         private final Supplier<String> textSupplier;
 
         public CopyButtonBuilder(String initialText, Supplier<String> textSupplier) {
-            button = new Button(initialText);
+            super(initialText);
+            button = super.getSource();
             this.textSupplier = textSupplier;
         }
 

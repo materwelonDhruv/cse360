@@ -23,12 +23,8 @@ public class SetupLoginSelectionPage extends BasePage {
         VBox layout = new VBox(10);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        Button setupButton = UIFactory.createButton("SetUp", e -> {
-            context.router().navigate(MyPages.SETUP_ACCOUNT);
-        });
-        Button loginButton = UIFactory.createButton("Login", e -> {
-            context.router().navigate(MyPages.USER_LOGIN);
-        });
+        Button setupButton = UIFactory.createButton("SetUp", e -> e.routeToPage(MyPages.SETUP_ACCOUNT, context));
+        Button loginButton = UIFactory.createButton("Login", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
         layout.getChildren().addAll(setupButton, loginButton);
         return layout;

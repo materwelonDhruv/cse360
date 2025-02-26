@@ -31,20 +31,22 @@ public class UserHomePage extends BasePage {
         // Retrieve the active user from session.
         User user = SessionContext.getActiveUser();
         if (user == null) {
-            return new VBox(new Label("No active user found."));
+            return new VBox(UIFactory.createLabel("No active user found."));
         }
 
+
         // Greeting and role display.
-        Label userLabel = UIFactory.createLabel("Hello, " + user.getUserName() + "!", DesignGuide.TITLE_LABEL, null);
+        Label userLabel = UIFactory.createLabel("Hello, " + user.getUserName() + "!");
         int roleInt = user.getRoles();
         Roles[] allRoles = RolesUtil.intToRoles(roleInt);
         // Assume primary role is the first one.
         Roles userCurrentRole = (allRoles.length > 0) ? allRoles[0] : null;
-        Label roleLabel = UIFactory.createLabel("Role: " + userCurrentRole, DesignGuide.TITLE_LABEL, null);
+        Label roleLabel = UIFactory.createLabel("Role: " + userCurrentRole);
 
         // Create Logout and Question Display buttons.
-        Button logoutButton = UIFactory.createButton("Logout", e -> context.router().navigate(MyPages.USER_LOGIN));
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> context.router().navigate(MyPages.USER_QUESTION_DISPLAY));
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button questionDisplayButton = UIFactory.createButton("Your Homepage",
+                e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
 
         layout.getChildren().addAll(userLabel, roleLabel, logoutButton, questionDisplayButton);
 
@@ -62,13 +64,14 @@ public class UserHomePage extends BasePage {
                     roleMenu.getItems().add(roleItem);
                 }
             }
-            Button goButton = UIFactory.createButton("Go", e -> {
-                if (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
-                    context.router().navigate(MyPages.ADMIN_HOME);
-                } else if (selectedRole[0] != null) {
-                    context.router().navigate(MyPages.USER_HOME);
-                }
-            });
+            Button goButton = UIFactory.createButton("Go", e ->
+                    e.routeToPage(
+                            (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN))
+                                    ? MyPages.ADMIN_HOME
+                                    : MyPages.USER_HOME,
+                            context
+                    )
+            );
             layout.getChildren().addAll(roleMenu, goButton);
         }
         return layout;
