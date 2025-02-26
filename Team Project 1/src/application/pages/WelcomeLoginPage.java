@@ -36,31 +36,29 @@ public class WelcomeLoginPage extends BasePage {
         User user = SessionContext.getActiveUser();
         String username = (user != null) ? user.getUserName() : "Guest";
 
-        Label welcomeLabel = UIFactory.createLabel("Welcome " + username + "!!", DesignGuide.TITLE_LABEL, null);
+        Label welcomeLabel = UIFactory.createLabel("Welcome " + username + "!!");
 
         // Get all roles assigned to the user
+        assert user != null; // TODO: Handle null user
         int roleInt = user.getRoles();
         Roles[] roles = RolesUtil.intToRoles(roleInt);
 
         // Create Continue and Quit buttons using UIFactory
-        Button continueButton = UIFactory.createButton("Continue to your page", null);
-        Button quitButton = UIFactory.createButton("Quit", e -> {
-            try {
-                context.closeConnection();
-            } catch (SQLException ex) {
-                throw new DataAccessException("Cannot close in WelcomePage", ex);
-            }
-            Platform.exit();
-        });
-
-        // If only one role is assigned, route accordingly
-        if (roles.length == 1) {
-            if (RolesUtil.hasRole(roles, Roles.ADMIN)) {
-                continueButton.setOnAction(e -> context.router().navigate(MyPages.ADMIN_HOME));
-            } else {
-                continueButton.setOnAction(e -> context.router().navigate(MyPages.USER_HOME));
-            }
-        }
+        Button continueButton = UIFactory.createButton("Continue to your page",
+                e -> e.routeToPage(
+                        (roles.length == 1 && RolesUtil.hasRole(roles, Roles.ADMIN) ? MyPages.ADMIN_HOME : MyPages.USER_HOME),
+                        context
+                )
+        );
+        Button quitButton = UIFactory.createButton("Quit",
+                e -> e.onAction(a -> {
+                    try {
+                        context.closeConnection();
+                    } catch (SQLException ex) {
+                        throw new DataAccessException("Cannot close in WelcomePage", ex);
+                    }
+                    Platform.exit();
+                }));
 
         // For multiple roles, use a dropdown (MenuButton) for selection
         MenuButton roleMenu;

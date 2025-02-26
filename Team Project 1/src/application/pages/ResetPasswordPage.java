@@ -25,30 +25,29 @@ public class ResetPasswordPage extends BasePage {
         VBox layout = new VBox(10);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        Label resetPassLabel = UIFactory.createLabel(
-                "Reset your password",
-                DesignGuide.TITLE_LABEL,
-                null
+        Label resetPassLabel = UIFactory.createLabel("Reset your password");
+
+        TextField newPassField = UIFactory.createPasswordField("Enter new password",
+                f -> f.minChars(8).maxChars(30));
+
+        Button resetPasswordButton = UIFactory.createButton("Reset Password",
+                e -> e.onAction(a -> handleResetPassword(newPassField, a))
         );
 
-        TextField newPassField = UIFactory.createTextField("Enter new password", 250);
-
-        Button resetPasswordButton = UIFactory.createButton("Reset Password", e -> {
-            String password = newPassField.getText();
-            try {
-                PasswordValidator.validatePassword(password);
-                // Password reset logic here (e.g., update the DB)
-                System.out.println("Password validated and reset successfully.");
-            } catch (IllegalArgumentException ex) {
-                ((Button) e.getSource()).setText(ex.getMessage());
-            }
-        });
-
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.ADMIN_HOME);
-        });
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
         layout.getChildren().addAll(resetPassLabel, newPassField, resetPasswordButton, backButton);
         return layout;
+    }
+
+    private void handleResetPassword(TextField newPassField, javafx.event.ActionEvent event) {
+        String password = newPassField.getText();
+        try {
+            PasswordValidator.validatePassword(password);
+            // Password reset logic here (e.g., update the DB)
+            System.out.println("Password validated and reset successfully.");
+        } catch (IllegalArgumentException ex) {
+            ((Button) event.getSource()).setText(ex.getMessage());
+        }
     }
 }

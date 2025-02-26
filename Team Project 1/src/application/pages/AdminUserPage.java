@@ -36,8 +36,8 @@ public class AdminUserPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Header label
-        Button backButton = UIFactory.createButton("Back", e -> context.router().navigate(MyPages.ADMIN_HOME));
-        var header = UIFactory.createLabel("Choose a User to Modify", DesignGuide.TITLE_LABEL, null);
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        var header = UIFactory.createLabel("Choose a User to Modify");
 
         // Create TableView to display users
         TableView<User> userTable = new TableView<>();

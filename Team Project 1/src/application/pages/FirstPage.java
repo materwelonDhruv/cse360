@@ -24,14 +24,10 @@ public class FirstPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         Label label = UIFactory.createLabel(
-                "Hello..You are the first person here.\nPlease select continue to setup administrator access",
-                DesignGuide.TITLE_LABEL,
-                null
+                "Hello..You are the first person here.\nPlease select continue to setup administrator access"
         );
 
-        Button continueBtn = UIFactory.createButton("Continue", e -> {
-            context.router().navigate(MyPages.ADMIN_SETUP);
-        });
+        Button continueBtn = UIFactory.createButton("Continue", e -> e.routeToPage(MyPages.ADMIN_SETUP, context));
 
         layout.getChildren().addAll(label, continueBtn);
         return layout;

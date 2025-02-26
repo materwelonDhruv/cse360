@@ -70,12 +70,9 @@ public class UserQuestionDisplay extends BasePage {
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.USER_HOME);
-        });
-        Button logoutButton = UIFactory.createButton("Logout", e -> {
-            context.router().navigate(MyPages.USER_LOGIN);
-        });
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+
         toolbar.getChildren().addAll(backButton, logoutButton);
 
         container.getChildren().addAll(splitPane, toolbar);
