@@ -45,7 +45,7 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
     public void testCreatePrivateMessage() {
         // Create a PrivateMessage using the dummy question ID.
         Message msg = new Message(1, "This is a private message.");
-        PrivateMessage pm = new PrivateMessage(msg, dummyQuestionId);
+        PrivateMessage pm = new PrivateMessage(msg, dummyQuestionId, null);
         PrivateMessage created = pmRepo.create(pm);
 
         assertNotNull(created.getId(), "PrivateMessage ID should be generated");
@@ -82,7 +82,7 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
     @Order(5)
     public void testGetPrivateMessagesByUser() {
         Message msg = new Message(2, "Message by user 2");
-        PrivateMessage pm = new PrivateMessage(msg, dummyQuestionId);
+        PrivateMessage pm = new PrivateMessage(msg, dummyQuestionId, null);
         pmRepo.create(pm);
 
         List<PrivateMessage> results = pmRepo.getPrivateMessagesByUser(2);
@@ -98,9 +98,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         Message msg1 = new Message(1, "Search test message one");
         Message msg2 = new Message(1, "Another SEARCH message");
         Message msg3 = new Message(1, "Unrelated content");
-        pmRepo.create(new PrivateMessage(msg1, dummyQuestionId));
-        pmRepo.create(new PrivateMessage(msg2, dummyQuestionId));
-        pmRepo.create(new PrivateMessage(msg3, dummyQuestionId));
+        pmRepo.create(new PrivateMessage(msg1, dummyQuestionId, null));
+        pmRepo.create(new PrivateMessage(msg2, dummyQuestionId, null));
+        pmRepo.create(new PrivateMessage(msg3, dummyQuestionId, null));
 
         List<PrivateMessage> results = pmRepo.searchPrivateMessages("search");
         assertTrue(results.size() >= 2, "Expected at least two private messages with 'search'");
