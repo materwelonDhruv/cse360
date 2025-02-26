@@ -90,7 +90,7 @@ public class AdminSetupPage extends BasePage {
         User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
         context.users().create(adminUser);
         // Set active user in session.
-        SessionContext.setActiveUser(adminUser);
+        context.getSession().setActiveUser(adminUser);
         // Navigate to welcome page.
         context.router().navigate(MyPages.WELCOME_LOGIN);
     }

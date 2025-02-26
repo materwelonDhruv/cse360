@@ -2,7 +2,6 @@ package application.pages;
 
 import application.framework.*;
 import database.model.entities.Invite;
-import database.model.entities.User;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -83,8 +82,7 @@ public class InvitationPage extends BasePage {
 
         if (!roleList.isEmpty()) {
             // Use the active user from session as the issuer
-            User currentUser = SessionContext.getActiveUser();
-            Invite invite = new Invite(currentUser.getId());
+            Invite invite = new Invite(context.getSession().getActiveUser().getId());
             int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
             invite.setRoles(roleInt);
             context.invites().create(invite);

@@ -99,9 +99,7 @@ public class SetupAccountPage extends BasePage {
             Invite invite = context.invites().findInvite(code);
             if (invite != null) {
                 User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
-                context.users().create(user);
-                // Optionally set active user:
-                SessionContext.setActiveUser(user);
+                context.getSession().setActiveUser(context.users().create(user)); // Create user and set as active.
                 context.router().navigate(MyPages.WELCOME_LOGIN);
             } else {
                 errorLabel.setText("Invitation code does not exist or is expired");

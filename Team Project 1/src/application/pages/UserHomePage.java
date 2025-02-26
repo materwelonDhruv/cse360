@@ -52,7 +52,7 @@ public class UserHomePage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Retrieve the active user from session.
-        User user = SessionContext.getActiveUser();
+        User user = context.getSession().getActiveUser();
         if (user == null) {
             return new VBox(new Label("No active user found."));
         }

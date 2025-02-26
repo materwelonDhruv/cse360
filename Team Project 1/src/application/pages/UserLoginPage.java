@@ -62,7 +62,7 @@ public class UserLoginPage extends BasePage {
             // Try one-time password
             var otpRepo = context.oneTimePasswords();
             if (otpRepo.check(user.getId(), password)) {
-                SessionContext.setActiveUser(user);
+                context.getSession().setActiveUser(user);
                 context.router().navigate(MyPages.WELCOME_LOGIN);
             } else {
                 errorLabel.setText("Invalid Password or OTP!");
@@ -71,7 +71,7 @@ public class UserLoginPage extends BasePage {
         }
 
         // Valid login: set active user and navigate
-        SessionContext.setActiveUser(user);
+        context.getSession().setActiveUser(user);
         context.router().navigate(MyPages.WELCOME_LOGIN);
     }
 }

@@ -33,7 +33,7 @@ public class WelcomeLoginPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Get the active user from session
-        User user = SessionContext.getActiveUser();
+        User user = context.getSession().getActiveUser();
         String username = (user != null) ? user.getUserName() : "Guest";
 
         Label welcomeLabel = UIFactory.createLabel("Welcome " + username + "!!");
