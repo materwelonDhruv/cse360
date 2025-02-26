@@ -166,4 +166,22 @@ public class Answers extends Repository<Answer> {
         existing.getMessage().setContent(newContent);
         return update(existing);
     }
+
+    /**
+     * Returns all answers that are replies to a particular answer.
+     */
+    public List<Answer> getRepliesToAnswer(int answerId) {
+        String sql = baseJoinQuery + "WHERE a.parentAnswerID = ?";
+
+        return queryForList(sql, pstmt -> pstmt.setInt(1, answerId), this::build);
+    }
+
+    /**
+     * Returns all answers that are replies to a particular question.
+     */
+    public List<Answer> getRepliesToQuestion(int questionId) {
+        String sql = baseJoinQuery + "WHERE a.questionID = ?";
+
+        return queryForList(sql, pstmt -> pstmt.setInt(1, questionId), this::build);
+    }
 }
