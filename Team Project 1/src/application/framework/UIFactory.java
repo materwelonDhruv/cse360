@@ -30,11 +30,33 @@ public final class UIFactory {
     /**
      * Creates a TextField with a prompt and optional max width.
      */
-    public static TextField createTextField(String prompt, double maxWidth) {
+    public static TextField createTextField(String prompt, double maxWidth, double minWidth, double maxCharacters, double minCharacters) {
         TextField tf = new TextField();
         tf.setPromptText(prompt);
         if (maxWidth > 0) {
             tf.setMaxWidth(maxWidth);
+        }
+
+        if (minWidth > 0) {
+            tf.setMinWidth(minWidth);
+        }
+
+        if (maxCharacters > 0) {
+            tf.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue.length() > maxCharacters) {
+                    tf.setText(oldValue);
+                }
+            });
+        }
+
+        if (minCharacters > 0) {
+            tf.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue.length() < minCharacters) {
+                    tf.setStyle("-fx-border-color: red;");
+                } else {
+                    tf.setStyle("");
+                }
+            });
         }
         return tf;
     }
