@@ -10,7 +10,6 @@ import database.repository.repos.Users;
 import org.junit.jupiter.api.*;
 import tests.database.BaseDatabaseTest;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,16 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PrivateMessagesTest extends BaseDatabaseTest {
 
     private static PrivateMessages pmRepo;
-    private static Users userRepo;
-    private static Questions questionsRepo;
-    private static Timestamp now;
     // Store the dummy question's generated ID for use in PrivateMessage creation.
     private static int dummyQuestionId;
 
     @BeforeAll
     public static void setupPrivateMessages() {
-        now = new Timestamp(System.currentTimeMillis());
-        userRepo = appContext.users();
+        Users userRepo = appContext.users();
         // Create two users: one as sender (ID=1) and one as receiver (ID=2)
         User sender = new User("pmUser1", "Private", "Sender", "pw1", "pm1@example.com", 0);
         userRepo.create(sender);
@@ -36,7 +31,7 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         userRepo.create(receiver);
 
         // Create a dummy question to satisfy the foreign key constraint on PrivateMessages.
-        questionsRepo = appContext.questions();
+        Questions questionsRepo = appContext.questions();
         Message qMsg = new Message(1, "Dummy question content for PM tests.");
         Question dummyQuestion = new Question(qMsg, "Dummy Question Title");
         dummyQuestion = questionsRepo.create(dummyQuestion);

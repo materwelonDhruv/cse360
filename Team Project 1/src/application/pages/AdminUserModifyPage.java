@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.BasePage;
+import application.framework.*;
 import database.model.entities.User;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,8 +13,8 @@ import java.util.ArrayList;
 
 import static utils.permissions.RolesUtil.*;
 
-@src.application.framework.Route(src.application.framework.MyPages.ADMIN_USER_MODIFY)
-@src.application.framework.View(title = "Modify User")
+@Route(MyPages.ADMIN_USER_MODIFY)
+@View(title = "Modify User")
 public class AdminUserModifyPage extends BasePage {
 
     // The target user that is to be modified.
@@ -37,23 +37,29 @@ public class AdminUserModifyPage extends BasePage {
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
-        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         if (targetUser == null) {
-            Label error = src.application.framework.UIFactory.createLabel("No user selected for modification.", null, null);
+            Label error = UIFactory.createLabel("No user selected for modification.");
             layout.getChildren().add(error);
             return layout;
         }
 
         // Display target user's name.
-        Label nameLabel = src.application.framework.UIFactory.createLabel("Name: " + targetUser.getUserName(), src.application.framework.DesignGuide.TITLE_LABEL, null);
+        Label nameLabel = UIFactory.createLabel("Name: " + targetUser.getUserName(),
+                l -> l.style(DesignGuide.TITLE_LABEL));
 
         // Create role checkboxes using UIFactory.
-        CheckBox adminCb = src.application.framework.UIFactory.createCheckBox("Admin", hasRole(targetUser.getRoles(), Roles.ADMIN));
-        CheckBox instructorCb = src.application.framework.UIFactory.createCheckBox("Instructor", hasRole(targetUser.getRoles(), Roles.INSTRUCTOR));
-        CheckBox studentCb = src.application.framework.UIFactory.createCheckBox("Student", hasRole(targetUser.getRoles(), Roles.STUDENT));
-        CheckBox reviewerCb = src.application.framework.UIFactory.createCheckBox("Reviewer", hasRole(targetUser.getRoles(), Roles.REVIEWER));
-        CheckBox staffCb = src.application.framework.UIFactory.createCheckBox("Staff", hasRole(targetUser.getRoles(), Roles.STAFF));
+        CheckBox adminCb = UIFactory.createCheckBox("Admin",
+                cb -> cb.selected(hasRole(targetUser.getRoles(), Roles.ADMIN)));
+        CheckBox instructorCb = UIFactory.createCheckBox("Instructor",
+                cb -> cb.selected(hasRole(targetUser.getRoles(), Roles.INSTRUCTOR)));
+        CheckBox studentCb = UIFactory.createCheckBox("Student",
+                cb -> cb.selected(hasRole(targetUser.getRoles(), Roles.STUDENT)));
+        CheckBox reviewerCb = UIFactory.createCheckBox("Reviewer",
+                cb -> cb.selected(hasRole(targetUser.getRoles(), Roles.REVIEWER)));
+        CheckBox staffCb = UIFactory.createCheckBox("Staff",
+                cb -> cb.selected(hasRole(targetUser.getRoles(), Roles.STAFF)));
 
         // Define a single event handler to update roles.
         EventHandler<ActionEvent> roleHandler = new EventHandler<>() {
@@ -117,25 +123,16 @@ public class AdminUserModifyPage extends BasePage {
         staffCb.setOnAction(roleHandler);
 
         VBox roleBox = new VBox(10, adminCb, instructorCb, studentCb, reviewerCb, staffCb);
-        roleBox.setStyle(src.application.framework.DesignGuide.CENTER_ALIGN);
+        roleBox.setStyle(DesignGuide.CENTER_ALIGN);
 
         // Delete button.
-        Button deleteBtn = src.application.framework.UIFactory.createButton("Delete", e -> {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete user " + targetUser.getUserName() + "?");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    if (!hasRole(targetUser.getRoles(), Roles.ADMIN)) {
-                        context.users().delete(targetUser.getId());
-                        context.router().navigate(src.application.framework.MyPages.ADMIN_USER);
-                    } else {
-                        new Alert(Alert.AlertType.ERROR, "You cannot remove an admin!").show();
-                    }
-                }
-            });
-        });
+        // Delete button.
+        Button deleteBtn = UIFactory.createButton("Delete",
+                e -> e.onAction(a -> handleUserDeletion(targetUser))
+        );
 
         // Back button.
-        Button backBtn = src.application.framework.UIFactory.createButton("Back", e -> context.router().navigate(src.application.framework.MyPages.ADMIN_USER));
+        Button backBtn = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_USER, context));
 
         layout.getChildren().addAll(nameLabel, roleBox, deleteBtn, backBtn);
         return layout;
@@ -148,5 +145,21 @@ public class AdminUserModifyPage extends BasePage {
         ArrayList<User> users = new ArrayList<>(context.users().getAll());
         long adminCount = users.stream().filter(u -> hasRole(u.getRoles(), Roles.ADMIN)).count();
         return adminCount <= 1;
+    }
+
+    private void handleUserDeletion(User targetUser) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to delete user " + targetUser.getUserName() + "?");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                if (!hasRole(targetUser.getRoles(), Roles.ADMIN)) {
+                    context.users().delete(targetUser.getId());
+                    context.router().navigate(MyPages.ADMIN_USER);
+                } else {
+                    new Alert(Alert.AlertType.ERROR, "You cannot remove an admin!").show();
+                }
+            }
+        });
     }
 }

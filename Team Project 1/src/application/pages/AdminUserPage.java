@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.BasePage;
+import application.framework.*;
 import database.model.entities.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -17,8 +17,8 @@ import utils.permissions.Roles;
 import static utils.permissions.RolesUtil.intToRoles;
 import static utils.permissions.RolesUtil.roleName;
 
-@src.application.framework.Route(src.application.framework.MyPages.ADMIN_USER)
-@src.application.framework.View(title = "Admin User Page")
+@Route(MyPages.ADMIN_USER)
+@View(title = "Admin User Page")
 public class AdminUserPage extends BasePage {
 
     public AdminUserPage() {
@@ -33,11 +33,11 @@ public class AdminUserPage extends BasePage {
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
-        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Header label
-        Button backButton = src.application.framework.UIFactory.createButton("Back", e -> context.router().navigate(src.application.framework.MyPages.ADMIN_HOME));
-        var header = src.application.framework.UIFactory.createLabel("Choose a User to Modify", src.application.framework.DesignGuide.TITLE_LABEL, null);
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        var header = UIFactory.createLabel("Choose a User to Modify");
 
         // Create TableView to display users
         TableView<User> userTable = new TableView<>();
@@ -79,7 +79,7 @@ public class AdminUserPage extends BasePage {
                     User rowUser = row.getItem();
                     try {
                         AdminUserModifyPage.setTargetUser(rowUser);
-                        context.router().navigate(src.application.framework.MyPages.ADMIN_USER_MODIFY);
+                        context.router().navigate(MyPages.ADMIN_USER_MODIFY);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
