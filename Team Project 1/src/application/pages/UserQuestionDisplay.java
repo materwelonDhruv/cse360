@@ -1,92 +1,81 @@
 package application.pages;
 
+import application.framework.*;
+import database.model.entities.Answer;
+import database.model.entities.Question;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import application.AppContext;
-import database.model.entities.Answer;
-import database.model.entities.Question;
-import database.model.entities.User;
-import utils.permissions.Roles;
 
-import java.sql.SQLException;
-import java.util.List;
+/**
+ * UserQuestionDisplay page shows the current user's questions
+ * (and reserved space for answers). Double-clicking a question is intended
+ * to load its detail page.
+ */
+@Route(MyPages.USER_QUESTION_DISPLAY)
+@View(title = "User Questions")
+public class UserQuestionDisplay extends BasePage {
 
-public class UserQuestionDisplay {
-    private final AppContext context;
-
-    public UserQuestionDisplay() throws SQLException {
-        this.context = AppContext.getInstance();
+    public UserQuestionDisplay() {
+        super();
     }
 
-    public void show(Stage primaryStage, User user, Roles userCurrentRole) throws SQLException {
-        //Setup all elements
-        VBox scene = new VBox(15);
+    @Override
+    public Pane createView() {
+        // Main container with consistent styling from DesignGuide
+        VBox container = new VBox(15);
+        container.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+
+        // Create a split pane: left for Questions, right for Answers (future use)
         SplitPane splitPane = new SplitPane();
-        TableView<Question> userQuestionTable = new TableView<>();
-        TableView<Answer> PMTable = new TableView<>();
-        HBox hBox = new HBox();
-        scene.getChildren().addAll(splitPane, hBox);
 
-        //Setup back button
-        Button backButton = new Button("Back");
-        backButton.setOnAction(a -> {
-            new UserHomePage().show(primaryStage, user, userCurrentRole);
-        });
-        hBox.getChildren().add(backButton);
+        // Create table for user's questions
+        TableView<Question> questionTable = new TableView<>();
+        ObservableList<Question> obQuestions = FXCollections.observableArrayList(
+                context.questions().getQuestionsByUser(SessionContext.getActiveUser().getId())
+        );
+        questionTable.setItems(obQuestions);
 
-        //Setup logout button
-        Button logoutButton = new Button("Logout");
-        logoutButton.setOnAction(e -> {
-            try {
-                new UserLoginPage().show(primaryStage);
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        hBox.getChildren().add(logoutButton);
-
-        //Setup Question list
-        List<Question> questionList = context.questions().getQuestionsByUser(user.getId());
-        //Setup Question table
-        ObservableList<Question> obQuestionList = FXCollections.observableArrayList();
-        obQuestionList.addAll(questionList);
-        userQuestionTable.setItems(obQuestionList);
-        //Double click functionality TODO: Make this go to user's question
-        userQuestionTable.setRowFactory(tv -> {
+        // Set up double-click on a row to load question details
+        questionTable.setRowFactory(tv -> {
             TableRow<Question> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    Question rowQuestion = row.getItem();
-                    //load specific Question page for user
-                    //try {
-                    System.out.println("placeholder");
-                    //} catch (SQLException e) {
-                    //   throw new RuntimeException(e);
-                    //}
+                    Question q = row.getItem();
+                    System.out.println("Load details for: " + q.getTitle());
+                    // TODO: Navigate to question detail page
                 }
             });
             return row;
         });
-        //Populate columns
-        TableColumn<Question, String> questionIDCol = new TableColumn<>("QuestionID");
-        questionIDCol.setCellValueFactory(new PropertyValueFactory<>("questionID"));
+
+        // Populate columns using UIFactory (if needed, otherwise create directly)
+        TableColumn<Question, String> idCol = new TableColumn<>("QuestionID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("questionID"));
         TableColumn<Question, String> titleCol = new TableColumn<>("Title");
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         TableColumn<Question, String> timeCol = new TableColumn<>("Time");
         timeCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        userQuestionTable.getColumns().addAll(questionIDCol, titleCol, timeCol);
-        //Add tables to scene
-        splitPane.getItems().addAll(userQuestionTable, PMTable);
-        Scene userScene = new Scene(scene, 800, 400);
+        questionTable.getColumns().addAll(idCol, titleCol, timeCol);
 
-        // Set the scene to primary stage
-        primaryStage.setScene(userScene);
-        primaryStage.setTitle("User Page");
+        // Placeholder for Answer table; will be populated later
+        TableView<Answer> answerTable = new TableView<>();
+
+        // Add tables to the split pane
+        splitPane.getItems().addAll(questionTable, answerTable);
+
+        // Bottom toolbar with Back and Logout buttons using UIFactory
+        HBox toolbar = new HBox(10);
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+
+        toolbar.getChildren().addAll(backButton, logoutButton);
+
+        container.getChildren().addAll(splitPane, toolbar);
+        return container;
     }
 }

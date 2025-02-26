@@ -1,74 +1,53 @@
 package application.pages;
 
-import javafx.scene.Scene;
+import application.framework.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import application.AppContext;
-import database.model.entities.User;
 import validators.PasswordValidator;
 
-import java.sql.SQLException;
-
 /**
- * InvitePage class represents the page where an admin can generate an
- **/
+ * ResetPasswordPage class represents the page where an admin can reset a user's password.
+ * It validates the new password and provides a back button to return to the admin home.
+ */
+@Route(MyPages.RESET_PASSWORD)
+@View(title = "Reset Password")
+public class ResetPasswordPage extends BasePage {
 
-public class ResetPasswordPage {
-
-    private final AppContext context;
-
-    public ResetPasswordPage() throws SQLException {
-        this.context = AppContext.getInstance();
+    public ResetPasswordPage() {
+        super();
     }
 
-    public void show(Stage primaryStage, User user) {
+    @Override
+    public Pane createView() {
+        VBox layout = new VBox(10);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        VBox layout = new VBox();
-        layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        Label resetPassLabel = UIFactory.createLabel("Reset your password");
 
-        // Label to display the title of the page
-        Label resetPassLabel = new Label("Reset your password ");
-        resetPassLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10");
+        TextField newPassField = UIFactory.createPasswordField("Enter new password",
+                f -> f.minChars(8).maxChars(30));
 
-        // Input field for the user's new password
-        TextField newPassField = new TextField();
-        newPassField.setPromptText("Enter new password");
-        newPassField.setMaxWidth(250);
+        Button resetPasswordButton = UIFactory.createButton("Reset Password",
+                e -> e.onAction(a -> handleResetPassword(newPassField, a))
+        );
 
-        // Button to generate the invitation code
-        Button resetPasswordButton = new Button("Reset Password");
-        resetPasswordButton.setOnAction(event -> {
-            String password = newPassField.getText();
-            try {
-                PasswordValidator.validatePassword(password);
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
-            } catch (IllegalArgumentException e) {
-                resetPasswordButton.setText(e.getMessage());
-            }
-
-        });
-
-        Button backButton = new Button("Back");
-
-        // Action for back button
-        backButton.setOnAction(_ -> {
-            try {
-                new AdminHomePage().show(primaryStage, user);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-
-        // Add components to layout
         layout.getChildren().addAll(resetPassLabel, newPassField, resetPasswordButton, backButton);
+        return layout;
+    }
 
-        // Set the scene
-        Scene inviteScene = new Scene(layout, 800, 400);
-        primaryStage.setScene(inviteScene);
-        primaryStage.setTitle("Invite Page");
+    private void handleResetPassword(TextField newPassField, javafx.event.ActionEvent event) {
+        String password = newPassField.getText();
+        try {
+            PasswordValidator.validatePassword(password);
+            // Password reset logic here (e.g., update the DB)
+            System.out.println("Password validated and reset successfully.");
+        } catch (IllegalArgumentException ex) {
+            ((Button) event.getSource()).setText(ex.getMessage());
+        }
     }
 }

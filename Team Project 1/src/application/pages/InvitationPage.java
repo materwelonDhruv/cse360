@@ -1,128 +1,104 @@
 package application.pages;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import application.AppContext;
+import application.framework.*;
 import database.model.entities.Invite;
 import database.model.entities.User;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * InvitePage class represents the page where an admin can generate an
- **/
+ * InvitationPage class represents the page where an admin can generate an invitation.
+ * The page uses UIFactory and DesignGuide for consistent UI creation and styling.
+ */
+@Route(MyPages.INVITATION)
+@View(title = "Invite Page")
+public class InvitationPage extends BasePage {
 
-public class InvitationPage {
-
-    private final AppContext context;
-
-    public InvitationPage() throws SQLException {
-        this.context = AppContext.getInstance();
+    public InvitationPage() {
+        super();
     }
 
-    public void show(Stage primaryStage, User user) {
+    @Override
+    public Pane createView() {
+        // Main vertical layout
+        VBox layout = new VBox(15);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        VBox layout = new VBox();
-        layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        // Title and instructions
+        Label titleLabel = UIFactory.createLabel("Invite");
+        Label instructions = UIFactory.createLabel("Select the roles that the invited user should receive:");
 
-        // Label to display the title of the page
-        Label userLabel = new Label("Invite ");
-        userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10");
+        // Role selection: create checkboxes using UIFactory
+        CheckBox adminCb = UIFactory.createCheckBox("Admin");
+        CheckBox studentCb = UIFactory.createCheckBox("Student");
+        CheckBox reviewerCb = UIFactory.createCheckBox("Reviewer");
+        CheckBox instructorCb = UIFactory.createCheckBox("Instructor");
+        CheckBox staffCb = UIFactory.createCheckBox("Staff");
 
-        // Label to display instructions
-        Label roleInstructions = new Label("Select the roles that the invited user should receive:");
-        roleInstructions.setStyle("-fx-font-size: 14px");
+        HBox roleBox = new HBox(10);
+        roleBox.setStyle(DesignGuide.CENTER_ALIGN);
+        roleBox.getChildren().addAll(adminCb, studentCb, reviewerCb, instructorCb, staffCb);
 
-        // Hbox to display the roles
-        HBox roles = new HBox(10);
-        roles.setStyle("-fx-alignment: center; -fx-padding: 10");
+        // Label to display generated invitation code
+        Label inviteCodeLabel = UIFactory.createLabel("");
 
-        // CheckBoxes for the roles
-        CheckBox admin = new CheckBox("Admin");
-        CheckBox student = new CheckBox("Student");
-        CheckBox reviewer = new CheckBox("Reviewer");
-        CheckBox instructor = new CheckBox("Instructor");
-        CheckBox staff = new CheckBox("Staff");
+        // Create a reusable copy button instance for the invitation code
+        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText);
 
         // Button to generate the invitation code
-        Button showCodeButton = new Button("Generate Invitation Code");
+        Button generateBtn = UIFactory.createButton("Generate Invitation Code",
+                e -> e.onAction(
+                        a -> handleGenerateInvitation(
+                                adminCb, studentCb, reviewerCb, instructorCb, staffCb, inviteCodeLabel, copyButton, layout
+                        )
+                )
+        );
 
-        // Label to display the generated invitation code
-        Label inviteCodeLabel = new Label("");
-        inviteCodeLabel.setStyle("-fx-font-size: 14px; -fx-font-style: italic;");
+        // Back button navigates to Admin Home
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
-        // Button to copy the invitation code
-        Button copyCodeToClipboard = new Button("Copy Code To Clipboard");
-        copyCodeToClipboard.setStyle("-fx-font-size: 12px");
+        // Assemble layout
+        layout.getChildren().addAll(titleLabel, instructions, roleBox, generateBtn, inviteCodeLabel, backButton);
+        return layout;
+    }
 
-        showCodeButton.setOnAction(_ -> {
-            // Get the roles to be assigned to the invited user
-            List<Roles> roleList = new ArrayList<>();
-            if (admin.isSelected()) roleList.add(Roles.ADMIN);
-            if (student.isSelected()) roleList.add(Roles.STUDENT);
-            if (reviewer.isSelected()) roleList.add(Roles.REVIEWER);
-            if (instructor.isSelected()) roleList.add(Roles.INSTRUCTOR);
-            if (staff.isSelected()) roleList.add(Roles.STAFF);
+    private void handleGenerateInvitation(CheckBox adminCb, CheckBox studentCb, CheckBox reviewerCb,
+                                          CheckBox instructorCb, CheckBox staffCb,
+                                          Label inviteCodeLabel, Button copyButton, VBox layout) {
+        List<Roles> roleList = new ArrayList<>();
+        if (adminCb.isSelected()) roleList.add(Roles.ADMIN);
+        if (studentCb.isSelected()) roleList.add(Roles.STUDENT);
+        if (reviewerCb.isSelected()) roleList.add(Roles.REVIEWER);
+        if (instructorCb.isSelected()) roleList.add(Roles.INSTRUCTOR);
+        if (staffCb.isSelected()) roleList.add(Roles.STAFF);
 
-            if (!roleList.isEmpty()) {
-                // Generate the invitation and set it to the label
-                Invite invite = new Invite(user.getId());
-                int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
-                invite.setRoles(roleInt);
-                context.invites().create(invite);
-                inviteCodeLabel.setText(invite.getCode());
+        if (!roleList.isEmpty()) {
+            // Use the active user from session as the issuer
+            User currentUser = SessionContext.getActiveUser();
+            Invite invite = new Invite(currentUser.getId());
+            int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
+            invite.setRoles(roleInt);
+            context.invites().create(invite);
+            inviteCodeLabel.setText(invite.getCode());
 
-                // Show copyCodeToClipboard button or reset its text if it is already shown
-                if (copyCodeToClipboard.getParent() == null) {
-                    layout.getChildren().add(copyCodeToClipboard);
-                } else {
-                    copyCodeToClipboard.setText("Copy Code To Clipboard");
-                }
+            // If copy button not yet in layout, add it; else reset its text.
+            if (copyButton.getParent() == null) {
+                layout.getChildren().add(copyButton);
             } else {
-                inviteCodeLabel.setText("Select at least one role!");
+                copyButton.setText("Copy Code To Clipboard");
+                copyButton.setDisable(false);
             }
-        });
-
-        // Action for copying the code to clipboard
-        copyCodeToClipboard.setOnAction(_ -> {
-            // Copy the generated code into the user's clipboard and change text for feedback
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent content = new ClipboardContent();
-            content.putString(inviteCodeLabel.getText());
-            clipboard.setContent(content);
-            copyCodeToClipboard.setText("Copied!");
-        });
-        Button backButton = new Button("Back");
-
-        // Action for back button
-        backButton.setOnAction(_ -> {
-            try {
-                new AdminHomePage().show(primaryStage, user);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-
-        // Add components to layout
-        layout.getChildren().addAll(userLabel, roleInstructions, roles, showCodeButton, inviteCodeLabel, backButton);
-        roles.getChildren().addAll(admin, student, reviewer, instructor, staff);
-
-        // Set the scene
-        Scene inviteScene = new Scene(layout, 800, 400);
-        primaryStage.setScene(inviteScene);
-        primaryStage.setTitle("Invite Page");
+        } else {
+            inviteCodeLabel.setText("Select at least one role!");
+        }
     }
 }

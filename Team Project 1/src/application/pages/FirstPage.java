@@ -1,60 +1,35 @@
 package application.pages;
 
-import application.AppContext;
-import javafx.scene.Scene;
+import application.framework.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
-import java.sql.SQLException;
 
 /**
  * FirstPage class represents the initial screen for the first user.
- * It prompts the user to set up administrator access and navigate to the setup
- * screen.
+ * It prompts the user to set up administrator access and navigate to the admin setup.
  */
-public class FirstPage {
+@Route(MyPages.FIRST)
+@View(title = "Welcome")
+public class FirstPage extends BasePage {
 
-    // Reference to the DatabaseHelper for database interactions
-    private final AppContext context;
-
-    public FirstPage() throws SQLException {
-        this.context = AppContext.getInstance();
+    public FirstPage() {
+        super();
     }
 
-    /**
-     * Displays the first page in the provided primary stage.
-     *
-     * @param primaryStage The primary stage where the scene will be displayed.
-     */
-    public void show(Stage primaryStage) {
-        VBox layout = new VBox(5);
+    @Override
+    public Pane createView() {
+        VBox layout = new VBox(15);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        // Label to display the welcome message for the first user
-        layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-        Label userLabel = new Label(
-                "Hello..You are the first person here. \nPlease select continue to setup administrator access");
-        userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        Label label = UIFactory.createLabel(
+                "Hello..You are the first person here.\nPlease select continue to setup administrator access"
+        );
 
-        Button continueButton = new Button("Continue");
-        // Button to navigate to the SetupAdmin page
+        Button continueBtn = UIFactory.createButton("Continue", e -> e.routeToPage(MyPages.ADMIN_SETUP, context));
 
-        continueButton.setOnAction(_ -> {
-            try {
-                new AdminSetupPage().show(primaryStage);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
-        });
-
-        layout.getChildren().addAll(userLabel, continueButton);
-        Scene firstPageScene = new Scene(layout, 800, 400);
-
-        // Set the scene to primary stage
-        primaryStage.setScene(firstPageScene);
-        primaryStage.setTitle("First Page");
-        primaryStage.show();
+        layout.getChildren().addAll(label, continueBtn);
+        return layout;
     }
 }
