@@ -1,8 +1,8 @@
 package application;
 
-import application.framework.MyPages;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import src.application.framework.MyPages;
 
 import java.sql.SQLException;
 

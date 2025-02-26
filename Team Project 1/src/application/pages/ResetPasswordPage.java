@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -12,8 +12,8 @@ import validators.PasswordValidator;
  * ResetPasswordPage class represents the page where an admin can reset a user's password.
  * It validates the new password and provides a back button to return to the admin home.
  */
-@Route(MyPages.RESET_PASSWORD)
-@View(title = "Reset Password")
+@src.application.framework.Route(src.application.framework.MyPages.RESET_PASSWORD)
+@src.application.framework.View(title = "Reset Password")
 public class ResetPasswordPage extends BasePage {
 
     public ResetPasswordPage() {
@@ -23,17 +23,17 @@ public class ResetPasswordPage extends BasePage {
     @Override
     public Pane createView() {
         VBox layout = new VBox(10);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
-        Label resetPassLabel = UIFactory.createLabel(
+        Label resetPassLabel = src.application.framework.UIFactory.createLabel(
                 "Reset your password",
-                DesignGuide.TITLE_LABEL,
+                src.application.framework.DesignGuide.TITLE_LABEL,
                 null
         );
 
-        TextField newPassField = UIFactory.createTextField("Enter new password", 250);
+        TextField newPassField = src.application.framework.UIFactory.createTextField("Enter new password", 250);
 
-        Button resetPasswordButton = UIFactory.createButton("Reset Password", e -> {
+        Button resetPasswordButton = src.application.framework.UIFactory.createButton("Reset Password", e -> {
             String password = newPassField.getText();
             try {
                 PasswordValidator.validatePassword(password);
@@ -44,8 +44,8 @@ public class ResetPasswordPage extends BasePage {
             }
         });
 
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.ADMIN_HOME);
+        Button backButton = src.application.framework.UIFactory.createButton("Back", e -> {
+            context.router().navigate(src.application.framework.MyPages.ADMIN_HOME);
         });
 
         layout.getChildren().addAll(resetPassLabel, newPassField, resetPasswordButton, backButton);

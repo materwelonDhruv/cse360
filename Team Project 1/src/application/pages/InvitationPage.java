@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import database.model.entities.Invite;
 import database.model.entities.User;
 import javafx.scene.control.Button;
@@ -19,8 +19,8 @@ import java.util.List;
  * InvitationPage class represents the page where an admin can generate an invitation.
  * The page uses UIFactory and DesignGuide for consistent UI creation and styling.
  */
-@Route(MyPages.INVITATION)
-@View(title = "Invite Page")
+@src.application.framework.Route(src.application.framework.MyPages.INVITATION)
+@src.application.framework.View(title = "Invite Page")
 public class InvitationPage extends BasePage {
 
     public InvitationPage() {
@@ -31,31 +31,31 @@ public class InvitationPage extends BasePage {
     public Pane createView() {
         // Main vertical layout
         VBox layout = new VBox(15);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
         // Title and instructions
-        Label titleLabel = UIFactory.createLabel("Invite", DesignGuide.TITLE_LABEL, null);
-        Label instructions = UIFactory.createLabel("Select the roles that the invited user should receive:", null, null);
+        Label titleLabel = src.application.framework.UIFactory.createLabel("Invite", src.application.framework.DesignGuide.TITLE_LABEL, null);
+        Label instructions = src.application.framework.UIFactory.createLabel("Select the roles that the invited user should receive:", null, null);
 
         // Role selection: create checkboxes using UIFactory
-        CheckBox adminCb = UIFactory.createCheckBox("Admin", false);
-        CheckBox studentCb = UIFactory.createCheckBox("Student", false);
-        CheckBox reviewerCb = UIFactory.createCheckBox("Reviewer", false);
-        CheckBox instructorCb = UIFactory.createCheckBox("Instructor", false);
-        CheckBox staffCb = UIFactory.createCheckBox("Staff", false);
+        CheckBox adminCb = src.application.framework.UIFactory.createCheckBox("Admin", false);
+        CheckBox studentCb = src.application.framework.UIFactory.createCheckBox("Student", false);
+        CheckBox reviewerCb = src.application.framework.UIFactory.createCheckBox("Reviewer", false);
+        CheckBox instructorCb = src.application.framework.UIFactory.createCheckBox("Instructor", false);
+        CheckBox staffCb = src.application.framework.UIFactory.createCheckBox("Staff", false);
 
         HBox roleBox = new HBox(10);
-        roleBox.setStyle(DesignGuide.CENTER_ALIGN);
+        roleBox.setStyle(src.application.framework.DesignGuide.CENTER_ALIGN);
         roleBox.getChildren().addAll(adminCb, studentCb, reviewerCb, instructorCb, staffCb);
 
         // Label to display generated invitation code
-        Label inviteCodeLabel = UIFactory.createLabel("", null, null);
+        Label inviteCodeLabel = src.application.framework.UIFactory.createLabel("", null, null);
 
         // Create a reusable copy button instance for the invitation code
-        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText);
+        Button copyButton = src.application.framework.UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText);
 
         // Button to generate the invitation code
-        Button generateBtn = UIFactory.createButton("Generate Invitation Code", e -> {
+        Button generateBtn = src.application.framework.UIFactory.createButton("Generate Invitation Code", e -> {
             List<Roles> roleList = new ArrayList<>();
             if (adminCb.isSelected()) roleList.add(Roles.ADMIN);
             if (studentCb.isSelected()) roleList.add(Roles.STUDENT);
@@ -65,7 +65,7 @@ public class InvitationPage extends BasePage {
 
             if (!roleList.isEmpty()) {
                 // Use the active user from session as the issuer
-                User currentUser = SessionContext.getActiveUser();
+                User currentUser = src.application.framework.SessionContext.getActiveUser();
                 Invite invite = new Invite(currentUser.getId());
                 int roleInt = RolesUtil.rolesToInt(roleList.toArray(new Roles[0]));
                 invite.setRoles(roleInt);
@@ -85,9 +85,9 @@ public class InvitationPage extends BasePage {
         });
 
         // Back button navigates to Admin Home
-        Button backButton = UIFactory.createButton("Back", e -> {
+        Button backButton = src.application.framework.UIFactory.createButton("Back", e -> {
             try {
-                context.router().navigate(MyPages.ADMIN_HOME);
+                context.router().navigate(src.application.framework.MyPages.ADMIN_HOME);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

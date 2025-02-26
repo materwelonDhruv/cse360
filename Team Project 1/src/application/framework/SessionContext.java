@@ -1,4 +1,4 @@
-package application.framework;
+package src.application.framework;
 
 import database.model.entities.User;
 

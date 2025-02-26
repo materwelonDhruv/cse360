@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import database.model.entities.User;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,8 +17,8 @@ import validators.UsernameValidator;
  * Users provide their userName, password, and a valid invitation code to register.
  * This page is used to initialize the system with admin credentials.
  */
-@Route(MyPages.ADMIN_SETUP)
-@View(title = "Administrator Setup")
+@src.application.framework.Route(src.application.framework.MyPages.ADMIN_SETUP)
+@src.application.framework.View(title = "Administrator Setup")
 public class AdminSetupPage extends BasePage {
 
     public AdminSetupPage() {
@@ -29,23 +29,23 @@ public class AdminSetupPage extends BasePage {
     public Pane createView() {
         // Create a vertically aligned layout with consistent padding and centering.
         VBox layout = new VBox(10);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
         // Create input fields using UIFactory.
-        TextField userNameField = UIFactory.createTextField("Enter Admin userName", 250);
-        TextField firstNameField = UIFactory.createTextField("Enter Admin first name", 250);
-        TextField lastNameField = UIFactory.createTextField("Enter Admin last name", 250);
-        TextField emailField = UIFactory.createTextField("Enter Email", 250);
+        TextField userNameField = src.application.framework.UIFactory.createTextField("Enter Admin userName", 250);
+        TextField firstNameField = src.application.framework.UIFactory.createTextField("Enter Admin first name", 250);
+        TextField lastNameField = src.application.framework.UIFactory.createTextField("Enter Admin last name", 250);
+        TextField emailField = src.application.framework.UIFactory.createTextField("Enter Email", 250);
         // For a real password field, consider using UIFactory.createPasswordField(...).
-        TextField passwordField = UIFactory.createTextField("Enter Password", 250);
-        TextField inviteCodeField = UIFactory.createTextField("Enter Invitation Code", 250);
+        TextField passwordField = src.application.framework.UIFactory.createTextField("Enter Password", 250);
+        TextField inviteCodeField = src.application.framework.UIFactory.createTextField("Enter Invitation Code", 250);
 
         // Create an error label.
-        Label errorLabel = UIFactory.createLabel("", null, null);
+        Label errorLabel = src.application.framework.UIFactory.createLabel("", null, null);
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
 
         // Create Setup and Back buttons.
-        Button setupButton = UIFactory.createButton("Setup", e -> {
+        Button setupButton = src.application.framework.UIFactory.createButton("Setup", e -> {
             String userName = userNameField.getText();
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
@@ -82,9 +82,9 @@ public class AdminSetupPage extends BasePage {
                     User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
                     context.users().create(adminUser);
                     // Set active user in session.
-                    SessionContext.setActiveUser(adminUser);
+                    src.application.framework.SessionContext.setActiveUser(adminUser);
                     // Navigate to welcome page.
-                    context.router().navigate(MyPages.WELCOME_LOGIN);
+                    context.router().navigate(src.application.framework.MyPages.WELCOME_LOGIN);
                 } else {
                     errorLabel.setText("Invitation code does not exist or is expired");
                 }
@@ -93,8 +93,8 @@ public class AdminSetupPage extends BasePage {
             }
         });
 
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.SETUP_LOGIN);
+        Button backButton = src.application.framework.UIFactory.createButton("Back", e -> {
+            context.router().navigate(src.application.framework.MyPages.SETUP_LOGIN);
         });
 
         layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, inviteCodeField, setupButton, errorLabel, backButton);

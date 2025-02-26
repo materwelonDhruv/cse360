@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import database.model.entities.User;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,8 +15,8 @@ import utils.permissions.RolesUtil;
  * This page displays a simple welcome message for the user and provides navigation.
  * It shows the user's current role and, if multiple roles exist, a dropdown to select another.
  */
-@Route(MyPages.USER_HOME)
-@View(title = "User Page")
+@src.application.framework.Route(src.application.framework.MyPages.USER_HOME)
+@src.application.framework.View(title = "User Page")
 public class UserHomePage extends BasePage {
 
     public UserHomePage() {
@@ -26,25 +26,25 @@ public class UserHomePage extends BasePage {
     @Override
     public Pane createView() {
         VBox layout = new VBox(10);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
         // Retrieve the active user from session.
-        User user = SessionContext.getActiveUser();
+        User user = src.application.framework.SessionContext.getActiveUser();
         if (user == null) {
             return new VBox(new Label("No active user found."));
         }
 
         // Greeting and role display.
-        Label userLabel = UIFactory.createLabel("Hello, " + user.getUserName() + "!", DesignGuide.TITLE_LABEL, null);
+        Label userLabel = src.application.framework.UIFactory.createLabel("Hello, " + user.getUserName() + "!", src.application.framework.DesignGuide.TITLE_LABEL, null);
         int roleInt = user.getRoles();
         Roles[] allRoles = RolesUtil.intToRoles(roleInt);
         // Assume primary role is the first one.
         Roles userCurrentRole = (allRoles.length > 0) ? allRoles[0] : null;
-        Label roleLabel = UIFactory.createLabel("Role: " + userCurrentRole, DesignGuide.TITLE_LABEL, null);
+        Label roleLabel = src.application.framework.UIFactory.createLabel("Role: " + userCurrentRole, src.application.framework.DesignGuide.TITLE_LABEL, null);
 
         // Create Logout and Question Display buttons.
-        Button logoutButton = UIFactory.createButton("Logout", e -> context.router().navigate(MyPages.USER_LOGIN));
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> context.router().navigate(MyPages.USER_QUESTION_DISPLAY));
+        Button logoutButton = src.application.framework.UIFactory.createButton("Logout", e -> context.router().navigate(src.application.framework.MyPages.USER_LOGIN));
+        Button questionDisplayButton = src.application.framework.UIFactory.createButton("Your Homepage", e -> context.router().navigate(src.application.framework.MyPages.USER_QUESTION_DISPLAY));
 
         layout.getChildren().addAll(userLabel, roleLabel, logoutButton, questionDisplayButton);
 
@@ -62,11 +62,11 @@ public class UserHomePage extends BasePage {
                     roleMenu.getItems().add(roleItem);
                 }
             }
-            Button goButton = UIFactory.createButton("Go", e -> {
+            Button goButton = src.application.framework.UIFactory.createButton("Go", e -> {
                 if (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
-                    context.router().navigate(MyPages.ADMIN_HOME);
+                    context.router().navigate(src.application.framework.MyPages.ADMIN_HOME);
                 } else if (selectedRole[0] != null) {
-                    context.router().navigate(MyPages.USER_HOME);
+                    context.router().navigate(src.application.framework.MyPages.USER_HOME);
                 }
             });
             layout.getChildren().addAll(roleMenu, goButton);

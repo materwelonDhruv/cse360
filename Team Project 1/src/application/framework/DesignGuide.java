@@ -1,4 +1,4 @@
-package application.framework;
+package src.application.framework;
 
 /**
  * Provides system-wide constants and utilities for consistent design.

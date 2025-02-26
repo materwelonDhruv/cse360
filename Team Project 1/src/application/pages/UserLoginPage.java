@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import database.model.entities.User;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -13,8 +13,8 @@ import javafx.scene.layout.VBox;
  * accounts. It validates the user's credentials and navigates to the appropriate page
  * upon successful login.
  */
-@Route(MyPages.USER_LOGIN)
-@View(title = "User Login")
+@src.application.framework.Route(src.application.framework.MyPages.USER_LOGIN)
+@src.application.framework.View(title = "User Login")
 public class UserLoginPage extends BasePage {
 
     public UserLoginPage() {
@@ -24,16 +24,16 @@ public class UserLoginPage extends BasePage {
     @Override
     public Pane createView() {
         VBox layout = new VBox(10);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
-        TextField userNameField = UIFactory.createTextField("Enter userName", 250);
-        PasswordField passwordField = UIFactory.createPasswordField("Enter Password", 250);
+        TextField userNameField = src.application.framework.UIFactory.createTextField("Enter userName", 250);
+        PasswordField passwordField = src.application.framework.UIFactory.createPasswordField("Enter Password", 250);
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
 
         // Login button using UIFactory
-        var loginButton = UIFactory.createButton("Login", e -> {
+        var loginButton = src.application.framework.UIFactory.createButton("Login", e -> {
             String userName = userNameField.getText();
             String password = passwordField.getText();
 
@@ -49,8 +49,8 @@ public class UserLoginPage extends BasePage {
                 var otpRepo = context.oneTimePasswords();
                 boolean otpValid = otpRepo.check(user.getId(), password);
                 if (otpValid) {
-                    SessionContext.setActiveUser(user);
-                    context.router().navigate(MyPages.WELCOME_LOGIN);
+                    src.application.framework.SessionContext.setActiveUser(user);
+                    context.router().navigate(src.application.framework.MyPages.WELCOME_LOGIN);
                     return;
                 } else {
                     errorLabel.setText("Invalid Password or OTP!");
@@ -59,14 +59,14 @@ public class UserLoginPage extends BasePage {
             }
 
             // Valid login: set active user and navigate
-            SessionContext.setActiveUser(user);
-            context.router().navigate(MyPages.WELCOME_LOGIN);
+            src.application.framework.SessionContext.setActiveUser(user);
+            context.router().navigate(src.application.framework.MyPages.WELCOME_LOGIN);
         });
 
         // Back button using UIFactory
-        var backButton = UIFactory.createButton("Back", e -> {
+        var backButton = src.application.framework.UIFactory.createButton("Back", e -> {
             try {
-                context.router().navigate(MyPages.SETUP_LOGIN);
+                context.router().navigate(src.application.framework.MyPages.SETUP_LOGIN);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

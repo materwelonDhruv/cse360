@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import database.model.entities.Answer;
 import database.model.entities.Question;
 import javafx.collections.FXCollections;
@@ -16,8 +16,8 @@ import javafx.scene.layout.VBox;
  * (and reserved space for answers). Double-clicking a question is intended
  * to load its detail page.
  */
-@Route(MyPages.USER_QUESTION_DISPLAY)
-@View(title = "User Questions")
+@src.application.framework.Route(src.application.framework.MyPages.USER_QUESTION_DISPLAY)
+@src.application.framework.View(title = "User Questions")
 public class UserQuestionDisplay extends BasePage {
 
     public UserQuestionDisplay() {
@@ -28,7 +28,7 @@ public class UserQuestionDisplay extends BasePage {
     public Pane createView() {
         // Main container with consistent styling from DesignGuide
         VBox container = new VBox(15);
-        container.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        container.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
         // Create a split pane: left for Questions, right for Answers (future use)
         SplitPane splitPane = new SplitPane();
@@ -36,7 +36,7 @@ public class UserQuestionDisplay extends BasePage {
         // Create table for user's questions
         TableView<Question> questionTable = new TableView<>();
         ObservableList<Question> obQuestions = FXCollections.observableArrayList(
-                context.questions().getQuestionsByUser(SessionContext.getActiveUser().getId())
+                context.questions().getQuestionsByUser(src.application.framework.SessionContext.getActiveUser().getId())
         );
         questionTable.setItems(obQuestions);
 
@@ -70,11 +70,11 @@ public class UserQuestionDisplay extends BasePage {
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createButton("Back", e -> {
-            context.router().navigate(MyPages.USER_HOME);
+        Button backButton = src.application.framework.UIFactory.createButton("Back", e -> {
+            context.router().navigate(src.application.framework.MyPages.USER_HOME);
         });
-        Button logoutButton = UIFactory.createButton("Logout", e -> {
-            context.router().navigate(MyPages.USER_LOGIN);
+        Button logoutButton = src.application.framework.UIFactory.createButton("Logout", e -> {
+            context.router().navigate(src.application.framework.MyPages.USER_LOGIN);
         });
         toolbar.getChildren().addAll(backButton, logoutButton);
 

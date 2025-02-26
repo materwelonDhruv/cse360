@@ -1,6 +1,6 @@
 package application.pages;
 
-import application.framework.*;
+import application.framework.BasePage;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -10,8 +10,8 @@ import javafx.scene.layout.VBox;
  * new account or logging into an existing account.
  * Provides two buttons for navigation.
  */
-@Route(MyPages.SETUP_LOGIN)
-@View(title = "Account Setup")
+@src.application.framework.Route(src.application.framework.MyPages.SETUP_LOGIN)
+@src.application.framework.View(title = "Account Setup")
 public class SetupLoginSelectionPage extends BasePage {
 
     public SetupLoginSelectionPage() {
@@ -21,13 +21,13 @@ public class SetupLoginSelectionPage extends BasePage {
     @Override
     public Pane createView() {
         VBox layout = new VBox(10);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        layout.setStyle(src.application.framework.DesignGuide.MAIN_PADDING + " " + src.application.framework.DesignGuide.CENTER_ALIGN);
 
-        Button setupButton = UIFactory.createButton("SetUp", e -> {
-            context.router().navigate(MyPages.SETUP_ACCOUNT);
+        Button setupButton = src.application.framework.UIFactory.createButton("SetUp", e -> {
+            context.router().navigate(src.application.framework.MyPages.SETUP_ACCOUNT);
         });
-        Button loginButton = UIFactory.createButton("Login", e -> {
-            context.router().navigate(MyPages.USER_LOGIN);
+        Button loginButton = src.application.framework.UIFactory.createButton("Login", e -> {
+            context.router().navigate(src.application.framework.MyPages.USER_LOGIN);
         });
 
         layout.getChildren().addAll(setupButton, loginButton);

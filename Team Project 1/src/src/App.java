@@ -1,3 +1,5 @@
+package src;
+
 import application.InstantiateApp;
 
 public class App {
