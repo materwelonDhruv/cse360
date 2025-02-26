@@ -8,7 +8,6 @@ import database.repository.repos.Users;
 import org.junit.jupiter.api.*;
 import tests.database.BaseDatabaseTest;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,11 +17,9 @@ public class QuestionsTest extends BaseDatabaseTest {
 
     private static Questions questionsRepo;
     private static Users userRepo;
-    private static Timestamp now;
 
     @BeforeAll
     public static void setupQuestions() {
-        now = new Timestamp(System.currentTimeMillis());
         userRepo = appContext.users();
         // Create two users
         User user1 = new User("qUser1", "Question", "Asker", "somePassword", "asker@example.com", 0);

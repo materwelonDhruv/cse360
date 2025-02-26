@@ -18,12 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AnswersTest extends BaseDatabaseTest {
 
     private static Answers answersRepo;
-    private static Questions questionsRepo;
-    private static Users userRepo;
 
     @BeforeAll
     public static void setupAnswers() {
-        userRepo = appContext.users();
+        Users userRepo = appContext.users();
         // Create two users: one for questions (ID=1) and one for answers (ID=2)
         User questionUser = new User("answerTestQ", "Question", "Owner", "pwQ", "question@example.com", 0);
         userRepo.create(questionUser);
@@ -31,7 +29,7 @@ public class AnswersTest extends BaseDatabaseTest {
         userRepo.create(answerUser);
 
         // Create a sample question so that answer references are valid.
-        questionsRepo = appContext.questions();
+        Questions questionsRepo = appContext.questions();
         Question q = new Question(new Message(1, "What is JUnit?"), "What is JUnit?");
         questionsRepo.create(q); // Assume questionID = generated value (likely 1)
 
