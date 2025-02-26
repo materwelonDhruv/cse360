@@ -20,7 +20,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
     }
 
     @Override
-    public PrivateMessage create(PrivateMessage pm) {
+    public PrivateMessage create(PrivateMessage pm) throws IllegalArgumentException {
         EntityValidator.validatePrivateMessage(pm);
         Message msg = pm.getMessage();
         if (msg == null) {
@@ -90,7 +90,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
     }
 
     @Override
-    public PrivateMessage update(PrivateMessage pm) {
+    public PrivateMessage update(PrivateMessage pm) throws IllegalArgumentException {
         EntityValidator.validatePrivateMessage(pm);
         if (pm.getMessage() == null) {
             throw new IllegalArgumentException("PrivateMessage must have a Message");

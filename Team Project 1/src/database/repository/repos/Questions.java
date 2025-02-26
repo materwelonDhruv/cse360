@@ -21,7 +21,7 @@ public class Questions extends Repository<Question> {
     }
 
     @Override
-    public Question create(Question question) {
+    public Question create(Question question) throws IllegalArgumentException {
         EntityValidator.validateQuestion(question);
         Message msg = question.getMessage();
         if (msg == null) {
@@ -84,7 +84,7 @@ public class Questions extends Repository<Question> {
     }
 
     @Override
-    public Question update(Question question) {
+    public Question update(Question question) throws IllegalArgumentException {
         EntityValidator.validateQuestion(question);
         if (question.getMessage() == null) {
             throw new IllegalArgumentException("Question must have a Message");
