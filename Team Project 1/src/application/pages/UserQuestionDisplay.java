@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /**
  * UserQuestionDisplay page shows the current user's questions
@@ -77,8 +78,45 @@ public class UserQuestionDisplay extends BasePage {
 
         questionTable.getColumns().addAll(idCol, titleCol, timeCol);
 
-        // Placeholder for Answer table; will be populated later
+        //Private message table declaration
         TableView<PrivateMessage> privateMessageTable = new TableView<>();
+        ArrayList<PrivateMessage> tempList;
+        ObservableList<PrivateMessage> obPMs = FXCollections.observableArrayList();
+        for (Question q : context.questions().getQuestionsByUser(context.getSession().getActiveUser().getId())) {
+            tempList = (ArrayList<PrivateMessage>) context.privateMessages().getRepliesToQuestion(q.getId());
+            obPMs.addAll(tempList);
+        }
+        privateMessageTable.setItems(obPMs);
+
+        privateMessageTable.setRowFactory(tv -> {
+            TableRow<PrivateMessage> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    PrivateMessage pm = row.getItem();
+                    // TODO: Navigate to PM detail page
+                    //context.router().navigate();
+                }
+            });
+            return row;
+        });
+
+        //Populate PM table w/ QuestionIds
+        TableColumn<PrivateMessage, String> pmCol = new TableColumn<>("QuestionID");
+        pmCol.setCellValueFactory(param -> {
+            PrivateMessage pm = param.getValue();
+            int questionInt = pm.getQuestionId();
+            return new SimpleStringProperty(String.valueOf(questionInt).trim());
+        });
+        //Populate PM table w/ usernames
+        TableColumn<PrivateMessage, String> pmUserCol = new TableColumn<>("Username");
+        pmUserCol.setCellValueFactory(param -> {
+            PrivateMessage pm = param.getValue();
+            int userId = pm.getMessage().getUserId();
+            String userName = context.users().getById(userId).getUserName();
+            return new SimpleStringProperty(userName.trim());
+        });
+        //Add PM columns
+        privateMessageTable.getColumns().addAll(pmCol, pmUserCol);
 
         // Add tables to the split pane
         splitPane.getItems().addAll(questionTable, privateMessageTable);

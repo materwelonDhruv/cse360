@@ -37,10 +37,12 @@ public class PrivateMessagePage extends BasePage {
         //Middle section with Text field
         VBox centerItems = new VBox(10);
         Button privateMessageButton = UIFactory.createButton("Send Private Message", e -> e.routeToPage(MyPages.USER_HOME, context));
+        //create private message
         privateMessageButton.onActionProperty().set(e -> {
             context.router().navigate(MyPages.PRIVATE_MESSAGE);
             Message message = new Message(user.getId(), privateMessageInput.getText().trim());
-            PrivateMessage privateMessage = new PrivateMessage(message, 1);
+            //TODO: fix placeholder questionID
+            PrivateMessage privateMessage = new PrivateMessage(message, 1, null);
             privateMessage.setMessage(message);
             context.privateMessages().create(privateMessage);
         });
