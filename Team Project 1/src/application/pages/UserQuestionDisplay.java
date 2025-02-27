@@ -36,7 +36,7 @@ public class UserQuestionDisplay extends BasePage {
         // Create table for user's questions
         TableView<Question> questionTable = new TableView<>();
         ObservableList<Question> obQuestions = FXCollections.observableArrayList(
-                context.questions().getQuestionsByUser(SessionContext.getActiveUser().getId())
+                context.questions().getQuestionsByUser(context.getSession().getActiveUser().getId())
         );
         questionTable.setItems(obQuestions);
 

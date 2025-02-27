@@ -81,6 +81,12 @@ public class ReadMessages extends Repository<ReadMessages.ReadMessagePivot> {
         deleteByCompositeKey(userId, messageId);
     }
 
+    public void markAsUnread(int userId, List<Integer> messageIds) {
+        for (int messageId : messageIds) {
+            deleteByCompositeKey(userId, messageId);
+        }
+    }
+
     public List<Integer> findReadMessages(int userId, List<Integer> messageIds) {
         List<ReadMessagePivot> userRead = getAllByUser(userId);
         List<Integer> result = new ArrayList<>();

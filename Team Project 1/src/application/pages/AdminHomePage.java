@@ -23,7 +23,6 @@ public class AdminHomePage extends BasePage {
         VBox layout = new VBox(15);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-
         Label adminLabel = UIFactory.createLabel("Hello, Admin!");
 
         // Navigation buttons using UIFactory; navigation via the shared router.

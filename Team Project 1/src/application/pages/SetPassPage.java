@@ -65,7 +65,7 @@ public class SetPassPage extends BasePage {
         }
 
         // Generate one-time password using current active user's ID as the issuer.
-        OneTimePassword newPass = new OneTimePassword(SessionContext.getActiveUser().getId(), targetID);
+        OneTimePassword newPass = new OneTimePassword(context.getSession().getActiveUser().getId(), targetID);
         context.oneTimePasswords().create(newPass);
         passLabel.setText(newPass.getPlainOtp());
         System.out.println("New password: " + newPass.getPlainOtp());

@@ -112,6 +112,16 @@ public final class UIFactory {
             return this;
         }
 
+        public TextFieldBuilder defaultText(String text) {
+            textField.setText(text);
+            return this;
+        }
+
+        public TextFieldBuilder placeholder(String text) {
+            textField.setPromptText(text);
+            return this;
+        }
+
         public TextField build() {
             if (maxWidth > 0) {
                 textField.setMaxWidth(maxWidth);
@@ -173,13 +183,45 @@ public final class UIFactory {
         }
     }
 
-    public static class PasswordFieldBuilder extends TextFieldBuilder {
+    public static class PasswordFieldBuilder {
         private final PasswordField passwordField;
 
         public PasswordFieldBuilder(String prompt) {
-            super(prompt);
             passwordField = new PasswordField();
             passwordField.setPromptText(prompt);
+        }
+
+        public PasswordFieldBuilder maxWidth(double width) {
+            passwordField.setMaxWidth(width);
+            return this;
+        }
+
+        public PasswordFieldBuilder minWidth(double width) {
+            passwordField.setMinWidth(width);
+            return this;
+        }
+
+        public PasswordFieldBuilder maxChars(int max) {
+            passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue.length() > max) {
+                    passwordField.setText(oldValue);
+                    passwordField.setStyle("-fx-border-color: red;");
+                    passwordField.setTooltip(new Tooltip("Maximum " + max + " characters allowed"));
+                }
+            });
+            return this;
+        }
+
+        public PasswordFieldBuilder minChars(int min) {
+            passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue.length() < min) {
+                    passwordField.setStyle("-fx-border-color: red;");
+                    passwordField.setTooltip(new Tooltip("Minimum " + min + " characters required"));
+                } else {
+                    passwordField.setStyle("");
+                }
+            });
+            return this;
         }
 
         public PasswordField build() {

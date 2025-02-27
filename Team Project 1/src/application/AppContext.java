@@ -1,6 +1,7 @@
 package application;
 
 import application.framework.PageRouter;
+import application.framework.Session;
 import database.connection.DatabaseConnection;
 import database.migration.SchemaManager;
 import javafx.stage.Stage;
@@ -15,6 +16,8 @@ public class AppContext {
     private static AppContext INSTANCE;
 
     private final Connection connection;
+
+    private final Session session;
 
     // Single, shared PageRouter so all pages can navigate.
     private final PageRouter router;
@@ -63,6 +66,9 @@ public class AppContext {
         } else {
             this.router = null;
         }
+
+        // 6) Create the Session
+        this.session = new Session();
     }
 
     /**
@@ -132,6 +138,10 @@ public class AppContext {
 
     public Connection getConnection() {
         return connection;
+    }
+
+    public Session getSession() {
+        return session;
     }
 
     /**

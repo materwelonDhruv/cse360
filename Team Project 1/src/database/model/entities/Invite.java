@@ -15,6 +15,11 @@ public class Invite extends BaseEntity {
         this.createdAt = Helpers.getCurrentTimeInSeconds();
     }
 
+    /**
+     * Create a new invite with a random code
+     *
+     * @param userId The user who created the invite
+     */
     public Invite(Integer userId) {
         this.code = Helpers.generateRandomCode(6, false);
         this.userId = userId;

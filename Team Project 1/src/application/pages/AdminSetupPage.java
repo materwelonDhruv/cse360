@@ -33,7 +33,7 @@ public class AdminSetupPage extends BasePage {
 
         // Create input fields using UIFactory.
         TextField userNameField = UIFactory.createTextField("Enter Admin userName",
-                f -> f.maxWidth(250).minChars(16).maxChars(18));
+                f -> f.maxWidth(250).minChars(6).maxChars(18));
         TextField firstNameField = UIFactory.createTextField("Enter Admin first name",
                 f -> f.maxWidth(250).minChars(1).maxChars(50));
         TextField lastNameField = UIFactory.createTextField("Enter Admin last name",
@@ -90,7 +90,7 @@ public class AdminSetupPage extends BasePage {
         User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
         context.users().create(adminUser);
         // Set active user in session.
-        SessionContext.setActiveUser(adminUser);
+        context.getSession().setActiveUser(adminUser);
         // Navigate to welcome page.
         context.router().navigate(MyPages.WELCOME_LOGIN);
     }

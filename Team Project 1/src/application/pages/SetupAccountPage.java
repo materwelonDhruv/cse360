@@ -31,7 +31,7 @@ public class SetupAccountPage extends BasePage {
 
         // Create input fields using UIFactory.
         TextField userNameField = UIFactory.createTextField("Enter Admin userName",
-                f -> f.maxWidth(250).minChars(16).maxChars(18));
+                f -> f.maxWidth(250).minChars(6).maxChars(18));
         TextField firstNameField = UIFactory.createTextField("Enter Admin first name",
                 f -> f.maxWidth(250).minChars(1).maxChars(50));
         TextField lastNameField = UIFactory.createTextField("Enter Admin last name",
@@ -99,9 +99,7 @@ public class SetupAccountPage extends BasePage {
             Invite invite = context.invites().findInvite(code);
             if (invite != null) {
                 User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
-                context.users().create(user);
-                // Optionally set active user:
-                SessionContext.setActiveUser(user);
+                context.getSession().setActiveUser(context.users().create(user)); // Create user and set as active.
                 context.router().navigate(MyPages.WELCOME_LOGIN);
             } else {
                 errorLabel.setText("Invitation code does not exist or is expired");
