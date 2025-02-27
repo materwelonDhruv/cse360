@@ -47,6 +47,9 @@ public class UserHomePage extends BasePage {
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
 
+    //keeping track of whether all questions are being shown or only unresolved
+    private Boolean showingAllQuestions = true;
+
     //Questions and Answer Stages
     private Stage questionStage;
     private Stage answerStage;
@@ -99,6 +102,18 @@ public class UserHomePage extends BasePage {
         Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
                 (a -> deleteQuestion()));
 
+        //Toggle unresolved questions only button
+        Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved only");
+        unresolvedQuestionsButton.setOnAction(a -> {
+            showingAllQuestions = !showingAllQuestions;
+            loadQuestions();
+            if (showingAllQuestions) {
+                unresolvedQuestionsButton.setText("Show Unresolved Only");
+            } else {
+                unresolvedQuestionsButton.setText("Show All");
+            }
+        });
+
         //Creating log out button
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
@@ -106,7 +121,7 @@ public class UserHomePage extends BasePage {
         Region spacer = new Region();
         spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, spacer, logoutButton);
+        HBox buttonBar = new HBox(10, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, spacer, logoutButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -196,7 +211,14 @@ public class UserHomePage extends BasePage {
     // And adding it to the question list view
     private void loadQuestions() {
         questionListView.getItems().clear();
-        List<Question> questionList = context.questions().getAll(); // Use Questions class
+        List<Question> questionList;
+        // Use Questions class
+        if (showingAllQuestions) {
+            questionList = context.questions().getAll();
+        } else {
+            questionList = context.questions().getUnansweredQuestions(); // Need a getUnresolvedQuestions() method
+        }
+
         for (Question q : questionList) {
             questionListView.getItems().add(new Pair<>(q.getId(), q.getTitle()));
         }
