@@ -104,7 +104,7 @@ public class UserHomePage extends BasePage {
 
         //Add spacer for better UI
         Region spacer = new Region();
-        spacer.setPrefWidth(270);
+        spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
         HBox buttonBar = new HBox(10, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, spacer, logoutButton);
 
@@ -292,7 +292,7 @@ public class UserHomePage extends BasePage {
 
         //Adding answer UI
         Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
-                a -> addAnswer(questionId)));
+                a -> addAnswer()));
 
         //Close answerStage UI
         Button closeButton = UIFactory.createButton("Close", e -> e.onAction(
@@ -345,11 +345,11 @@ public class UserHomePage extends BasePage {
 
 
     //method to add an answer
-    private void addAnswer(int UserID) {
+    private void addAnswer() {
         if (currentlySelectedQuestionId == -1) return;
         String content = answerInput.getText().trim();
         if (!content.isEmpty()) {
-            Message message = new Message(UserID, content);
+            Message message = new Message(context.getSession().getActiveUser().getId(), content);
             Answer newAnswer = new Answer(message, currentlySelectedQuestionId, null, false);
 
             Answer createdAnswer = null;
