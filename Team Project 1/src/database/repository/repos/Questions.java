@@ -164,7 +164,7 @@ public class Questions extends Repository<Question> {
     public List<Question> getQuestionsWithoutPinnedAnswer() {
         String sql = baseJoinQuery +
                 "LEFT JOIN Answers a ON q.questionID = a.questionID " +
-                "WHERE a.isPinned = 0 OR a.isPinned IS NULL";
+                "WHERE a.isPinned = FALSE OR a.isPinned IS NULL";
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
@@ -175,7 +175,7 @@ public class Questions extends Repository<Question> {
      * @param questionId The ID of the question to check
      */
     public boolean hasPinnedAnswer(int questionId) {
-        String sql = "SELECT COUNT(*) FROM Answers WHERE questionID = ? AND isPinned = 1";
+        String sql = "SELECT COUNT(*) FROM Answers WHERE questionID = ? AND isPinned = TRUE";
         return queryForBoolean(sql, pstmt -> pstmt.setInt(1, questionId));
     }
 }
