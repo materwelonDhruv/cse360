@@ -168,4 +168,14 @@ public class Questions extends Repository<Question> {
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
+
+    /**
+     * Returns a true false for whether a question has a pinned answer.
+     *
+     * @param questionId The ID of the question to check
+     */
+    public boolean hasPinnedAnswer(int questionId) {
+        String sql = "SELECT COUNT(*) FROM Answers WHERE questionID = ? AND isPinned = 1";
+        return queryForBoolean(sql, pstmt -> pstmt.setInt(1, questionId));
+    }
 }
