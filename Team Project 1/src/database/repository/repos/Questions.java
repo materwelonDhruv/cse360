@@ -155,4 +155,17 @@ public class Questions extends Repository<Question> {
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
+
+    /**
+     * Returns a list of questions that don't have a pinned answer.
+     *
+     * @return List of questions without a pinned answer
+     */
+    public List<Question> getQuestionsWithoutPinnedAnswer() {
+        String sql = baseJoinQuery +
+                "LEFT JOIN Answers a ON q.questionID = a.questionID " +
+                "WHERE a.isPinned = 0 OR a.isPinned IS NULL";
+        return queryForList(sql, pstmt -> {
+        }, this::build);
+    }
 }
