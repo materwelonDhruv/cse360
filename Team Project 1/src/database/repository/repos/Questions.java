@@ -14,6 +14,11 @@ import java.util.List;
 public class Questions extends Repository<Question> {
 
     private final Messages messagesRepo;
+    private final String baseJoinQuery =
+            "SELECT q.questionID, q.title, " +
+                    "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
+                    "FROM Questions q " +
+                    "JOIN Messages m ON q.messageID = m.messageID ";
 
     public Questions(Connection connection) throws SQLException {
         super(connection);
@@ -42,12 +47,7 @@ public class Questions extends Repository<Question> {
 
     @Override
     public Question getById(int id) {
-        String sql =
-                "SELECT q.questionID, q.title, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Questions q " +
-                        "JOIN Messages m ON q.messageID = m.messageID " +
-                        "WHERE q.questionID = ?";
+        String sql = baseJoinQuery + "WHERE q.questionID = ?";
 
         return queryForObject(sql,
                 pstmt -> pstmt.setInt(1, id),
@@ -57,11 +57,7 @@ public class Questions extends Repository<Question> {
 
     @Override
     public List<Question> getAll() {
-        String sql =
-                "SELECT q.questionID, q.title, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Questions q " +
-                        "JOIN Messages m ON q.messageID = m.messageID";
+        String sql = baseJoinQuery;
 
         return queryForList(sql, pstmt -> {
         }, this::build);
@@ -111,12 +107,7 @@ public class Questions extends Repository<Question> {
      * Returns questions posted by a particular user.
      */
     public List<Question> getQuestionsByUser(int userId) {
-        String sql =
-                "SELECT q.questionID, q.title, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Questions q " +
-                        "JOIN Messages m ON q.messageID = m.messageID " +
-                        "WHERE m.userID = ?";
+        String sql = baseJoinQuery + "WHERE m.userID = ?";
 
         return queryForList(sql, pstmt -> pstmt.setInt(1, userId), this::build);
     }
@@ -158,13 +149,9 @@ public class Questions extends Repository<Question> {
      * @return List of unanswered questions
      */
     public List<Question> getUnansweredQuestions() {
-        String sql =
-                "SELECT q.questionID, q.title, " +
-                        "       m.messageID AS msg_id, m.userID AS msg_userID, m.content AS msg_content, m.createdAt AS msg_createdAt " +
-                        "FROM Questions q " +
-                        "JOIN Messages m ON q.messageID = m.messageID " +
-                        "LEFT JOIN Answers a ON q.questionID = a.questionID " +
-                        "WHERE a.answerID IS NULL";
+        String sql = baseJoinQuery +
+                "LEFT JOIN Answers a ON q.questionID = a.questionID " +
+                "WHERE a.answerID IS NULL";
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
