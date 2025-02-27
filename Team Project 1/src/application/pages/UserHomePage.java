@@ -47,6 +47,9 @@ public class UserHomePage extends BasePage {
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
 
+    //keeping track of whether the current question is resolved
+    private Boolean currentlySelectedQuestionResolved = false;
+
     //keeping track of whether all questions are being shown or only unresolved
     private Boolean showingAllQuestions = true;
 
@@ -334,6 +337,32 @@ public class UserHomePage extends BasePage {
         //Delete Answer Button
         Button deleteAnswerButton = UIFactory.createButton("Delete Answer", e -> e.onAction(a -> deleteAnswer()));
 
+        //Mark and Unmark Solution Button
+        Button markAnswerButton = UIFactory.createButton("Mark Answer As Solution");
+        if (currentlySelectedQuestionResolved) {markAnswerButton.setText("Unmark Answer As Solution");}
+        
+        markAnswerButton.setOnAction(a -> {
+            Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
+            if (currentlySelectedQuestionResolved) {
+                //unmark the solution
+                for (Pair<Integer, String> answer : answerListView.getItems()) {
+                    if (context.answers().getById(answer.getKey()).getIsPinned()) {
+                        context.answers().togglePin(answer.getKey());
+                        break;
+                    }
+                }
+                //update listView and button text
+                loadAnswers(questionId);
+                markAnswerButton.setText("Mark Answer As Solution");
+            } else if (selectedAnswer != null) {
+                Answer answer = context.answers().getById(selectedAnswer.getKey());
+                context.answers().togglePin(selectedAnswer.getKey());
+                //update listView and button text
+                loadAnswers(questionId);
+                markAnswerButton.setText("Unmark Answer As Solution");
+            }
+        });
+
         //Change the listview to only show the content without the ID
         answerListView.setCellFactory(lv -> new ListCell<Pair<Integer, String>>() {
             @Override
@@ -349,6 +378,9 @@ public class UserHomePage extends BasePage {
 
         HBox addUI = new HBox(10, addAnswerButton, answerInput);
         HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteAnswerButton);
+        if (context.getSession().getActiveUser().getId() == queContent.getId()) {
+            editUI.getChildren().add(markAnswerButton);
+        }
 
         //Layout to show every UI
         VBox answerLayout = new VBox(questionContent, addUI, editUI, answerListView, closeButton);
@@ -360,8 +392,14 @@ public class UserHomePage extends BasePage {
     private void loadAnswers(int questionID) {
         answerListView.getItems().clear();
         List<Answer> answerList = context.answers().getRepliesToQuestion(questionID);
+        currentlySelectedQuestionResolved = false;
         for (Answer a : answerList) {
-            answerListView.getItems().add(new Pair<>(a.getId(), a.getMessage().getContent()));
+            if (a.getIsPinned()) {
+                currentlySelectedQuestionResolved = true;
+                answerListView.getItems().addFirst(new Pair<>(a.getId(), a.getMessage().getContent() + " ✔"));
+            } else {
+                answerListView.getItems().addLast(new Pair<>(a.getId(), a.getMessage().getContent()));
+            }
         }
     }
 
@@ -427,7 +465,7 @@ public class UserHomePage extends BasePage {
         answerEditStage.showAndWait();
     }
 
-    //Opening thr answers window
+    //Opening the answers window
     private void showAnswerWindow(int questionID) {
         answerStage.setTitle(context.questions().getById(questionID).getTitle());
         loadAnswers(questionID);
