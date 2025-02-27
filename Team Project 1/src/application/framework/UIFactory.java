@@ -112,6 +112,16 @@ public final class UIFactory {
             return this;
         }
 
+        public TextFieldBuilder defaultText(String text) {
+            textField.setText(text);
+            return this;
+        }
+
+        public TextFieldBuilder placeholder(String text) {
+            textField.setPromptText(text);
+            return this;
+        }
+
         public TextField build() {
             if (maxWidth > 0) {
                 textField.setMaxWidth(maxWidth);
