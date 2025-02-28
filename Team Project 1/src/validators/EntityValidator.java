@@ -71,9 +71,6 @@ public class EntityValidator {
             throw new IllegalArgumentException("A valid userID is required for a private message.");
         }
         validateMessageContent(privateMessage.getMessage().getContent());
-        if (privateMessage.getQuestionId() == null) {
-            throw new IllegalArgumentException("Private message question ID cannot be null.");
-        }
 
         // Must reference exactly one of questionId or parentPrivateMessageId
         boolean hasQuestion = (privateMessage.getQuestionId() != null);
