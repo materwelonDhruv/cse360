@@ -126,7 +126,11 @@ public class UserQuestionDisplay extends BasePage {
         //Private message table declaration
         TableView<PrivateMessage> sentPrivateMessageTable = new TableView<>();
         ObservableList<PrivateMessage> obSPMs = FXCollections.observableArrayList();
-        obSPMs.addAll(context.privateMessages().getPrivateMessagesByUser(user.getId()));
+        for (PrivateMessage pm : context.privateMessages().getPrivateMessagesByUser(user.getId())) {
+            if (pm.doesQuestionIdExist()) {
+                obSPMs.add(pm);
+            }
+        }
         sentPrivateMessageTable.setItems(obSPMs);
 
         //Set up double click functionality for sentPrivateMessageTable
