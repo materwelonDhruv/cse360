@@ -164,10 +164,12 @@ public class Questions extends Repository<Question> {
     public List<Question> getQuestionsWithoutPinnedAnswer() {
         String sql = baseJoinQuery +
                 "LEFT JOIN Answers a ON q.questionID = a.questionID " +
-                "WHERE a.isPinned = FALSE OR a.isPinned IS NULL";
+                "WHERE a.isPinned = FALSE OR a.isPinned IS NULL " +
+                "GROUP BY q.questionID";
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
+
 
     /**
      * Returns a true false for whether a question has a pinned answer.
