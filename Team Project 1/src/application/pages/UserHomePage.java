@@ -48,10 +48,10 @@ public class UserHomePage extends BasePage {
     private int currentlySelectedQuestionId = -1;
 
     //keeping track of whether the current question is resolved
-    private Boolean currentlySelectedQuestionResolved = false;
+    private boolean currentlySelectedQuestionResolved = false;
 
     //keeping track of whether all questions are being shown or only unresolved
-    private Boolean showingAllQuestions = true;
+    private boolean showingAllQuestions = true;
 
     //Questions and Answer Stages
     private Stage questionStage;
@@ -358,7 +358,6 @@ public class UserHomePage extends BasePage {
                 loadQuestions();
                 markAnswerButton.setText("Mark Answer As Solution");
             } else if (selectedAnswer != null) {
-                Answer answer = context.answers().getById(selectedAnswer.getKey());
                 context.answers().togglePin(selectedAnswer.getKey());
                 //update answerListView, questionListView, and button text
                 loadAnswers(questionId);
@@ -432,7 +431,13 @@ public class UserHomePage extends BasePage {
     private void deleteAnswer() {
         Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
+            boolean isPinned = context.answers().getById(selectedItem.getKey()).getIsPinned();
             context.answers().delete(selectedItem.getKey()); // Use the Answers instance to delete
+            //if answer is pinned, loadQuestions to update questionViewList
+            if (isPinned) {
+                currentlySelectedQuestionResolved = false;
+                loadQuestions();
+            }
             answerListView.getItems().remove(selectedItem); // Remove the item from the ListView
         }
     }
