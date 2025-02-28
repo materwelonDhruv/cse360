@@ -51,7 +51,7 @@ public class InvitationPage extends BasePage {
         Label inviteCodeLabel = UIFactory.createLabel("");
 
         // Create a reusable copy button instance for the invitation code
-        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText);
+        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
 
         // Button to generate the invitation code
         Button generateBtn = UIFactory.createButton("Generate Invitation Code",

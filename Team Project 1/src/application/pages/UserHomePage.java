@@ -47,8 +47,12 @@ public class UserHomePage extends BasePage {
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
     private final Questions questionsRepo;
     private final Answers answersRepo;
+    //keeping track of whether the current question is resolved
+    private final boolean currentlySelectedQuestionResolved = false;
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
+    //keeping track of whether all questions are being shown or only unresolved
+    private boolean showingAllQuestions = true;
 
     //Questions and Answer Stages
     private Stage questionStage;
@@ -136,6 +140,18 @@ public class UserHomePage extends BasePage {
         //Delete button to delete a question
         Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
                 (a -> deleteQuestion()));
+
+        //Toggle unresolved questions only button
+        Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved only");
+        unresolvedQuestionsButton.setOnAction(a -> {
+            showingAllQuestions = !showingAllQuestions;
+            loadQuestions();
+            if (showingAllQuestions) {
+                unresolvedQuestionsButton.setText("Show Unresolved Only");
+            } else {
+                unresolvedQuestionsButton.setText("Show All");
+            }
+        });
 
         //Creating log out button
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
@@ -262,9 +278,18 @@ public class UserHomePage extends BasePage {
     // And adding it to the question list view
     private void loadQuestions() {
         questionListView.getItems().clear();
-        List<Question> questionList = context.questions().getAll(); // Use Questions class
+        List<Question> questionList;
+        // Use Questions class
+        if (showingAllQuestions) {
+            questionList = context.questions().getAll();
+        } else {
+            questionList = context.questions().getQuestionsWithoutPinnedAnswer();
+        }
+
         for (Question q : questionList) {
-            questionListView.getItems().add(new Pair<>(q.getId(), q.getTitle()));
+            String title = q.getTitle();
+            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
+            questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }
 
@@ -380,6 +405,33 @@ public class UserHomePage extends BasePage {
         //Delete Answer Button
         Button deleteAnswerButton = UIFactory.createButton("Delete Answer", e -> e.onAction(a -> deleteAnswer()));
 
+        //Mark and Unmark Solution Button
+        Button markAnswerButton = UIFactory.createButton("Mark Answer As Solution");
+        if (context.questions().hasPinnedAnswer(questionId)) {markAnswerButton.setText("Unmark Answer As Solution");}
+
+        markAnswerButton.setOnAction(a -> {
+            Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
+            if (currentlySelectedQuestionResolved) {
+                //unmark the solution
+                for (Pair<Integer, String> answer : answerListView.getItems()) {
+                    if (context.answers().getById(answer.getKey()).getIsPinned()) {
+                        context.answers().togglePin(answer.getKey());
+                        break;
+                    }
+                }
+                //update answerListView, questionListView, and button text
+                loadAnswers(questionId);
+                loadQuestions();
+                markAnswerButton.setText("Mark Answer As Solution");
+            } else if (selectedAnswer != null) {
+                context.answers().togglePin(selectedAnswer.getKey());
+                //update answerListView, questionListView, and button text
+                loadAnswers(questionId);
+                loadQuestions();
+                markAnswerButton.setText("Unmark Answer As Solution");
+            }
+        });
+
         //Change the listview to only show the content without the ID
         answerListView.setCellFactory(lv -> new ListCell<Pair<Integer, String>>() {
             @Override
@@ -395,6 +447,9 @@ public class UserHomePage extends BasePage {
 
         HBox addUI = new HBox(10, addAnswerButton, answerInput);
         HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteAnswerButton);
+        if (context.getSession().getActiveUser().getId() == queContent.getMessage().getUserId()) {
+            editUI.getChildren().add(markAnswerButton);
+        }
 
         //Layout to show every UI
         VBox answerLayout = new VBox(questionContent, addUI, editUI, answerListView, closeButton);
@@ -406,8 +461,14 @@ public class UserHomePage extends BasePage {
     private void loadAnswers(int questionID) {
         answerListView.getItems().clear();
         List<Answer> answerList = context.answers().getRepliesToQuestion(questionID);
+        currentlySelectedQuestionResolved = false;
         for (Answer a : answerList) {
-            answerListView.getItems().add(new Pair<>(a.getId(), a.getMessage().getContent()));
+            if (a.getIsPinned()) {
+                currentlySelectedQuestionResolved = true;
+                answerListView.getItems().addFirst(new Pair<>(a.getId(), a.getMessage().getContent() + " ✔"));
+            } else {
+                answerListView.getItems().addLast(new Pair<>(a.getId(), a.getMessage().getContent()));
+            }
         }
     }
 
@@ -435,7 +496,13 @@ public class UserHomePage extends BasePage {
     private void deleteAnswer() {
         Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
+            boolean isPinned = context.answers().getById(selectedItem.getKey()).getIsPinned();
             context.answers().delete(selectedItem.getKey()); // Use the Answers instance to delete
+            //if answer is pinned, loadQuestions to update questionViewList
+            if (isPinned) {
+                currentlySelectedQuestionResolved = false;
+                loadQuestions();
+            }
             answerListView.getItems().remove(selectedItem); // Remove the item from the ListView
         }
     }
@@ -472,7 +539,7 @@ public class UserHomePage extends BasePage {
         answerEditStage.showAndWait();
     }
 
-    //Opening thr answers window
+    //Opening the answers window
     private void showAnswerWindow(int questionID) {
         answerStage.setTitle(context.questions().getById(questionID).getTitle());
         loadAnswers(questionID);
