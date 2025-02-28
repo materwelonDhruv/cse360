@@ -219,7 +219,7 @@ public class UserHomePage extends BasePage {
         if (showingAllQuestions) {
             questionList = context.questions().getAll();
         } else {
-            questionList = context.questions().getUnansweredQuestions(); // Need a getUnresolvedQuestions() method
+            questionList = context.questions().getQuestionsWithoutPinnedAnswer();
         }
 
         for (Question q : questionList) {
