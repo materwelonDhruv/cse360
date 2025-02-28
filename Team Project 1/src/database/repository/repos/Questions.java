@@ -123,23 +123,15 @@ public class Questions extends Repository<Question> {
         );
     }
 
-    /**
-     * Updates only the title of an existing question.
-     */
-    public Question updateQuestionTitle(int questionId, String newTitle) {
+    public Question updateQuestionFields(int questionId, String newTitle, String newContent) {
         Question existing = getById(questionId);
         if (existing == null) return null;
-        existing.setTitle(newTitle);
-        return update(existing);
-    }
-
-    /**
-     * Updates only the content of the question's underlying message.
-     */
-    public Question updateQuestionContent(int questionId, String newContent) {
-        Question existing = getById(questionId);
-        if (existing == null) return null;
-        existing.getMessage().setContent(newContent);
+        if (newTitle != null) {
+            existing.setTitle(newTitle);
+        }
+        if (newContent != null) {
+            existing.getMessage().setContent(newContent);
+        }
         return update(existing);
     }
 
