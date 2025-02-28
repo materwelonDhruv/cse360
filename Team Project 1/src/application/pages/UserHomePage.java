@@ -351,14 +351,16 @@ public class UserHomePage extends BasePage {
                         break;
                     }
                 }
-                //update listView and button text
+                //update answerListView, questionListView, and button text
                 loadAnswers(questionId);
+                loadQuestions();
                 markAnswerButton.setText("Mark Answer As Solution");
             } else if (selectedAnswer != null) {
                 Answer answer = context.answers().getById(selectedAnswer.getKey());
                 context.answers().togglePin(selectedAnswer.getKey());
-                //update listView and button text
+                //update answerListView, questionListView, and button text
                 loadAnswers(questionId);
+                loadQuestions();
                 markAnswerButton.setText("Unmark Answer As Solution");
             }
         });
