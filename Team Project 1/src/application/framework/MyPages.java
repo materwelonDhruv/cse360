@@ -1,4 +1,4 @@
-package src.application.framework;
+package application.framework;
 
 /**
  * Enum of all page routes. Each entry has a string route.

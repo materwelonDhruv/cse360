@@ -5,6 +5,7 @@ import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Question;
 import database.model.entities.User;
+import database.repository.repos.Questions;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -17,6 +18,7 @@ import javafx.util.Pair;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,26 +26,25 @@ import java.util.List;
  * It shows the user's current role and, if multiple roles exist, a dropdown to select another.
  */
 @Route(MyPages.USER_HOME)
-@View(title = "User Page")
+@application.framework.View(title = "User Page")
 public class UserHomePage extends BasePage {
     //max length for number of characters in the text field
     private static final int MAX_LENGTH = 300;
-
+    //Creates list view to display search results
+    private static final ListView<String> resultView = new ListView<>();
     //Question and Question title TextFields
     private final TextField questionTitleInput = UIFactory.createTextField("Enter the title", f ->
             f.minWidth(200).maxWidth(600).minChars(5).maxChars(10));
     private final TextField questionInput = UIFactory.createTextField("Enter question", f ->
             f.minWidth(200).maxWidth(600).minChars(10).maxChars(MAX_LENGTH));
-
     //Answer TextField
     private final TextField answerInput = UIFactory.createTextField("Enter answer", f ->
             f.minWidth(500).maxWidth(1200).minChars(10).maxChars(600));
-
     //Question and Answers list to store and
     //interact with each element in the list -- questions and answers
     private final ListView<Pair<Integer, String>> questionListView = new ListView<>();
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
-
+    private final Questions questionsRepo;
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
 
@@ -53,13 +54,31 @@ public class UserHomePage extends BasePage {
 
     public UserHomePage() {
         super();
+        this.questionsRepo = context.questions();  // Initialize here
+        loadQuestions();
+    }
+
+    //Updating search results
+    public static void updateResults(List<Question> list) {
+        resultView.getItems().clear();
+        for (Question q : list) {
+            resultView.getItems().add(q.getTitle());
+        }
+        int height = list.size();
+        resultView.setPrefHeight(height * 26); //Gives 26 height for every element to cleanly display
 
     }
+
+//--------------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------------------------------//
+//Question Stage and Methods
 
     @Override
     public Pane createView() {
         loadQuestions();
-
+        double rowHeight = 26; // Original height for search listview
+        resultView.getItems().clear();
+        resultView.setPrefHeight(rowHeight);
         VBox layout = new VBox(10);
 
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
@@ -70,6 +89,23 @@ public class UserHomePage extends BasePage {
             return new VBox(new Label("No active user found."));
         }
 
+
+        //List to hold search results
+        List<Question> searchList = new ArrayList<Question>();
+
+        questionTitleInput.setOnKeyReleased(event -> {
+            String inputText = questionTitleInput.getText();
+            if (inputText.length() > 3) {
+                try {
+                    searchList.clear(); //Clear previous searches
+                    resultView.getItems().clear();
+                    searchList.addAll(questionsRepo.searchQuestions(inputText)); //Add search results
+                    updateResults(searchList);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         // Greeting and role display.
         int roleInt = user.getRoles();
@@ -106,7 +142,7 @@ public class UserHomePage extends BasePage {
         Region spacer = new Region();
         spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, spacer, logoutButton);
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, spacer, logoutButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -168,11 +204,6 @@ public class UserHomePage extends BasePage {
         return layout;
     }
 
-
-//--------------------------------------------------------------------------------------------------------------------------//
-//------------------------------------------------------------------------------------------------------------------------//
-//Question Stage and Methods
-
     //Creating a stage for question
     private void createQuestionStage(int userID) {
         questionStage = new Stage();
@@ -187,7 +218,7 @@ public class UserHomePage extends BasePage {
         // Opening the answer window after a double click is detected on the list item
 
 
-        VBox questionLayout = new VBox(10, questionTitle, questionTitleInput, questionContent, questionInput, createButton, closeButton);
+        VBox questionLayout = new VBox(10, questionTitle, questionTitleInput, resultView, questionContent, questionInput, createButton, closeButton);
         questionStage.setScene(new Scene(questionLayout, 300, 400));
     }
 

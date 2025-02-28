@@ -1,4 +1,4 @@
-package src.application.framework;
+package application.framework;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,4 +1,4 @@
-package src.application.framework;
+package application.framework;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,5 +8,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Route {
-    src.application.framework.MyPages value();
+    application.framework.MyPages value();
 }

@@ -17,7 +17,7 @@ public class PageRouter {
 
     private static final Logger logger = Logger.getLogger(PageRouter.class.getName());
     private final Stage primaryStage;
-    private final Map<src.application.framework.MyPages, Class<? extends application.framework.BasePage>> routeMap = new HashMap<>();
+    private final Map<application.framework.MyPages, Class<? extends application.framework.BasePage>> routeMap = new HashMap<>();
 
     public PageRouter(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -28,14 +28,14 @@ public class PageRouter {
         // 1) Use Reflections to scan package "application.pages" for annotated classes
         Reflections reflections = new Reflections("application.pages", Scanners.TypesAnnotated);
         // 2) Find all classes with @Route
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(src.application.framework.Route.class);
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(application.framework.Route.class);
 
         for (Class<?> cls : annotated) {
             if (application.framework.BasePage.class.isAssignableFrom(cls)) {
                 @SuppressWarnings("unchecked")
                 Class<? extends application.framework.BasePage> pageClass = (Class<? extends application.framework.BasePage>) cls;
-                src.application.framework.Route routeAnnotation = pageClass.getAnnotation(src.application.framework.Route.class);
-                src.application.framework.MyPages pageEnum = routeAnnotation.value();
+                application.framework.Route routeAnnotation = pageClass.getAnnotation(application.framework.Route.class);
+                application.framework.MyPages pageEnum = routeAnnotation.value();
                 routeMap.put(pageEnum, pageClass);
                 System.out.println("Registered route " + pageEnum + " -> " + pageClass.getName());
             }
@@ -45,7 +45,7 @@ public class PageRouter {
     /**
      * Navigate to the specified route in MyPages enum.
      */
-    public void navigate(src.application.framework.MyPages page) {
+    public void navigate(application.framework.MyPages page) {
         Class<? extends BasePage> pageClass = routeMap.get(page);
         if (pageClass == null) {
             logger.warning("No route found for: " + page);
