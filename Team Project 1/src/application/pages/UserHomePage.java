@@ -280,9 +280,11 @@ public class UserHomePage extends BasePage {
         answerStage = new Stage();
         answerStage.initModality(Modality.NONE);
 
-        Question queContent = null;
+        Question queContent;
         if (context.questions().getById(questionId) != null) {
             queContent = context.questions().getById(questionId);
+        } else {
+            queContent = null;
         }
 
         //Question for the answers/ Labels
@@ -309,6 +311,13 @@ public class UserHomePage extends BasePage {
             }
         }));
 
+        //Adding answer UI
+        Button addPMButton = UIFactory.createButton("Private Message", e -> e.onAction(
+                a -> {
+                    PrivateMessagePage.setTargetQuestion(queContent);
+                    context.router().navigate(MyPages.PRIVATE_MESSAGE);
+                }));
+
         //Delete Answer Button
         Button deleteAnswerButton = UIFactory.createButton("Delete Answer", e -> e.onAction(a -> deleteAnswer()));
 
@@ -326,7 +335,7 @@ public class UserHomePage extends BasePage {
         });
 
         HBox addUI = new HBox(10, addAnswerButton, answerInput);
-        HBox editUI = new HBox(10, editAnswerButton, deleteAnswerButton);
+        HBox editUI = new HBox(10, editAnswerButton, deleteAnswerButton, addPMButton);
 
         //Layout to show every UI
         VBox answerLayout = new VBox(questionContent, addUI, editUI, answerListView, closeButton);

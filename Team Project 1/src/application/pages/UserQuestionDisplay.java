@@ -54,8 +54,10 @@ public class UserQuestionDisplay extends BasePage {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     Question q = row.getItem();
                     System.out.println("Load details for: " + q.getTitle());
-                    // TODO: Navigate to question detail page
-                    //context.router().navigate();
+                    if (q != null) {
+                        //createAnswerStage(q.getId());
+                        //showAnswerWindow(q.getId());
+                    }
                 }
             });
             return row;

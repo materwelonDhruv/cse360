@@ -3,6 +3,7 @@ package application.pages;
 import application.framework.*;
 import database.model.entities.Message;
 import database.model.entities.PrivateMessage;
+import database.model.entities.Question;
 import database.model.entities.User;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -14,8 +15,14 @@ import javafx.scene.layout.VBox;
 @Route(MyPages.PRIVATE_MESSAGE)
 @View(title = "Private Message Page")
 public class PrivateMessagePage extends BasePage {
+    private static Question question;
+
     public PrivateMessagePage() {
         super();
+    }
+
+    public static void setTargetQuestion(Question q) {
+        question = q;
     }
 
     public Pane createView() {
@@ -41,8 +48,7 @@ public class PrivateMessagePage extends BasePage {
         privateMessageButton.onActionProperty().set(e -> {
             context.router().navigate(MyPages.PRIVATE_MESSAGE);
             Message message = new Message(user.getId(), privateMessageInput.getText().trim());
-            //TODO: fix placeholder questionID
-            PrivateMessage privateMessage = new PrivateMessage(message, 1, null);
+            PrivateMessage privateMessage = new PrivateMessage(message, question.getId(), null);
             privateMessage.setMessage(message);
             context.privateMessages().create(privateMessage);
         });
