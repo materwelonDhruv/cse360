@@ -146,7 +146,7 @@ public class QuestionsTest extends BaseDatabaseTest {
     @Order(11)
     public void testUpdateQuestionTitle() {
         Question existing = questionsRepo.getById(2);
-        Question updated = questionsRepo.updateQuestionTitle(existing.getId(), "New Title");
+        Question updated = questionsRepo.updateQuestionFields(existing.getId(), "New Title", null);
         assertEquals("New Title", updated.getTitle());
     }
 
@@ -154,7 +154,7 @@ public class QuestionsTest extends BaseDatabaseTest {
     @Order(12)
     public void testUpdateQuestionContent() {
         Question existing = questionsRepo.getById(2);
-        Question updated = questionsRepo.updateQuestionContent(existing.getId(), "New Content");
+        Question updated = questionsRepo.updateQuestionFields(existing.getId(), null, "New Content");
         assertEquals("New Content", updated.getMessage().getContent());
     }
 }

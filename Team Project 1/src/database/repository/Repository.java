@@ -64,6 +64,20 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
     }
 
     /**
+     * Executes a query expecting a boolean result.
+     */
+    protected boolean queryForBoolean(String sql, SqlConsumer paramSetter) {
+        return wrap(() -> {
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                paramSetter.accept(pstmt);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    return rs.next() && rs.getBoolean(1);
+                }
+            }
+        });
+    }
+
+    /**
      * Executes an update (INSERT, UPDATE, DELETE) that does not need generated keys.
      *
      * @return number of rows affected
