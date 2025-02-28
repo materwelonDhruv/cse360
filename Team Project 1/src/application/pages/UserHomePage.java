@@ -246,7 +246,8 @@ public class UserHomePage extends BasePage {
         //save button to save the updated content
         Button saveButton = UIFactory.createButton("Save", e -> e.onAction(a -> {
             String newContent = editQuestionField.getText();
-            context.questions().updateQuestionContent(questionId, newContent);
+            String titleContent = editQuestionTitleField.getText();
+            context.questions().updateQuestionFields(questionId, titleContent, newContent);
             loadQuestions(); // Refresh the question list
             editorStage.close();
         }));
@@ -288,7 +289,6 @@ public class UserHomePage extends BasePage {
         assert queContent != null;
         Label questionContent = UIFactory.createLabel("Question: " + queContent.getMessage().getContent(),
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
-        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;-fx"));
 
         //Adding answer UI
         Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
@@ -326,7 +326,7 @@ public class UserHomePage extends BasePage {
         });
 
         HBox addUI = new HBox(10, addAnswerButton, answerInput);
-        HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteAnswerButton);
+        HBox editUI = new HBox(10, editAnswerButton, deleteAnswerButton);
 
         //Layout to show every UI
         VBox answerLayout = new VBox(questionContent, addUI, editUI, answerListView, closeButton);
