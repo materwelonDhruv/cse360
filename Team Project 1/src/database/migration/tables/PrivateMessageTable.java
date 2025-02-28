@@ -17,7 +17,7 @@ public class PrivateMessageTable extends BaseTable {
         Map<String, String> cols = new LinkedHashMap<>();
         cols.put("privateMessageID", "INT AUTO_INCREMENT PRIMARY KEY");
         cols.put("messageID", "INT UNIQUE NOT NULL");  // References Messages table
-        cols.put("questionID", "INT NOT NULL"); // If top-level private message
+        cols.put("questionID", "INT NULL"); // If top-level private message
         cols.put("parentPrivateMessageID", "INT NULL"); // For threaded replies
         return cols;
     }
