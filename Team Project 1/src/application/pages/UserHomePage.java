@@ -223,7 +223,9 @@ public class UserHomePage extends BasePage {
         }
 
         for (Question q : questionList) {
-            questionListView.getItems().add(new Pair<>(q.getId(), q.getTitle()));
+            String title = q.getTitle();
+            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
+            questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }
 
