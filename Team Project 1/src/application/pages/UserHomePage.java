@@ -339,8 +339,8 @@ public class UserHomePage extends BasePage {
 
         //Mark and Unmark Solution Button
         Button markAnswerButton = UIFactory.createButton("Mark Answer As Solution");
-        if (currentlySelectedQuestionResolved) {markAnswerButton.setText("Unmark Answer As Solution");}
-        
+        if (context.questions().hasPinnedAnswer(questionId)) {markAnswerButton.setText("Unmark Answer As Solution");}
+
         markAnswerButton.setOnAction(a -> {
             Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
             if (currentlySelectedQuestionResolved) {
