@@ -19,7 +19,8 @@ public enum MyPages {
     USER_HOME("/userHome"),
     USER_LOGIN("/userLogin"),
     USER_QUESTION_DISPLAY("/userQuestionDisplay"),
-    PRIVATE_MESSAGE("/privateMessagePage");
+    PRIVATE_MESSAGE("/privateMessagePage"),
+    PRIVATE_CONVERSATION("/privateConversation");
 
     private final String route;
 

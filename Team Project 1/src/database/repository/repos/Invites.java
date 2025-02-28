@@ -119,8 +119,9 @@ public class Invites extends Repository<Invite> {
                 },
                 this::build
         );
-
-        delete(invite.getId());
+        if (invite != null) {
+            delete(invite.getId());
+        }
         return invite;
     }
 }
