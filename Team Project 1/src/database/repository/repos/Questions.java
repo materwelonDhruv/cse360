@@ -123,23 +123,15 @@ public class Questions extends Repository<Question> {
         );
     }
 
-    /**
-     * Updates only the title of an existing question.
-     */
-    public Question updateQuestionTitle(int questionId, String newTitle) {
+    public Question updateQuestionFields(int questionId, String newTitle, String newContent) {
         Question existing = getById(questionId);
         if (existing == null) return null;
-        existing.setTitle(newTitle);
-        return update(existing);
-    }
-
-    /**
-     * Updates only the content of the question's underlying message.
-     */
-    public Question updateQuestionContent(int questionId, String newContent) {
-        Question existing = getById(questionId);
-        if (existing == null) return null;
-        existing.getMessage().setContent(newContent);
+        if (newTitle != null) {
+            existing.setTitle(newTitle);
+        }
+        if (newContent != null) {
+            existing.getMessage().setContent(newContent);
+        }
         return update(existing);
     }
 
@@ -154,5 +146,30 @@ public class Questions extends Repository<Question> {
                 "WHERE a.answerID IS NULL";
         return queryForList(sql, pstmt -> {
         }, this::build);
+    }
+
+    /**
+     * Returns a list of questions that don't have a pinned answer while excluding those that have at least one pinned answer.
+     *
+     * @return List of questions without a pinned answer
+     */
+    public List<Question> getQuestionsWithoutPinnedAnswer() {
+        String sql = baseJoinQuery +
+                "LEFT JOIN Answers a ON q.questionID = a.questionID " +
+                "GROUP BY q.questionID " +
+                "HAVING COUNT(CASE WHEN a.isPinned = TRUE THEN 1 END) = 0";
+        return queryForList(sql, pstmt -> {
+        }, this::build);
+    }
+
+
+    /**
+     * Returns a true false for whether a question has a pinned answer.
+     *
+     * @param questionId The ID of the question to check
+     */
+    public boolean hasPinnedAnswer(int questionId) {
+        String sql = "SELECT COUNT(*) FROM Answers WHERE questionID = ? AND isPinned = TRUE";
+        return queryForBoolean(sql, pstmt -> pstmt.setInt(1, questionId));
     }
 }
