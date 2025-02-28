@@ -378,7 +378,7 @@ public class UserHomePage extends BasePage {
 
         HBox addUI = new HBox(10, addAnswerButton, answerInput);
         HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteAnswerButton);
-        if (context.getSession().getActiveUser().getId() == queContent.getId()) {
+        if (context.getSession().getActiveUser().getId() == queContent.getMessage().getUserId()) {
             editUI.getChildren().add(markAnswerButton);
         }
 
