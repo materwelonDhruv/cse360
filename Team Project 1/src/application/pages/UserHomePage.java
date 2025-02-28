@@ -5,6 +5,7 @@ import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Question;
 import database.model.entities.User;
+import database.repository.repos.Answers;
 import database.repository.repos.Questions;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,7 +27,7 @@ import java.util.List;
  * It shows the user's current role and, if multiple roles exist, a dropdown to select another.
  */
 @Route(MyPages.USER_HOME)
-@application.framework.View(title = "User Page")
+@View(title = "User Page")
 public class UserHomePage extends BasePage {
     //max length for number of characters in the text field
     private static final int MAX_LENGTH = 300;
@@ -45,6 +46,7 @@ public class UserHomePage extends BasePage {
     private final ListView<Pair<Integer, String>> questionListView = new ListView<>();
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
     private final Questions questionsRepo;
+    private final Answers answersRepo;
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
 
@@ -54,7 +56,9 @@ public class UserHomePage extends BasePage {
 
     public UserHomePage() {
         super();
-        this.questionsRepo = context.questions();  // Initialize here
+        this.questionsRepo = context.questions();
+        this.answersRepo = context.answers();
+
         loadQuestions();
     }
 
@@ -66,7 +70,6 @@ public class UserHomePage extends BasePage {
         }
         int height = list.size();
         resultView.setPrefHeight(height * 26); //Gives 26 height for every element to cleanly display
-
     }
 
 //--------------------------------------------------------------------------------------------------------------------------//
@@ -88,7 +91,6 @@ public class UserHomePage extends BasePage {
         if (user == null) {
             return new VBox(new Label("No active user found."));
         }
-
 
         //List to hold search results
         List<Question> searchList = new ArrayList<Question>();
@@ -167,12 +169,46 @@ public class UserHomePage extends BasePage {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item.getValue()); // Display only the answer content
+                    if (questionsRepo.getUnansweredQuestions().contains(item.getValue())) {
+                        setText(item.getValue().concat(" Unresolved")); // Display only the answer content
+                    } else
+                        setText(item.getValue()); // Display only the answer content
                 }
             }
         });
 
-        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
+        //Button to allow user to toggle between seeing only their questions, and all questions
+        Button myQuestionsButton = new Button("My Questions");
+        myQuestionsButton.setOnMouseClicked(event -> {
+
+            if (myQuestionsButton.getText().equals("My Questions")) {
+                myQuestionsButton.setText("All Questions");
+                questionListView.getItems().clear();
+                for (Question q : questionsRepo.getQuestionsByUser(user.getId())) {
+                    int id = q.getId();
+                    if (!questionsRepo.hasPinnedAnswer(id)) {
+                        int numAnswers = answersRepo.getRepliesToQuestion(id).size();
+                        String title = q.getTitle() + "  | ";
+                        String r = " Reply";
+                        if (numAnswers != 1) {
+                            r = " Replies";
+                        }
+                        title += "  Unresolved" + " [" + numAnswers + "]" + r;
+                        questionListView.getItems().add(new Pair<>(id, title));
+                    } else {
+                        questionListView.getItems().add(new Pair<>(id, q.getTitle()));
+                    }
+                }
+            } else {
+                myQuestionsButton.setText("My Questions");
+                questionListView.getItems().clear();
+                for (Question q : questionsRepo.getAll()) {
+                    questionListView.getItems().add(new Pair<>(q.getId(), q.getTitle()));
+                }
+            }
+        });
+
+        layout.getChildren().addAll(userLabel, myQuestionsButton, buttonBar, questionListView);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
@@ -222,7 +258,6 @@ public class UserHomePage extends BasePage {
         questionStage.setScene(new Scene(questionLayout, 300, 400));
     }
 
-
     //Method to load all the questions from the database
     // And adding it to the question list view
     private void loadQuestions() {
@@ -232,6 +267,7 @@ public class UserHomePage extends BasePage {
             questionListView.getItems().add(new Pair<>(q.getId(), q.getTitle()));
         }
     }
+
 
     //Method to add a question with the userID
     private void addQuestion(int userID) {
@@ -277,7 +313,7 @@ public class UserHomePage extends BasePage {
         //save button to save the updated content
         Button saveButton = UIFactory.createButton("Save", e -> e.onAction(a -> {
             String newContent = editQuestionField.getText();
-            context.questions().updateQuestionContent(questionId, newContent);
+            context.questions().updateQuestionFields(questionId, currentTitle, newContent);
             loadQuestions(); // Refresh the question list
             editorStage.close();
         }));
@@ -295,11 +331,12 @@ public class UserHomePage extends BasePage {
         editorStage.show();
     }
 
-    //Opening thr Question window
+    //Opening the Question window
     private void ShowQuestionWindow() {
         questionStage.setTitle("Create Question");
         questionStage.show();
     }
+
 
 //------------------------------------------------------------------------------------------------------------------------//
 //------------------------------------------------------------------------------------------------------------------------//
@@ -373,7 +410,6 @@ public class UserHomePage extends BasePage {
             answerListView.getItems().add(new Pair<>(a.getId(), a.getMessage().getContent()));
         }
     }
-
 
     //method to add an answer
     private void addAnswer() {
