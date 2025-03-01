@@ -48,7 +48,7 @@ public class UserHomePage extends BasePage {
     private final Questions questionsRepo;
     private final Answers answersRepo;
     //keeping track of whether the current question is resolved
-    private final boolean currentlySelectedQuestionResolved = false;
+    private boolean currentlySelectedQuestionResolved = false;
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
     //keeping track of whether all questions are being shown or only unresolved
@@ -141,6 +141,9 @@ public class UserHomePage extends BasePage {
         Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
                 (a -> deleteQuestion()));
 
+        //Button to allow user to toggle between seeing only their questions, and all questions
+        Button myQuestionsButton = new Button("My Questions");
+
         //Toggle unresolved questions only button
         Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved only");
         unresolvedQuestionsButton.setOnAction(a -> {
@@ -153,6 +156,42 @@ public class UserHomePage extends BasePage {
             }
         });
 
+
+        myQuestionsButton.setOnMouseClicked(event -> {
+
+            if (myQuestionsButton.getText().equals("My Questions")) {
+                myQuestionsButton.setText("All Questions");
+                questionListView.getItems().clear();
+                for (Question q : questionsRepo.getQuestionsByUser(user.getId())) {
+                    int id = q.getId();
+                    if (!questionsRepo.hasPinnedAnswer(id)) {
+                        int numAnswers = answersRepo.getRepliesToQuestion(id).size();
+                        String title = q.getTitle();
+                        String r = " Reply";
+                        if (numAnswers != 1) {
+                            r = " Replies";
+                        }
+                        title += " [" + numAnswers + "]" + r;
+                        questionListView.getItems().add(new Pair<>(id, title));
+                    } else {
+                        int numAnswers = answersRepo.getRepliesToQuestion(id).size();
+                        String title = q.getTitle();
+                        title += " ✔";
+                        String r = " Reply";
+                        if (numAnswers != 1) {
+                            r = " Replies";
+                        }
+                        title += " [" + numAnswers + "]" + r;
+                        questionListView.getItems().add(new Pair<>(id, title));
+                    }
+                }
+            } else {
+                myQuestionsButton.setText("My Questions");
+                questionListView.getItems().clear();
+                loadQuestions();
+            }
+        });
+
         //Creating log out button
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
@@ -160,7 +199,7 @@ public class UserHomePage extends BasePage {
         Region spacer = new Region();
         spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, spacer, logoutButton);
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, spacer, logoutButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -193,38 +232,8 @@ public class UserHomePage extends BasePage {
             }
         });
 
-        //Button to allow user to toggle between seeing only their questions, and all questions
-        Button myQuestionsButton = new Button("My Questions");
-        myQuestionsButton.setOnMouseClicked(event -> {
 
-            if (myQuestionsButton.getText().equals("My Questions")) {
-                myQuestionsButton.setText("All Questions");
-                questionListView.getItems().clear();
-                for (Question q : questionsRepo.getQuestionsByUser(user.getId())) {
-                    int id = q.getId();
-                    if (!questionsRepo.hasPinnedAnswer(id)) {
-                        int numAnswers = answersRepo.getRepliesToQuestion(id).size();
-                        String title = q.getTitle() + "  | ";
-                        String r = " Reply";
-                        if (numAnswers != 1) {
-                            r = " Replies";
-                        }
-                        title += "  Unresolved" + " [" + numAnswers + "]" + r;
-                        questionListView.getItems().add(new Pair<>(id, title));
-                    } else {
-                        questionListView.getItems().add(new Pair<>(id, q.getTitle()));
-                    }
-                }
-            } else {
-                myQuestionsButton.setText("My Questions");
-                questionListView.getItems().clear();
-                for (Question q : questionsRepo.getAll()) {
-                    questionListView.getItems().add(new Pair<>(q.getId(), q.getTitle()));
-                }
-            }
-        });
-
-        layout.getChildren().addAll(userLabel, myQuestionsButton, buttonBar, questionListView);
+        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
@@ -287,8 +296,18 @@ public class UserHomePage extends BasePage {
         }
 
         for (Question q : questionList) {
+            int numAnswers = answersRepo.getRepliesToQuestion(q.getId()).size();
             String title = q.getTitle();
-            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
+            String r = "Reply";
+            if (numAnswers != 1) {
+                r = "Replies";
+            }
+            title += " [" + numAnswers + "] " + r;
+            if (context.questions().hasPinnedAnswer(q.getId())) {
+                title = q.getTitle();
+                title += " ✔";
+                title += " [" + numAnswers + "] " + r;
+            }
             questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }
@@ -407,7 +426,9 @@ public class UserHomePage extends BasePage {
 
         //Mark and Unmark Solution Button
         Button markAnswerButton = UIFactory.createButton("Mark Answer As Solution");
-        if (context.questions().hasPinnedAnswer(questionId)) {markAnswerButton.setText("Unmark Answer As Solution");}
+        if (context.questions().hasPinnedAnswer(questionId)) {
+            markAnswerButton.setText("Unmark Answer As Solution");
+        }
 
         markAnswerButton.setOnAction(a -> {
             Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
