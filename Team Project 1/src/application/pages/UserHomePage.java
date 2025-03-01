@@ -313,6 +313,7 @@ public class UserHomePage extends BasePage {
             questionListView.getItems().add(new Pair<>(createdQuestion.getId(), createdQuestion.getTitle()));
             questionInput.clear();
         }
+        loadQuestions();
     }
 
     private void deleteQuestion() {
