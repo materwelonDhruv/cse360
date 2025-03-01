@@ -20,7 +20,7 @@ import java.sql.SQLException;
  * It allows users to navigate to their respective pages based on their role or quit the application.
  */
 @Route(MyPages.WELCOME_LOGIN)
-@View(title = "Role Select")
+@application.framework.View(title = "Role Select")
 public class WelcomeLoginPage extends BasePage {
 
     public WelcomeLoginPage() {

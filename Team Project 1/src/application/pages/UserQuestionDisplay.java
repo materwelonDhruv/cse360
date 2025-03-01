@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * to load its detail page.
  */
 @Route(MyPages.USER_QUESTION_DISPLAY)
-@View(title = "User Questions")
+@application.framework.View(title = "User Questions")
 public class UserQuestionDisplay extends BasePage {
 
     public UserQuestionDisplay() {

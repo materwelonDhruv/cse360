@@ -17,7 +17,7 @@ import validators.UsernameValidator;
  * Users provide their userName, password, and a valid invitation code to register.
  */
 @Route(MyPages.SETUP_ACCOUNT)
-@View(title = "Account Setup")
+@application.framework.View(title = "Account Setup")
 public class SetupAccountPage extends BasePage {
 
     public SetupAccountPage() {

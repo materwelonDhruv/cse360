@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class Questions extends Repository<Question> {
-
     private final Messages messagesRepo;
     private final String baseJoinQuery =
             "SELECT q.questionID, q.title, " +

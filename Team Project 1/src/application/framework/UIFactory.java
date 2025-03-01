@@ -234,7 +234,7 @@ public final class UIFactory {
 
         public LabelBuilder(String text) {
             label = new Label(text);
-            label.setStyle(DesignGuide.TITLE_LABEL);
+            label.setStyle(application.framework.DesignGuide.TITLE_LABEL);
         }
 
         public LabelBuilder style(String style) {

@@ -18,7 +18,7 @@ import static utils.permissions.RolesUtil.intToRoles;
 import static utils.permissions.RolesUtil.roleName;
 
 @Route(MyPages.ADMIN_USER)
-@View(title = "Admin User Page")
+@application.framework.View(title = "Admin User Page")
 public class AdminUserPage extends BasePage {
 
     public AdminUserPage() {
