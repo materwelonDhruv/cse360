@@ -19,7 +19,7 @@ import java.util.List;
  * The page uses UIFactory and DesignGuide for consistent UI creation and styling.
  */
 @Route(MyPages.INVITATION)
-@View(title = "Invite Page")
+@application.framework.View(title = "Invite Page")
 public class InvitationPage extends BasePage {
 
     public InvitationPage() {
@@ -51,7 +51,7 @@ public class InvitationPage extends BasePage {
         Label inviteCodeLabel = UIFactory.createLabel("");
 
         // Create a reusable copy button instance for the invitation code
-        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText);
+        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
 
         // Button to generate the invitation code
         Button generateBtn = UIFactory.createButton("Generate Invitation Code",

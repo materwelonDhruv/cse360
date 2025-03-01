@@ -35,6 +35,10 @@ public class PrivateMessage extends BaseEntity {
         this.questionId = questionId;
     }
 
+    public boolean doesQuestionIdExist() {
+        return questionId != null;
+    }
+
     public Integer getParentPrivateMessageId() {
         return parentPrivateMessageId;
     }

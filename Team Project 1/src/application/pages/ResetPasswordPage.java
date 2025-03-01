@@ -13,7 +13,7 @@ import validators.PasswordValidator;
  * It validates the new password and provides a back button to return to the admin home.
  */
 @Route(MyPages.RESET_PASSWORD)
-@View(title = "Reset Password")
+@application.framework.View(title = "Reset Password")
 public class ResetPasswordPage extends BasePage {
 
     public ResetPasswordPage() {

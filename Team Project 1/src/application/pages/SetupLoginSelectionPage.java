@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
  * Provides two buttons for navigation.
  */
 @Route(MyPages.SETUP_LOGIN)
-@View(title = "Account Setup")
+@application.framework.View(title = "Account Setup")
 public class SetupLoginSelectionPage extends BasePage {
 
     public SetupLoginSelectionPage() {

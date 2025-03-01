@@ -56,30 +56,30 @@ public abstract class BasePage {
      * If @View is present, use it; else default to 800x400, etc.
      */
     public String getTitle() {
-        if (this.getClass().isAnnotationPresent(View.class)) {
-            View v = this.getClass().getAnnotation(View.class);
+        if (this.getClass().isAnnotationPresent(application.framework.View.class)) {
+            application.framework.View v = this.getClass().getAnnotation(application.framework.View.class);
             return v.title().isEmpty() ? "Untitled" : v.title();
         }
         return "Untitled";
     }
 
     public int getWidth() {
-        if (this.getClass().isAnnotationPresent(View.class)) {
-            return this.getClass().getAnnotation(View.class).width();
+        if (this.getClass().isAnnotationPresent(application.framework.View.class)) {
+            return this.getClass().getAnnotation(application.framework.View.class).width();
         }
-        return DesignGuide.DEFAULT_WIDTH;
+        return application.framework.DesignGuide.DEFAULT_WIDTH;
     }
 
     public int getHeight() {
-        if (this.getClass().isAnnotationPresent(View.class)) {
-            return this.getClass().getAnnotation(View.class).height();
+        if (this.getClass().isAnnotationPresent(application.framework.View.class)) {
+            return this.getClass().getAnnotation(application.framework.View.class).height();
         }
-        return DesignGuide.DEFAULT_HEIGHT;
+        return application.framework.DesignGuide.DEFAULT_HEIGHT;
     }
 
     public boolean isResizable() {
-        if (this.getClass().isAnnotationPresent(View.class)) {
-            return this.getClass().getAnnotation(View.class).resizable();
+        if (this.getClass().isAnnotationPresent(application.framework.View.class)) {
+            return this.getClass().getAnnotation(application.framework.View.class).resizable();
         }
         return true;
     }

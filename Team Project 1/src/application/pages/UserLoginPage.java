@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
  * upon successful login.
  */
 @Route(MyPages.USER_LOGIN)
-@View(title = "User Login")
+@application.framework.View(title = "User Login")
 public class UserLoginPage extends BasePage {
 
     public UserLoginPage() {

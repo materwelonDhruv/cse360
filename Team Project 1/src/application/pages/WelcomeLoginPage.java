@@ -20,7 +20,7 @@ import java.sql.SQLException;
  * It allows users to navigate to their respective pages based on their role or quit the application.
  */
 @Route(MyPages.WELCOME_LOGIN)
-@View(title = "Role Select")
+@application.framework.View(title = "Role Select")
 public class WelcomeLoginPage extends BasePage {
 
     public WelcomeLoginPage() {
@@ -76,8 +76,10 @@ public class WelcomeLoginPage extends BasePage {
             // Set continue button to use the selected role
             continueButton.setOnAction(e -> {
                 if (RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
+                    context.getSession().setCurrentRole(Roles.ADMIN);
                     context.router().navigate(MyPages.ADMIN_HOME);
                 } else if (selectedRole[0] != null) {
+                    context.getSession().setCurrentRole(selectedRole[0]);
                     context.router().navigate(MyPages.USER_HOME);
                 }
             });
