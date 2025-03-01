@@ -1,4 +1,4 @@
-package src.utils;
+package utils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,9 +9,9 @@ public class TableSyncUtil {
 
     /**
      * Syncs the table schema:
-     *  1) If table doesn't exist -> CREATE TABLE
-     *  2) If table exists -> compare columns, add any that are missing
-     *  3) (Placeholder) If columns changed or removed -> handle rename or drop
+     * 1) If table doesn't exist -> CREATE TABLE
+     * 2) If table exists -> compare columns, add any that are missing
+     * 3) (Placeholder) If columns changed or removed -> handle rename or drop
      */
     public static void syncTableSchema(Connection connection,
                                        String tableName,
@@ -60,8 +60,8 @@ public class TableSyncUtil {
                                           List<String> existingColumns,
                                           Map<String, String> expectedColumns) throws SQLException {
         for (Map.Entry<String, String> entry : expectedColumns.entrySet()) {
-            String columnName  = entry.getKey().toUpperCase();
-            String columnDef   = entry.getValue();
+            String columnName = entry.getKey().toUpperCase();
+            String columnDef = entry.getValue();
             if (!existingColumns.contains(columnName)) {
                 String alterSql = String.format("ALTER TABLE %s ADD COLUMN %s %s",
                         tableName, entry.getKey(), columnDef);

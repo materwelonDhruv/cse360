@@ -1,80 +1,97 @@
-package src.application.pages;
+package application.pages;
 
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import application.framework.*;
+import database.model.entities.User;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
-
-import java.sql.SQLException;
+import utils.permissions.Roles;
+import validators.EmailValidator;
+import validators.PasswordValidator;
+import validators.UsernameValidator;
 
 /**
- * The SetupAdmin class handles the setup process for creating an administrator
- * account.
- * This is intended to be used by the first user to initialize the system with
- * admin credentials.
+ * SetupAccountPage class handles the account setup process for new users.
+ * Users provide their userName, password, and a valid invitation code to register.
+ * This page is used to initialize the system with admin credentials.
  */
-public class AdminSetupPage {
+@Route(MyPages.ADMIN_SETUP)
+@application.framework.View(title = "Administrator Setup")
+public class AdminSetupPage extends BasePage {
 
-    private final AppContext context;
-
-    public AdminSetupPage() throws SQLException {
-        this.context = AppContext.getInstance();
+    public AdminSetupPage() {
+        super();
     }
 
-    public void show(Stage primaryStage) {
-        // Input fields for userName and password
-        TextField userNameField = new TextField();
-        userNameField.setPromptText("Enter Admin userName");
-        userNameField.setMaxWidth(250);
+    @Override
+    public Pane createView() {
+        // Create a vertically aligned layout with consistent padding and centering.
+        VBox layout = new VBox(10);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter Password");
-        passwordField.setMaxWidth(250);
+        // Create input fields using UIFactory.
+        TextField userNameField = UIFactory.createTextField("Enter Admin userName",
+                f -> f.maxWidth(250).minChars(6).maxChars(18));
+        TextField firstNameField = UIFactory.createTextField("Enter Admin first name",
+                f -> f.maxWidth(250).minChars(1).maxChars(50));
+        TextField lastNameField = UIFactory.createTextField("Enter Admin last name",
+                f -> f.maxWidth(250).minChars(1).maxChars(50));
+        TextField emailField = UIFactory.createTextField("Enter Email",
+                f -> f.maxWidth(250).minChars(5).maxChars(50));
+        TextField passwordField = UIFactory.createPasswordField("Enter Password",
+                p -> p.maxWidth(250).minChars(8).maxChars(30));
 
-        TextField emailField = new TextField();
-        emailField.setPromptText("Enter Email");
-        emailField.setMaxWidth(250);
+        // Create an error label.
+        Label errorLabel = UIFactory.createLabel("",
+                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
 
-        TextField firstNameField = new TextField();
-        firstNameField.setPromptText("Enter Admin first name");
-        firstNameField.setMaxWidth(250);
+        // Create Setup and Back buttons.
+        // Create Setup button using UIFactory with reduced nesting
+        Button setupButton = UIFactory.createButton("Setup",
+                e -> e.onAction(a -> handleSetup(userNameField, firstNameField, lastNameField, passwordField, emailField, errorLabel))
+        );
 
-        TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Enter Admin userName");
-        lastNameField.setMaxWidth(250);
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
 
-        Button setupButton = new Button("Setup");
+        layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton, errorLabel, backButton);
+        return layout;
+    }
 
-        setupButton.setOnAction(_ -> {
-            // Retrieve user input
-            String userName = userNameField.getText();
-            String password = passwordField.getText();
-            String firstName = firstNameField.getText();
-            String lastName = lastNameField.getText();
-            String email = emailField.getText();
+    private void handleSetup(TextField userNameField, TextField firstNameField, TextField lastNameField,
+                             TextField passwordField, TextField emailField, Label errorLabel) {
+        String userName = userNameField.getText();
+        String firstName = firstNameField.getText();
+        String lastName = lastNameField.getText();
+        String password = passwordField.getText();
+        String email = emailField.getText();
 
-            try {
-                // Create a new User object with admin role and register in the database
-                User user = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
-                context.users().create(user);
-                System.out.println("Administrator setup completed.");
+        // Validate user input.
+        try {
+            UsernameValidator.validateUserName(userName);
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
+            return;
+        }
+        try {
+            PasswordValidator.validatePassword(password);
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
+            return;
+        }
+        try {
+            EmailValidator.validateEmail(email);
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
+            return;
+        }
 
-                // Navigate to the Welcome Login Page
-                new WelcomeLoginPage().show(primaryStage, user);
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
-                e.printStackTrace();
-            }
-        });
-
-        VBox layout = new VBox(10, userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
-        primaryStage.setScene(new Scene(layout, 800, 400));
-        primaryStage.setTitle("Administrator Setup");
-        primaryStage.show();
+        User adminUser = new User(userName, firstName, lastName, password, email, Roles.ADMIN.getBit());
+        context.users().create(adminUser);
+        // Set active user in session.
+        context.getSession().setActiveUser(adminUser);
+        // Navigate to welcome page.
+        context.router().navigate(MyPages.WELCOME_LOGIN);
     }
 }

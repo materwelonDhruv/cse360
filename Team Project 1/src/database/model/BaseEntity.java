@@ -1,4 +1,4 @@
-package src.database.model;
+package database.model;
 
 public abstract class BaseEntity {
     protected int id; // Common primary key field

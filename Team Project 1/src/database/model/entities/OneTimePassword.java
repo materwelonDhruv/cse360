@@ -1,16 +1,16 @@
-package src.database.model.entities;
+package database.model.entities;
 
-import src.database.model.BaseEntity;
-import src.utils.Helpers;
+import database.model.BaseEntity;
+import utils.Helpers;
 
 import java.security.SecureRandom;
 
 public class OneTimePassword extends BaseEntity {
+    private final transient String plainOtp = Helpers.generateRandomCode(10, true);
     private int creatorId;
     private int targetId;
     private boolean isUsed;
     private String otpValue;
-    private final transient String plainOtp = Helpers.generateRandomCode(10, true);
 
     public OneTimePassword() {
         this.isUsed = false;
@@ -30,6 +30,7 @@ public class OneTimePassword extends BaseEntity {
     public int getCreatorId() {
         return creatorId;
     }
+
     public void setCreatorId(int creatorId) {
         this.creatorId = creatorId;
     }
@@ -37,6 +38,7 @@ public class OneTimePassword extends BaseEntity {
     public int getTargetId() {
         return targetId;
     }
+
     public void setTargetId(int targetId) {
         this.targetId = targetId;
     }
@@ -44,6 +46,7 @@ public class OneTimePassword extends BaseEntity {
     public boolean isUsed() {
         return isUsed;
     }
+
     public void setUsed(boolean used) {
         isUsed = used;
     }
@@ -51,6 +54,7 @@ public class OneTimePassword extends BaseEntity {
     public String getOtpValue() {
         return otpValue;
     }
+
     public void setOtpValue(String otpValue) {
         this.otpValue = otpValue;
     }

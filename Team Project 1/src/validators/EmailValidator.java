@@ -1,12 +1,10 @@
-package src.validators;
+package validators;
 
 public class EmailValidator {
 
-    private enum State { LOCAL, AT, DOMAIN, ERROR }
-
-    public static String validateEmail(String input) {
+    public static void validateEmail(String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
-            return "Email is empty";
+            throw new IllegalArgumentException("Email is empty");
         }
         State state = State.LOCAL;
         int length = input.length();
@@ -44,18 +42,19 @@ public class EmailValidator {
                     break;
             }
             if (state == State.ERROR) {
-                return "Invalid email format at character: " + c;
+                throw new IllegalArgumentException("Invalid email format at character: " + c);
             }
         }
         if (state == State.LOCAL) {
-            return "Missing '@' symbol in email";
+            throw new IllegalArgumentException("Missing '@' symbol in email");
         }
         if (state == State.AT) {
-            return "Domain part is empty";
+            throw new IllegalArgumentException("Domain part is empty");
         }
         if (!dotInDomain) {
-            return "Domain must contain at least one dot";
+            throw new IllegalArgumentException("Domain must contain at least one dot");
         }
-        return "";
     }
+
+    private enum State {LOCAL, AT, DOMAIN, ERROR}
 }

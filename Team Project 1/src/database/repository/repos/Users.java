@@ -1,8 +1,8 @@
-package src.database.repository.repos;
+package database.repository.repos;
 
-import src.database.model.entities.User;
-import src.database.repository.Repository;
-import src.utils.PasswordUtil;
+import database.model.entities.User;
+import database.repository.Repository;
+import utils.PasswordUtil;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -21,8 +21,6 @@ public class Users extends Repository<User> {
         String plain = user.getPassword();
         String hashed = PasswordUtil.hashPassword(plain);
         user.setPassword(hashed);
-        System.out.println("User created: " + plain);
-        System.out.println("User created: " + hashed);
 
         String sql = "INSERT INTO Users "
                 + "(userName, firstName, lastName, password, email, roles) "

@@ -1,10 +1,10 @@
-package src.tests;
+package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import src.utils.permissions.Roles;
-import src.utils.permissions.RolesUtil;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 public class RolesUtilTest {
 
@@ -51,7 +51,7 @@ public class RolesUtilTest {
     @Test
     public void testRolesToString_UserInstructor() {
         // user => 1, instructor => 4 => combined => 5
-        Roles[] roles = { Roles.USER, Roles.INSTRUCTOR };
+        Roles[] roles = {Roles.USER, Roles.INSTRUCTOR};
         int result = RolesUtil.rolesToInt(roles);
         assertEquals(5, result, "Should produce 5 for USER+INSTRUCTOR");
     }
@@ -59,7 +59,7 @@ public class RolesUtilTest {
     @Test
     public void testRolesToString_ReviewerStaff() {
         // reviewer => 16, staff => 32 => combined => 48
-        Roles[] roles = { Roles.REVIEWER, Roles.STAFF };
+        Roles[] roles = {Roles.REVIEWER, Roles.STAFF};
         int result = RolesUtil.rolesToInt(roles);
         assertEquals(48, result, "Should produce 48 for REVIEWER+STAFF");
     }
@@ -74,13 +74,13 @@ public class RolesUtilTest {
 
     @Test
     public void testHasRole_RoleFound() {
-        Roles[] roles = { Roles.USER, Roles.ADMIN };
+        Roles[] roles = {Roles.USER, Roles.ADMIN};
         assertTrue(RolesUtil.hasRole(roles, Roles.ADMIN), "Should return true when the role is present");
     }
 
     @Test
     public void testHasRole_RoleNotFound() {
-        Roles[] roles = { Roles.USER, Roles.INSTRUCTOR };
+        Roles[] roles = {Roles.USER, Roles.INSTRUCTOR};
         assertFalse(RolesUtil.hasRole(roles, Roles.STAFF), "Should return false when the role is not present");
     }
 
@@ -92,42 +92,42 @@ public class RolesUtilTest {
 
     @Test
     public void testHasAllRoles_AllPresent() {
-        Roles[] roles = { Roles.USER, Roles.ADMIN, Roles.INSTRUCTOR };
-        Roles[] required = { Roles.USER, Roles.ADMIN };
+        Roles[] roles = {Roles.USER, Roles.ADMIN, Roles.INSTRUCTOR};
+        Roles[] required = {Roles.USER, Roles.ADMIN};
         assertTrue(RolesUtil.hasAllRoles(roles, required), "Should return true when all required roles are present");
     }
 
     @Test
     public void testHasAllRoles_NotAllPresent() {
-        Roles[] roles = { Roles.USER, Roles.STUDENT };
-        Roles[] required = { Roles.USER, Roles.ADMIN };
+        Roles[] roles = {Roles.USER, Roles.STUDENT};
+        Roles[] required = {Roles.USER, Roles.ADMIN};
         assertFalse(RolesUtil.hasAllRoles(roles, required), "Should return false if any required role is missing");
     }
 
     @Test
     public void testHasAllRoles_EmptyRequired() {
-        Roles[] roles = { Roles.ADMIN, Roles.STAFF };
+        Roles[] roles = {Roles.ADMIN, Roles.STAFF};
         Roles[] required = new Roles[0];
         assertTrue(RolesUtil.hasAllRoles(roles, required), "Empty required roles should return true");
     }
 
     @Test
     public void testHasAnyRole_OnePresent() {
-        Roles[] roles = { Roles.USER, Roles.REVIEWER };
-        Roles[] required = { Roles.ADMIN, Roles.REVIEWER };
+        Roles[] roles = {Roles.USER, Roles.REVIEWER};
+        Roles[] required = {Roles.ADMIN, Roles.REVIEWER};
         assertTrue(RolesUtil.hasAnyRole(roles, required), "Should return true when at least one required role is present");
     }
 
     @Test
     public void testHasAnyRole_NonePresent() {
-        Roles[] roles = { Roles.USER, Roles.INSTRUCTOR };
-        Roles[] required = { Roles.ADMIN, Roles.STUDENT };
+        Roles[] roles = {Roles.USER, Roles.INSTRUCTOR};
+        Roles[] required = {Roles.ADMIN, Roles.STUDENT};
         assertFalse(RolesUtil.hasAnyRole(roles, required), "Should return false when none of the required roles are present");
     }
 
     @Test
     public void testHasAnyRole_EmptyRequired() {
-        Roles[] roles = { Roles.ADMIN, Roles.STAFF };
+        Roles[] roles = {Roles.ADMIN, Roles.STAFF};
         Roles[] required = new Roles[0];
         assertFalse(RolesUtil.hasAnyRole(roles, required), "Empty required roles should return false");
     }

@@ -1,104 +1,73 @@
-package src.application.pages;
+package application.pages;
 
+import application.framework.*;
+import database.model.entities.OneTimePassword;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.OneTimePassword;
-import src.database.model.entities.User;
-
-import java.sql.SQLException;
 
 /**
- * InvitePage class represents the page where an admin can generate an
- **/
+ * SetPassPage represents the page where an admin can generate a one-time password
+ * for a selected user.
+ */
+@Route(MyPages.SET_PASS)
+@application.framework.View(title = "Set User Password")
+public class SetPassPage extends BasePage {
 
-public class SetPassPage {
-
-    private final AppContext context;
+    // Fields to hold the selected target user's info.
     private String targetUser;
     private int targetID;
 
-    public SetPassPage() throws SQLException {
-        this.context = AppContext.getInstance();
+    public SetPassPage() {
+        super();
     }
 
-    public void show(Stage primaryStage, User user) {
+    @Override
+    public Pane createView() {
+        VBox layout = new VBox(15);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-        VBox layout = new VBox();
-        layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        Label titleLabel = UIFactory.createLabel("Set user's one-time password",
+                l -> l.style(DesignGuide.TITLE_LABEL));
 
-        // Label to display the title of the page
-        Label userLabel = new Label("Set user's one-time password");
-        userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10");
-
-
-        // Button to generate the invitation code
-        Button setUserOTP = new Button("Set Password");
-
-        // Button to copy the invitation code
-        Button copyPassToClipboard = new Button("Copy password To Clipboard");
-        copyPassToClipboard.setStyle("-fx-font-size: 12px");
+        // Create and populate the user selection ChoiceBox.
         ChoiceBox<String> userDropBox = new ChoiceBox<>();
-        ObservableList<String> obUserList = FXCollections.observableArrayList();
-        for (User otherUSer : context.users().getAll()) {
-            obUserList.add(otherUSer.getUserName());
-            System.out.println(otherUSer.getId());
-        }
-        userDropBox.getItems().addAll(obUserList);
+        ObservableList<String> userList = FXCollections.observableArrayList();
+        context.users().getAll().forEach(u -> userList.add(u.getUserName()));
+        userDropBox.setItems(userList);
 
-        userDropBox.setOnAction(_ -> {
+        userDropBox.setOnAction(e -> {
             targetUser = userDropBox.getValue();
-            System.out.println(targetUser);
             targetID = context.users().getByUsername(targetUser).getId();
         });
 
-        Label passLabel = new Label("");
-        setUserOTP.setOnAction(_ -> {
-            OneTimePassword newPass = new OneTimePassword(user.getId(), targetID);
-            context.oneTimePasswords().create(newPass);
-            passLabel.setText(newPass.getPlainOtp());
-            System.out.println("New password: " + newPass.getPlainOtp());
+        Label passLabel = UIFactory.createLabel("");
 
-        });
+        Button setOTPButton = UIFactory.createButton("Set One-Time Password",
+                e -> handleSetOneTimePassword(passLabel));
 
-        passLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10");
-        // Action for copying the code to clipboard
+        Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
 
-        copyPassToClipboard.setOnAction(_ -> {
-            // Copy the generated code into the user's clipboard and change text for feedback
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent content = new ClipboardContent();
-            content.putString(passLabel.getText());
-            clipboard.setContent(content);
-            copyPassToClipboard.setText("Copied!");
-        });
-        Button backButton = new Button("Back");
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
-        // Action for back button
-        backButton.setOnAction(_ -> {
-            try {
-                new AdminHomePage().show(primaryStage, user);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        layout.getChildren().addAll(titleLabel, userDropBox, passLabel, setOTPButton, copyButton, backButton);
+        return layout;
+    }
 
+    private void handleSetOneTimePassword(Label passLabel) {
+        if (targetUser == null || targetID == 0) {
+            passLabel.setText("Please select a user first.");
+            return;
+        }
 
-        // Add components to layout
-        layout.getChildren().addAll(userLabel, userDropBox, passLabel, setUserOTP, copyPassToClipboard, backButton);
-
-
-        // Set the scene
-        Scene inviteScene = new Scene(layout, 800, 400);
-        primaryStage.setScene(inviteScene);
-        primaryStage.setTitle("Set user password");
+        // Generate one-time password using current active user's ID as the issuer.
+        OneTimePassword newPass = new OneTimePassword(context.getSession().getActiveUser().getId(), targetID);
+        context.oneTimePasswords().create(newPass);
+        passLabel.setText(newPass.getPlainOtp());
+        System.out.println("New password: " + newPass.getPlainOtp());
     }
 }
