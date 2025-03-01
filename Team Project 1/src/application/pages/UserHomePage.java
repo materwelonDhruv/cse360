@@ -47,12 +47,18 @@ public class UserHomePage extends BasePage {
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
     private final Questions questionsRepo;
     private final Answers answersRepo;
+
     //keeping track of whether the current question is resolved
     private boolean currentlySelectedQuestionResolved = false;
+
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
-    //keeping track of whether all questions are being shown or only unresolved
-    private boolean showingAllQuestions = true;
+
+    //keeping track of whether resolved questions are being shown or only unresolved
+    private boolean showingResolvedQuestions = true;
+
+    //keeping track of whether only the user's questions are being shown
+    private boolean showingUserQuestionsOnly = false;
 
     //Questions and Answer Stages
     private Stage questionStage;
@@ -141,54 +147,27 @@ public class UserHomePage extends BasePage {
         Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
                 (a -> deleteQuestion()));
 
-        //Button to allow user to toggle between seeing only their questions, and all questions
-        Button myQuestionsButton = new Button("My Questions");
-
         //Toggle unresolved questions only button
-        Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved only");
+        Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved Only");
         unresolvedQuestionsButton.setOnAction(a -> {
-            showingAllQuestions = !showingAllQuestions;
+            showingResolvedQuestions = !showingResolvedQuestions;
             loadQuestions();
-            if (showingAllQuestions) {
+            if (showingResolvedQuestions) {
                 unresolvedQuestionsButton.setText("Show Unresolved Only");
             } else {
-                unresolvedQuestionsButton.setText("Show All");
+                unresolvedQuestionsButton.setText("Show Resolved And Unresolved");
             }
         });
 
-
-        myQuestionsButton.setOnMouseClicked(event -> {
-
-            if (myQuestionsButton.getText().equals("My Questions")) {
-                myQuestionsButton.setText("All Questions");
-                questionListView.getItems().clear();
-                for (Question q : questionsRepo.getQuestionsByUser(user.getId())) {
-                    int id = q.getId();
-                    if (!questionsRepo.hasPinnedAnswer(id)) {
-                        int numAnswers = answersRepo.getRepliesToQuestion(id).size();
-                        String title = q.getTitle();
-                        String r = " Reply";
-                        if (numAnswers != 1) {
-                            r = " Replies";
-                        }
-                        title += " [" + numAnswers + "]" + r;
-                        questionListView.getItems().add(new Pair<>(id, title));
-                    } else {
-                        int numAnswers = answersRepo.getRepliesToQuestion(id).size();
-                        String title = q.getTitle();
-                        title += " ✔";
-                        String r = " Reply";
-                        if (numAnswers != 1) {
-                            r = " Replies";
-                        }
-                        title += " [" + numAnswers + "]" + r;
-                        questionListView.getItems().add(new Pair<>(id, title));
-                    }
-                }
+        //Toggle user questions only button
+        Button myQuestionsButton = UIFactory.createButton("Show Mine Only");
+        myQuestionsButton.setOnAction(a -> {
+            showingUserQuestionsOnly = !showingUserQuestionsOnly;
+            loadQuestions();
+            if (showingUserQuestionsOnly) {
+                myQuestionsButton.setText("Show Others");
             } else {
-                myQuestionsButton.setText("My Questions");
-                questionListView.getItems().clear();
-                loadQuestions();
+                myQuestionsButton.setText("Show Mine Only");
             }
         });
 
@@ -289,10 +268,15 @@ public class UserHomePage extends BasePage {
         questionListView.getItems().clear();
         List<Question> questionList;
         // Use Questions class
-        if (showingAllQuestions) {
+        if (showingResolvedQuestions) {
             questionList = context.questions().getAll();
         } else {
             questionList = context.questions().getQuestionsWithoutPinnedAnswer();
+        }
+
+        if (showingUserQuestionsOnly) {
+            // remove questions not belonging to the user
+            questionList.removeIf(q -> context.getSession().getActiveUser().getId() != q.getMessage().getUserId());
         }
 
         for (Question q : questionList) {
@@ -305,8 +289,8 @@ public class UserHomePage extends BasePage {
             title += " [" + numAnswers + "] " + r;
             if (context.questions().hasPinnedAnswer(q.getId())) {
                 title = q.getTitle();
-                title += " ✔";
                 title += " [" + numAnswers + "] " + r;
+                title += " ✔";
             }
             questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
