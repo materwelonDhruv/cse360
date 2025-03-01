@@ -18,7 +18,7 @@ import validators.UsernameValidator;
  * This page is used to initialize the system with admin credentials.
  */
 @Route(MyPages.ADMIN_SETUP)
-@application.framework.View(title = "Administrator Setup")
+@View(title = "Administrator Setup")
 public class AdminSetupPage extends BasePage {
 
     public AdminSetupPage() {
