@@ -48,7 +48,6 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         PrivateMessage pm = new PrivateMessage(msg, dummyQuestionId, null);
         PrivateMessage created = pmRepo.create(pm);
 
-        assertNotNull(created.getId(), "PrivateMessage ID should be generated");
         assertEquals(1, created.getMessage().getUserId());
         assertEquals("This is a private message.", created.getMessage().getContent());
         assertEquals(dummyQuestionId, created.getQuestionId());

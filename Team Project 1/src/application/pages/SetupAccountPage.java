@@ -30,11 +30,11 @@ public class SetupAccountPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Create input fields using UIFactory.
-        TextField userNameField = UIFactory.createTextField("Enter Admin userName",
+        TextField userNameField = UIFactory.createTextField("Enter userName",
                 f -> f.maxWidth(250).minChars(6).maxChars(18));
-        TextField firstNameField = UIFactory.createTextField("Enter Admin first name",
+        TextField firstNameField = UIFactory.createTextField("Enter first name",
                 f -> f.maxWidth(250).minChars(1).maxChars(50));
-        TextField lastNameField = UIFactory.createTextField("Enter Admin last name",
+        TextField lastNameField = UIFactory.createTextField("Enter last name",
                 f -> f.maxWidth(250).minChars(1).maxChars(50));
         TextField emailField = UIFactory.createTextField("Enter Email",
                 f -> f.maxWidth(250).minChars(5).maxChars(50));
