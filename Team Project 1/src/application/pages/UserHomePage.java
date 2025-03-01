@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -175,10 +174,10 @@ public class UserHomePage extends BasePage {
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
         //Add spacer for better UI
-        Region spacer = new Region();
-        spacer.setPrefWidth(250);
+        //Region spacer = new Region();
+        //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, spacer, logoutButton);
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, logoutButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
