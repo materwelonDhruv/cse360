@@ -487,6 +487,7 @@ public class UserHomePage extends BasePage {
             Answer createdAnswer = null;
             try {
                 createdAnswer = context.answers().create(newAnswer);
+                loadQuestions();
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException(e);
             }
