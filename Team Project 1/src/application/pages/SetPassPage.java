@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
  * for a selected user.
  */
 @Route(MyPages.SET_PASS)
-@application.framework.View(title = "Set User Password")
+@View(title = "Set User Password")
 public class SetPassPage extends BasePage {
 
     // Fields to hold the selected target user's info.

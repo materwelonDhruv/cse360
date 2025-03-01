@@ -514,6 +514,7 @@ public class UserHomePage extends BasePage {
             }
             answerListView.getItems().remove(selectedItem); // Remove the item from the ListView
         }
+        loadQuestions();
     }
 
     //edit answer window to edit an answer

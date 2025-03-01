@@ -19,7 +19,7 @@ import java.util.List;
  * The page uses UIFactory and DesignGuide for consistent UI creation and styling.
  */
 @Route(MyPages.INVITATION)
-@application.framework.View(title = "Invite Page")
+@View(title = "Invite Page")
 public class InvitationPage extends BasePage {
 
     public InvitationPage() {

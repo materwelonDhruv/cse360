@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import static utils.permissions.RolesUtil.*;
 
 @Route(MyPages.ADMIN_USER_MODIFY)
-@application.framework.View(title = "Modify User")
+@View(title = "Modify User")
 public class AdminUserModifyPage extends BasePage {
 
     // The target user that is to be modified.
@@ -47,7 +47,7 @@ public class AdminUserModifyPage extends BasePage {
 
         // Display target user's name.
         Label nameLabel = UIFactory.createLabel("Name: " + targetUser.getUserName(),
-                l -> l.style(application.framework.DesignGuide.TITLE_LABEL));
+                l -> l.style(DesignGuide.TITLE_LABEL));
 
         // Create role checkboxes using UIFactory.
         CheckBox adminCb = UIFactory.createCheckBox("Admin",
@@ -123,7 +123,7 @@ public class AdminUserModifyPage extends BasePage {
         staffCb.setOnAction(roleHandler);
 
         VBox roleBox = new VBox(10, adminCb, instructorCb, studentCb, reviewerCb, staffCb);
-        roleBox.setStyle(application.framework.DesignGuide.CENTER_ALIGN);
+        roleBox.setStyle(DesignGuide.CENTER_ALIGN);
 
         // Delete button.
         // Delete button.
@@ -155,7 +155,7 @@ public class AdminUserModifyPage extends BasePage {
             if (response == ButtonType.OK) {
                 if (!hasRole(targetUser.getRoles(), Roles.ADMIN)) {
                     context.users().delete(targetUser.getId());
-                    context.router().navigate(application.framework.MyPages.ADMIN_USER);
+                    context.router().navigate(MyPages.ADMIN_USER);
                 } else {
                     new Alert(Alert.AlertType.ERROR, "You cannot remove an admin!").show();
                 }

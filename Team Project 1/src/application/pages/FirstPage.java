@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
  * It prompts the user to set up administrator access and navigate to the admin setup.
  */
 @Route(MyPages.FIRST)
-@application.framework.View(title = "Welcome")
+@View(title = "Welcome")
 public class FirstPage extends BasePage {
 
     public FirstPage() {
