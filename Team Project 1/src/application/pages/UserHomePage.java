@@ -286,11 +286,7 @@ public class UserHomePage extends BasePage {
                 r = "Replies";
             }
             title += " [" + numAnswers + "] " + r;
-            if (context.questions().hasPinnedAnswer(q.getId())) {
-                title = q.getTitle();
-                title += " [" + numAnswers + "] " + r;
-                title += " ✔";
-            }
+            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
             questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }
