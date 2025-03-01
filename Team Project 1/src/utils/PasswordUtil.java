@@ -1,4 +1,4 @@
-package src.utils;
+package utils;
 
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
@@ -14,13 +14,6 @@ public class PasswordUtil {
     private static final int ITERATIONS = 3;
     private static final int MEMORY_COST = 65536;     // in kilobytes (64 MB)
     private static final int PARALLELISM = 1;
-
-    private byte[] generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[SALT_LENGTH];
-        random.nextBytes(salt);
-        return salt;
-    }
 
     public static String hashPassword(String plainPassword) {
         // Generate a new salt for this password
@@ -78,5 +71,12 @@ public class PasswordUtil {
             diff |= storedHash[i] ^ computedHash[i];
         }
         return diff == 0;
+    }
+
+    private byte[] generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[SALT_LENGTH];
+        random.nextBytes(salt);
+        return salt;
     }
 }

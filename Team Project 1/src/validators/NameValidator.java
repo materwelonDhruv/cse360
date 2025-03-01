@@ -1,10 +1,10 @@
-package src.validators;
+package validators;
 
 public class NameValidator {
 
-    public static String validateName(String input) {
+    public static void validateName(String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
-            return "Name is empty";
+            throw new IllegalArgumentException("Name is empty");
         }
         int length = input.length();
         State state = State.START;
@@ -15,7 +15,7 @@ public class NameValidator {
                     if (Character.isLetter(c)) {
                         state = State.VALID;
                     } else {
-                        return "Name must start with a letter";
+                        throw new IllegalArgumentException("Name must start with a letter");
                     }
                     break;
                 case VALID:
@@ -29,10 +29,9 @@ public class NameValidator {
                     break;
             }
             if (state == State.ERROR) {
-                return "Invalid character in name: " + c;
+                throw new IllegalArgumentException("Invalid character in name: " + c);
             }
         }
-        return "";
     }
 
     private enum State {START, VALID, ERROR}

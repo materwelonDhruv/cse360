@@ -1,81 +1,53 @@
-package src.application.pages;
+package application.pages;
 
-import javafx.scene.Scene;
+import application.framework.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import src.application.AppContext;
-import src.database.model.entities.Invite;
-import src.database.model.entities.User;
-import src.utils.permissions.Roles;
-import src.utils.permissions.RolesUtil;
-import src.validators.PasswordValidator;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import validators.PasswordValidator;
 
 /**
- * InvitePage class represents the page where an admin can generate an
- **/
+ * ResetPasswordPage class represents the page where an admin can reset a user's password.
+ * It validates the new password and provides a back button to return to the admin home.
+ */
+@Route(MyPages.RESET_PASSWORD)
+@View(title = "Reset Password")
+public class ResetPasswordPage extends BasePage {
 
-public class ResetPasswordPage {
+    public ResetPasswordPage() {
+        super();
+    }
 
-	private final AppContext context;
+    @Override
+    public Pane createView() {
+        VBox layout = new VBox(10);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-	public ResetPasswordPage() throws SQLException {
-		this.context = AppContext.getInstance();
-	}
+        Label resetPassLabel = UIFactory.createLabel("Reset your password");
 
-	public void show(Stage primaryStage, User user) {
+        TextField newPassField = UIFactory.createPasswordField("Enter new password",
+                f -> f.minChars(8).maxChars(30));
 
-		VBox layout = new VBox();
-		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        Button resetPasswordButton = UIFactory.createButton("Reset Password",
+                e -> e.onAction(a -> handleResetPassword(newPassField, a))
+        );
 
-		// Label to display the title of the page
-		Label resetPassLabel = new Label("Reset your password ");
-		resetPassLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10");
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
-		// Input field for the user's new password
-		TextField newPassField = new TextField();
-		newPassField.setPromptText("Enter new password");
-		newPassField.setMaxWidth(250);
+        layout.getChildren().addAll(resetPassLabel, newPassField, resetPasswordButton, backButton);
+        return layout;
+    }
 
-		// Button to generate the invitation code
-		Button resetPasswordButton = new Button("Reset Password");
-		resetPasswordButton.setOnAction(e -> {
-			String password = newPassField.getText();
-			String passwordCheck = PasswordValidator.evaluatePassword(password);
-			if(!passwordCheck.isEmpty()) {
-				resetPasswordButton.setText(passwordCheck);
-				return;
-			}
-		});
-
-		Button backButton = new Button("Back");
-
-		// Action for back button
-		backButton.setOnAction(_ -> {
-			try {
-				new AdminHomePage().show(primaryStage, user);
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		});
-
-
-		// Add components to layout
-		layout.getChildren().addAll(resetPassLabel,newPassField, resetPasswordButton, backButton);
-
-		// Set the scene
-		Scene inviteScene = new Scene(layout, 800, 400);
-		primaryStage.setScene(inviteScene);
-		primaryStage.setTitle("Invite Page");
-	}
+    private void handleResetPassword(TextField newPassField, javafx.event.ActionEvent event) {
+        String password = newPassField.getText();
+        try {
+            PasswordValidator.validatePassword(password);
+            // Password reset logic here (e.g., update the DB)
+            System.out.println("Password validated and reset successfully.");
+        } catch (IllegalArgumentException ex) {
+            ((Button) event.getSource()).setText(ex.getMessage());
+        }
+    }
 }

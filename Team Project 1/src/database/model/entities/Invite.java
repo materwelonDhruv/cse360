@@ -1,7 +1,7 @@
-package src.database.model.entities;
+package database.model.entities;
 
-import src.database.model.BaseEntity;
-import src.utils.Helpers;
+import database.model.BaseEntity;
+import utils.Helpers;
 
 public class Invite extends BaseEntity {
     private String code;
@@ -15,6 +15,11 @@ public class Invite extends BaseEntity {
         this.createdAt = Helpers.getCurrentTimeInSeconds();
     }
 
+    /**
+     * Create a new invite with a random code
+     *
+     * @param userId The user who created the invite
+     */
     public Invite(Integer userId) {
         this.code = Helpers.generateRandomCode(6, false);
         this.userId = userId;

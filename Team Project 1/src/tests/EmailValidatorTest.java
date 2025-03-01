@@ -1,39 +1,51 @@
-package src.tests;
+package tests;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import src.validators.EmailValidator;
+import validators.EmailValidator;
 
 public class EmailValidatorTest {
 
     @Test
     public void testEmptyEmail() {
-        assertEquals("Email is empty", EmailValidator.validateEmail(""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            EmailValidator.validateEmail("");
+        }, "Should throw for empty email");
     }
 
     @Test
     public void testMissingAtSymbol() {
-        assertEquals("Missing '@' symbol in email", EmailValidator.validateEmail("user.domain.com"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            EmailValidator.validateEmail("user.domain.com");
+        }, "Missing '@' symbol in email");
     }
 
     @Test
     public void testEmptyDomain() {
-        assertEquals("Domain part is empty", EmailValidator.validateEmail("user@"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            EmailValidator.validateEmail("user@");
+        }, "Domain part is empty");
     }
 
     @Test
     public void testDomainWithoutDot() {
-        assertEquals("Domain must contain at least one dot", EmailValidator.validateEmail("user@domain"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            EmailValidator.validateEmail("user@domain");
+        }, "Domain must contain at least one dot");
     }
 
     @Test
     public void testInvalidLocalCharacter() {
-        String result = EmailValidator.validateEmail("us!er@domain.com");
-        assertTrue(result.contains("Invalid email format at character:"), "Should detect an invalid character in local part");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            EmailValidator.validateEmail("us!er@domain.com");
+        }, "Should throw for invalid character in local part");
     }
 
     @Test
     public void testValidEmail() {
-        assertEquals("", EmailValidator.validateEmail("user.name@domain.com"), "Email should be valid");
+//        assertEquals("", EmailValidator.validateEmail("user.name@domain.com"), "Email should be valid");
+        Assertions.assertDoesNotThrow(() -> {
+            EmailValidator.validateEmail("user.name@domain.com");
+        }, "Email should be valid");
     }
 }
