@@ -20,6 +20,7 @@ import static utils.permissions.RolesUtil.roleName;
 @Route(MyPages.ADMIN_USER)
 @View(title = "Admin User Page")
 public class AdminUserPage extends BasePage {
+    User admin = context.getSession().getActiveUser();
 
     public AdminUserPage() {
         super();
@@ -79,6 +80,7 @@ public class AdminUserPage extends BasePage {
                     User rowUser = row.getItem();
                     try {
                         AdminUserModifyPage.setTargetUser(rowUser);
+                        AdminUserModifyPage.setAdmin(admin);
                         context.router().navigate(MyPages.ADMIN_USER_MODIFY);
                     } catch (Exception ex) {
                         ex.printStackTrace();
