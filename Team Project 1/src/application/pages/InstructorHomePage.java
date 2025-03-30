@@ -17,14 +17,10 @@ public class InstructorHomePage extends BasePage {
 
 
         Label adminLabel = UIFactory.createLabel("Hello, Instructor!");
-
         // Navigation buttons using UIFactory; navigation via the shared router.
-        Button userButton = UIFactory.createButton("Show Users", e -> e.routeToPage(MyPages.ADMIN_USER, context));
-        Button inviteButton = UIFactory.createButton("Invite", e -> e.routeToPage(MyPages.INVITATION, context));
-        Button otpButton = UIFactory.createButton("Set user OTP", e -> e.routeToPage(MyPages.SET_PASS, context));
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
-        layout.getChildren().addAll(adminLabel, userButton, inviteButton, otpButton, logoutButton);
+        layout.getChildren().addAll(adminLabel, logoutButton);
         return layout;
     }
 }

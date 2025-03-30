@@ -44,11 +44,16 @@ public class WelcomeLoginPage extends BasePage {
         Roles[] roles = RolesUtil.intToRoles(roleInt);
 
         // Create Continue and Quit buttons using UIFactory
+        final MyPages targetPage;
+        if (roles.length == 1 && RolesUtil.hasRole(roles, Roles.ADMIN)) {
+            targetPage = MyPages.ADMIN_HOME;
+        } else if (roles.length == 1 && RolesUtil.hasRole(roles, Roles.INSTRUCTOR)) {
+            targetPage = MyPages.INSTRUCTOR_HOME;
+        } else {
+            targetPage = MyPages.USER_HOME;
+        }
         Button continueButton = UIFactory.createButton("Continue to your page",
-                e -> e.routeToPage(
-                        (roles.length == 1 && RolesUtil.hasRole(roles, Roles.ADMIN) ? MyPages.ADMIN_HOME : MyPages.USER_HOME),
-                        context
-                )
+                e -> e.routeToPage(targetPage, context)
         );
         Button quitButton = UIFactory.createButton("Quit",
                 e -> e.onAction(a -> {
@@ -78,6 +83,9 @@ public class WelcomeLoginPage extends BasePage {
                 if (RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
                     context.getSession().setCurrentRole(Roles.ADMIN);
                     context.router().navigate(MyPages.ADMIN_HOME);
+                } else if (selectedRole[0] == Roles.INSTRUCTOR) {
+                    context.getSession().setCurrentRole(selectedRole[0]);
+                    context.router().navigate(MyPages.INSTRUCTOR_HOME);
                 } else if (selectedRole[0] != null) {
                     context.getSession().setCurrentRole(selectedRole[0]);
                     context.router().navigate(MyPages.USER_HOME);
