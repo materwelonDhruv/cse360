@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PrivateMessagesTest extends BaseDatabaseTest {
 
@@ -21,6 +22,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
     // Store the dummy question's generated ID for use in PrivateMessage creation.
     private static int dummyQuestionId;
 
+    /**
+     *
+     */
     @BeforeAll
     public static void setupPrivateMessages() {
         Users userRepo = appContext.users();
@@ -40,6 +44,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         pmRepo = appContext.privateMessages();
     }
 
+    /**
+     *
+     */
     @Test
     @Order(1)
     public void testCreatePrivateMessage() {
@@ -53,6 +60,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertEquals(dummyQuestionId, created.getQuestionId());
     }
 
+    /**
+     *
+     */
     @Test
     @Order(2)
     public void testGetPrivateMessageById() {
@@ -61,6 +71,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertEquals("This is a private message.", fetched.getMessage().getContent());
     }
 
+    /**
+     *
+     */
     @Test
     @Order(3)
     public void testUpdatePrivateMessage() {
@@ -70,6 +83,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertEquals("Updated private message content.", updated.getMessage().getContent());
     }
 
+    /**
+     *
+     */
     @Test
     @Order(4)
     public void testGetAllPrivateMessages() {
@@ -77,6 +93,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertFalse(all.isEmpty(), "Expected at least one private message");
     }
 
+    /**
+     *
+     */
     @Test
     @Order(5)
     public void testGetPrivateMessagesByUser() {
@@ -91,6 +110,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * @throws Exception
+     */
     @Test
     @Order(6)
     public void testSearchPrivateMessages() throws Exception {
@@ -110,6 +132,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     *
+     */
     @Test
     @Order(7)
     public void testDeletePrivateMessage() {
