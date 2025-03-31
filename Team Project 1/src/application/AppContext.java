@@ -4,6 +4,7 @@ import application.framework.PageRouter;
 import application.framework.Session;
 import database.connection.DatabaseConnection;
 import database.migration.SchemaManager;
+import database.repository.repos.*;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
@@ -23,14 +24,15 @@ public class AppContext {
     private final PageRouter router;
 
     // Repositories:
-    private final database.repository.repos.Users userRepository;
-    private final database.repository.repos.Messages messageRepository;
-    private final database.repository.repos.Invites inviteRepository;
-    private final database.repository.repos.OneTimePasswords otpRepository;
-    private final database.repository.repos.Questions questionRepository;
-    private final database.repository.repos.Answers answerRepository;
-    private final database.repository.repos.PrivateMessages privateMessagesRepository;
-    private final database.repository.repos.ReadMessages readMessagesRepository;
+    private final Users userRepository;
+    private final Messages messageRepository;
+    private final Invites inviteRepository;
+    private final OneTimePasswords otpRepository;
+    private final Questions questionRepository;
+    private final Answers answerRepository;
+    private final PrivateMessages privateMessagesRepository;
+    private final ReadMessages readMessagesRepository;
+    private final Reviews reviewsRepository;
 
     /**
      * Private constructor sets up the DB connection, runs migrations, and
@@ -51,14 +53,15 @@ public class AppContext {
         schemaManager.inspectTables(connection);
 
         // 4) Build repositories
-        this.userRepository = new database.repository.repos.Users(connection);
-        this.messageRepository = new database.repository.repos.Messages(connection);
-        this.inviteRepository = new database.repository.repos.Invites(connection);
-        this.otpRepository = new database.repository.repos.OneTimePasswords(connection);
-        this.questionRepository = new database.repository.repos.Questions(connection);
-        this.answerRepository = new database.repository.repos.Answers(connection);
-        this.privateMessagesRepository = new database.repository.repos.PrivateMessages(connection);
-        this.readMessagesRepository = new database.repository.repos.ReadMessages(connection);
+        this.userRepository = new Users(connection);
+        this.messageRepository = new Messages(connection);
+        this.inviteRepository = new Invites(connection);
+        this.otpRepository = new OneTimePasswords(connection);
+        this.questionRepository = new Questions(connection);
+        this.answerRepository = new Answers(connection);
+        this.privateMessagesRepository = new PrivateMessages(connection);
+        this.readMessagesRepository = new ReadMessages(connection);
+        this.reviewsRepository = new Reviews(connection);
 
         // 5) Create the PageRouter ONCE, passing the main stage
         if (primaryStage != null) {
@@ -104,36 +107,40 @@ public class AppContext {
 
     // Repositories:
 
-    public database.repository.repos.Users users() {
+    public Users users() {
         return userRepository;
     }
 
-    public database.repository.repos.Messages messages() {
+    public Messages messages() {
         return messageRepository;
     }
 
-    public database.repository.repos.Invites invites() {
+    public Invites invites() {
         return inviteRepository;
     }
 
-    public database.repository.repos.OneTimePasswords oneTimePasswords() {
+    public OneTimePasswords oneTimePasswords() {
         return otpRepository;
     }
 
-    public database.repository.repos.Questions questions() {
+    public Questions questions() {
         return questionRepository;
     }
 
-    public database.repository.repos.Answers answers() {
+    public Answers answers() {
         return answerRepository;
     }
 
-    public database.repository.repos.PrivateMessages privateMessages() {
+    public PrivateMessages privateMessages() {
         return privateMessagesRepository;
     }
 
-    public database.repository.repos.ReadMessages readMessages() {
+    public ReadMessages readMessages() {
         return readMessagesRepository;
+    }
+
+    public Reviews reviews() {
+        return reviewsRepository;
     }
 
     public Connection getConnection() {

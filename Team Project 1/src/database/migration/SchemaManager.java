@@ -25,6 +25,7 @@ public class SchemaManager {
         tables.add(new AnswersTable());
         tables.add(new PrivateMessageTable());
         tables.add(new ReadMessagesTable());
+        tables.add(new ReviewsTable());
     }
 
     public void syncTables(Connection connection) throws SQLException {
