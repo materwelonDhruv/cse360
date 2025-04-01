@@ -176,8 +176,8 @@ public class UserHomePage extends BasePage {
         //Add spacer for better UI
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
-        //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, logoutButton);
+        //Button Bar above question list
+        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -210,8 +210,10 @@ public class UserHomePage extends BasePage {
             }
         });
 
+        //Button bar below question list for options
+        HBox optionBar = new HBox(10, questionDisplayButton);
 
-        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
+        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
@@ -238,7 +240,7 @@ public class UserHomePage extends BasePage {
                     context.router().navigate(MyPages.USER_HOME);
                 }
             }));
-            buttonBar.getChildren().addAll(roleMenu, goButton);
+            optionBar.getChildren().addAll(roleMenu, goButton, logoutButton);
         }
         return layout;
     }
