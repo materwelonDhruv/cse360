@@ -121,4 +121,21 @@ public class EntityValidator {
             throw new IllegalArgumentException("Reviewers must have the REVIEWER role.");
         }
     }
+
+    public static void validateReviewerRequest(ReviewerRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("ReviewerRequest cannot be null.");
+        }
+        if (request.getRequester() == null || request.getRequester().getId() <= 0) {
+            throw new IllegalArgumentException("A valid requester is required.");
+        }
+        if (request.getInstructor() != null) {
+            if (request.getInstructor().getId() <= 0) {
+                throw new IllegalArgumentException("A valid instructor is required.");
+            }
+            if (!RolesUtil.hasRole(request.getInstructor().getRoles(), Roles.INSTRUCTOR)) {
+                throw new IllegalArgumentException("The instructor user must have the INSTRUCTOR role.");
+            }
+        }
+    }
 }

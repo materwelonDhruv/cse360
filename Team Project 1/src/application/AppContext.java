@@ -33,6 +33,7 @@ public class AppContext {
     private final PrivateMessages privateMessagesRepository;
     private final ReadMessages readMessagesRepository;
     private final Reviews reviewsRepository;
+    private final ReviewerRequests reviewerRequestsRepository;
 
     /**
      * Private constructor sets up the DB connection, runs migrations, and
@@ -62,6 +63,7 @@ public class AppContext {
         this.privateMessagesRepository = new PrivateMessages(connection);
         this.readMessagesRepository = new ReadMessages(connection);
         this.reviewsRepository = new Reviews(connection);
+        this.reviewerRequestsRepository = new ReviewerRequests(connection);
 
         // 5) Create the PageRouter ONCE, passing the main stage
         if (primaryStage != null) {
@@ -141,6 +143,10 @@ public class AppContext {
 
     public Reviews reviews() {
         return reviewsRepository;
+    }
+
+    public ReviewerRequests reviewerRequests() {
+        return reviewerRequestsRepository;
     }
 
     public Connection getConnection() {
