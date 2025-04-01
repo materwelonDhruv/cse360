@@ -80,19 +80,20 @@ public final class UIFactory {
     }
 
     public static Optional<ButtonType> showAlert(Alert.AlertType alertType, String title, String content) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null); // No header text for cleaner look
-        alert.setContentText(content);
+        Alert alert = new AlertBuilder(alertType)
+                .title(title)
+                .header(null) // No header text for cleaner look
+                .content(content)
+                .build();
         return alert.showAndWait();
     }
 
     public static boolean showConfirmation(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-
+        Alert alert = new AlertBuilder(Alert.AlertType.CONFIRMATION)
+                .title(title)
+                .header(null)
+                .content(content)
+                .build();
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }
@@ -311,6 +312,33 @@ public final class UIFactory {
 
         public Button build() {
             return button;
+        }
+    }
+    
+    public static class AlertBuilder {
+        private final Alert alert;
+
+        public AlertBuilder(Alert.AlertType type) {
+            alert = new Alert(type);
+        }
+
+        public AlertBuilder title(String title) {
+            alert.setTitle(title);
+            return this;
+        }
+
+        public AlertBuilder header(String header) {
+            alert.setHeaderText(header);
+            return this;
+        }
+
+        public AlertBuilder content(String content) {
+            alert.setContentText(content);
+            return this;
+        }
+
+        public Alert build() {
+            return alert;
         }
     }
 }
