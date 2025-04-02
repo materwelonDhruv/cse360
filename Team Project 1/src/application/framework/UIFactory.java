@@ -26,7 +26,7 @@ public final class UIFactory {
     private UIFactory() {
     }
 
-    public static MyPages getPageForRole(Roles role) {
+    private static MyPages getPageForRole(Roles role) {
         return ROLE_PAGE_MAP.getOrDefault(role, MyPages.USER_HOME);
     }
 
@@ -380,14 +380,15 @@ public final class UIFactory {
                     }
                 }
             }
-            
+
             menuButton = new MenuButton(menuText);
             for (Roles role : menuRoles) {
                 MenuItem roleItem = new MenuItem(role.toString());
                 roleItem.setOnAction(e -> {
                     MyPages page = UIFactory.getPageForRole(role);
                     if (page == null) {
-                        throw new IllegalArgumentException("No page mapping found for role: " + role);
+                        context.getSession().setCurrentRole(role);
+                        context.router().navigate(MyPages.USER_HOME);
                     }
                     context.getSession().setCurrentRole(role);
                     context.router().navigate(page);
