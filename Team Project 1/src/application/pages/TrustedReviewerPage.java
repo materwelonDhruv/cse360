@@ -132,7 +132,7 @@ public class TrustedReviewerPage extends BasePage {
 
         // Button for removing the trusted reviewer from the student's trusted reviewers list
         Button removeTrustedReviewerButton = UIFactory.createButton("Remove", e -> e.onAction(
-                a -> removeTrustedReviewer(trustedReviewerHBox, reviewer)
+                a -> removeTrustedReviewer(trustedReviewerHBox)
         ));
 
         // Set up trustedReviewerHBox
@@ -144,9 +144,10 @@ public class TrustedReviewerPage extends BasePage {
     }
 
     // Method to remove a reviewer from the student's trusted reviewers list
-    private void removeTrustedReviewer(HBox trustedReviewerHBox, Review reviewer) {
+    private void removeTrustedReviewer(HBox trustedReviewerHBox) {
         if (!reviewersListView.getItems().contains(trustedReviewerHBox)) {return;}
         // Delete the trusted reviewer from the database
+        Review reviewer = getReviewFromHBox(trustedReviewerHBox);
         context.reviews().delete(reviewer.getReviewer().getId(), reviewer.getUser().getId());
 
         // Disable a ranking button of new first or last trustedReviewerHBox in list view
@@ -164,5 +165,12 @@ public class TrustedReviewerPage extends BasePage {
         }
 
         reviewersListView.getItems().remove(trustedReviewerHBox);
+    }
+
+    // Method to get the Review from the given trustedReviewerHBox using the reviewer's name
+    private Review getReviewFromHBox(HBox trustedReviewerHBox) {
+        Label reviewerName = (Label) trustedReviewerHBox.getChildren().getFirst();
+        User reviewer = context.users().getByUsername(reviewerName.getText());
+        return context.reviews().getByCompositeKey(reviewer.getId(), context.getSession().getActiveUser().getId());
     }
 }
