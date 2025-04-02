@@ -227,8 +227,10 @@ public class UserHomePage extends BasePage {
 
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
             
-            optionBar.getChildren().addAll(roleMenu, logoutButton);
+            optionBar.getChildren().addAll(roleMenu);
         }
+        optionBar.getChildren().add(logoutButton);
+        
         return layout;
     }
 
