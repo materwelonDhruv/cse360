@@ -22,7 +22,8 @@ public enum MyPages {
     PRIVATE_MESSAGE("/privateMessagePage"),
     PRIVATE_CONVERSATION("/privateConversation"),
     INSTRUCTOR_HOME("/instructorHome"),
-    TRUSTED_REVIEWER("/trustedReviewer");
+    TRUSTED_REVIEWER("/trustedReviewer"),
+    ADD_TRUSTED_REVIEWER("/addTrustedReviewer");
 
     private final String route;
 

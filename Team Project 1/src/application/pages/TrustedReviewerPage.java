@@ -50,12 +50,6 @@ public class TrustedReviewerPage extends BasePage {
             }
         });
 
-        // Retrieve the active user from session.
-        User user = context.getSession().getActiveUser();
-        if (user == null) {
-            return new VBox(new Label("No active user found."));
-        }
-
         Label titleLabel = UIFactory.createLabel("Trusted Reviewers");
 
         // Load the user's trusted reviewers
