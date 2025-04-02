@@ -24,10 +24,8 @@ import java.util.List;
 @Route(MyPages.TRUSTED_REVIEWER)
 @View(title = "Manage Trusted Reviewers")
 public class TrustedReviewerPage extends BasePage {
-    // ListView, AnchorPane, and ScrollPane to contain the trusted reviewers
+    // ListView to contain the trusted reviewers
     private final ListView<HBox> reviewersListView = new ListView<HBox>();
-    private final AnchorPane reviewersAnchorPane = new AnchorPane(reviewersListView);
-    private final ScrollPane reviewersScrollPane = new ScrollPane(reviewersAnchorPane);
 
     @Override
     public Pane createView() {
@@ -35,7 +33,7 @@ public class TrustedReviewerPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Set up reviewersListView
-        reviewersListView.prefWidthProperty().bind(reviewersScrollPane.widthProperty().subtract(17));
+        reviewersListView.prefWidthProperty().bind(layout.widthProperty().multiply(.9));
         reviewersListView.prefHeightProperty().bind(layout.heightProperty().multiply(.75));
         reviewersListView.setFixedCellSize(65);
         reviewersListView.setPlaceholder(new Label("No Trusted Reviewers"));
@@ -65,7 +63,7 @@ public class TrustedReviewerPage extends BasePage {
         HBox optionBar = new HBox(15, addReviewersButton, backButton);
         optionBar.setAlignment(Pos.BASELINE_CENTER);
 
-        layout.getChildren().addAll(titleLabel, reviewersScrollPane, optionBar);
+        layout.getChildren().addAll(titleLabel, reviewersListView, optionBar);
         return layout;
     }
 
