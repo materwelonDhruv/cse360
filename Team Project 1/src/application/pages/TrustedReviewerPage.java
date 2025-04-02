@@ -118,6 +118,9 @@ public class TrustedReviewerPage extends BasePage {
     // Method to create an HBox containing information about the given
     // reviewer and buttons for ranking and removal from the list
     private HBox createTrustedReviewerHBox(Review reviewer) {
+        // HBox to contain the reviewerNameLabel and buttons
+        HBox trustedReviewerHBox = new HBox(20);
+
         // Label for the name of the trusted reviewer
         Label reviewerNameLabel = UIFactory.createLabel(reviewer.getReviewer().getUserName());
 
@@ -128,13 +131,34 @@ public class TrustedReviewerPage extends BasePage {
         rankingVBox.setAlignment(Pos.TOP_CENTER);
 
         // Button for removing the trusted reviewer from the student's trusted reviewers list
-        Button removeTrustedReviewerButton = UIFactory.createButton("Remove");
+        Button removeTrustedReviewerButton = UIFactory.createButton("Remove", e -> e.onAction(
+                a -> removeTrustedReviewer(trustedReviewerHBox, reviewer)
+        ));
 
-        // HBox to contain the reviewerNameLabel and buttons
-        HBox trustedReviewerHBox = new HBox(20, reviewerNameLabel, removeTrustedReviewerButton, rankingVBox);
+        // Set up trustedReviewerHBox
+        trustedReviewerHBox.getChildren().addAll(reviewerNameLabel, removeTrustedReviewerButton, rankingVBox);
         HBox.setHgrow(reviewerNameLabel, Priority.ALWAYS);
         reviewerNameLabel.setMaxWidth(Double.MAX_VALUE);
         trustedReviewerHBox.setAlignment(Pos.CENTER_LEFT);
         return trustedReviewerHBox;
+    }
+
+    private void removeTrustedReviewer(HBox trustedReviewerHBox, Review reviewer) {
+        if (!reviewersListView.getItems().contains(trustedReviewerHBox)) {return;}
+        context.reviews().delete(reviewer.getReviewer().getId(), reviewer.getUser().getId());
+        // Disable a ranking button of new first or last trustedReviewerHBox in list view
+        if (reviewersListView.getItems().size() > 1) {
+            if (reviewersListView.getItems().getFirst().equals(trustedReviewerHBox)) {
+                // Disable new first increaseRankingButton
+                VBox rankingButtonsVBox = (VBox) reviewersListView.getItems().get(1).getChildren().getLast();
+                rankingButtonsVBox.getChildren().getFirst().setDisable(true);
+            } else if (reviewersListView.getItems().getLast().equals(trustedReviewerHBox)) {
+                // Disable new last decreaseRankingButton
+                int newLastIndex = reviewersListView.getItems().size() - 2;
+                VBox rankingButtonsVBox = (VBox) reviewersListView.getItems().get(newLastIndex).getChildren().getLast();
+                rankingButtonsVBox.getChildren().getLast().setDisable(true);
+            }
+        }
+        reviewersListView.getItems().remove(trustedReviewerHBox);
     }
 }
