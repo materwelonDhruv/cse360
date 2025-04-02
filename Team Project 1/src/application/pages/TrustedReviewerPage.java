@@ -33,8 +33,6 @@ public class TrustedReviewerPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Set up reviewersListView
-        reviewersListView.prefWidthProperty().bind(layout.widthProperty().multiply(.9));
-        reviewersListView.prefHeightProperty().bind(layout.heightProperty().multiply(.75));
         reviewersListView.setFixedCellSize(65);
         reviewersListView.setPlaceholder(new Label("No Trusted Reviewers"));
 
