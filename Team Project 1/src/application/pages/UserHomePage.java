@@ -217,28 +217,9 @@ public class UserHomePage extends BasePage {
         if (allRoles.length > 1) {
             final Roles[] selectedRole = new Roles[1];
 
-            MenuButton roleMenu = new MenuButton("Select Role");
-
-            for (Roles rol : allRoles) {
-                if (!rol.equals(userCurrentRole)) {
-                    MenuItem roleItem = new MenuItem(rol.toString());
-                    roleItem.setOnAction(e -> {
-                        selectedRole[0] = rol;
-                        roleMenu.setText(rol.toString());
-                    });
-                    roleMenu.getItems().add(roleItem);
-                }
-            }
-
-            Button goButton = UIFactory.createButton("Go", e -> e.onAction(a -> {
-                if (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
-                    context.router().navigate(MyPages.ADMIN_HOME);
-                } else if (selectedRole[0] != null) {
-                    context.getSession().setCurrentRole(selectedRole[0]);
-                    context.router().navigate(MyPages.USER_HOME);
-                }
-            }));
-            buttonBar.getChildren().addAll(roleMenu, goButton);
+            MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
+            
+            buttonBar.getChildren().addAll(roleMenu);
         }
         return layout;
     }
@@ -286,7 +267,9 @@ public class UserHomePage extends BasePage {
                 r = "Replies";
             }
             title += " [" + numAnswers + "] " + r;
-            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
+            if (context.questions().hasPinnedAnswer(q.getId())) {
+                title += " ✔";
+            }
             questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }

@@ -6,7 +6,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
+import utils.permissions.Roles;
 
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -14,8 +16,18 @@ import java.util.function.Supplier;
  * Utility class to reduce JavaFX boilerplate.
  */
 public final class UIFactory {
+    private static final Map<Roles, MyPages> ROLE_PAGE_MAP = new HashMap<>();
+
+    static {
+        ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
+        ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
+    }
 
     private UIFactory() {
+    }
+
+    public static MyPages getPageForRole(Roles role) {
+        return ROLE_PAGE_MAP.getOrDefault(role, MyPages.USER_HOME);
     }
 
     // TextField creation using builder lambdas
@@ -77,6 +89,35 @@ public final class UIFactory {
         }
         return builder.build();
     }
+
+    public static Optional<ButtonType> showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new AlertBuilder(alertType)
+                .title(title)
+                .header(null) // No header text for cleaner look
+                .content(content)
+                .build();
+        return alert.showAndWait();
+    }
+
+    public static boolean showConfirmation(String title, String content) {
+        Alert alert = new AlertBuilder(Alert.AlertType.CONFIRMATION)
+                .title(title)
+                .header(null)
+                .content(content)
+                .build();
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    @SafeVarargs
+    public static MenuButton createNavMenu(AppContext context, String menuText, Consumer<NavMenuBuilder>... configs) {
+        NavMenuBuilder builder = new NavMenuBuilder(context, menuText);
+        for (Consumer<NavMenuBuilder> config : configs) {
+            config.accept(builder);
+        }
+        return builder.build();
+    }
+
 
     // --- Builder Classes ---
 
@@ -293,6 +334,75 @@ public final class UIFactory {
 
         public Button build() {
             return button;
+        }
+    }
+
+    public static class AlertBuilder {
+        private final Alert alert;
+
+        public AlertBuilder(Alert.AlertType type) {
+            alert = new Alert(type);
+        }
+
+        public AlertBuilder title(String title) {
+            alert.setTitle(title);
+            return this;
+        }
+
+        public AlertBuilder header(String header) {
+            alert.setHeaderText(header);
+            return this;
+        }
+
+        public AlertBuilder content(String content) {
+            alert.setContentText(content);
+            return this;
+        }
+
+        public Alert build() {
+            return alert;
+        }
+    }
+
+    public static class NavMenuBuilder {
+        private final MenuButton menuButton;
+
+        public NavMenuBuilder(AppContext context, String menuText) {
+            Roles currentRole = context.getSession().getCurrentRole();
+            Roles[] allRoles = utils.permissions.RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles());
+            List<Roles> menuRoles = new ArrayList<>();
+            if (currentRole == null) {
+                menuRoles.addAll(Arrays.asList(allRoles));
+            } else {
+                for (Roles role : allRoles) {
+                    if (!role.equals(currentRole)) {
+                        menuRoles.add(role);
+                    }
+                }
+            }
+            
+            menuButton = new MenuButton(menuText);
+            for (Roles role : menuRoles) {
+                MenuItem roleItem = new MenuItem(role.toString());
+                roleItem.setOnAction(e -> {
+                    MyPages page = UIFactory.getPageForRole(role);
+                    if (page == null) {
+                        throw new IllegalArgumentException("No page mapping found for role: " + role);
+                    }
+                    context.getSession().setCurrentRole(role);
+                    context.router().navigate(page);
+                });
+                menuButton.getItems().add(roleItem);
+            }
+        }
+
+        public NavMenuBuilder text(String text) {
+            menuButton.setText(text);
+            return this;
+        }
+
+        public MenuButton build() {
+            return menuButton;
         }
     }
 }

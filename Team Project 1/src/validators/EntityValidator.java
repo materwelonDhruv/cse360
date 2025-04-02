@@ -1,9 +1,8 @@
 package validators;
 
-import database.model.entities.Answer;
-import database.model.entities.Message;
-import database.model.entities.PrivateMessage;
-import database.model.entities.Question;
+import database.model.entities.*;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 public class EntityValidator {
     private final static int MIN_TITLE_LENGTH = 5;
@@ -98,6 +97,45 @@ public class EntityValidator {
     public static void validateMessageContent(String content) {
         if (content == null || content.trim().isEmpty()) {
             throw new IllegalArgumentException("Message content cannot be empty.");
+        }
+    }
+
+    public static void validateReview(Review review) {
+        if (review == null) {
+            throw new IllegalArgumentException("Review cannot be null.");
+        }
+
+        if (review.getReviewer() == null || review.getReviewer().getId() <= 0) {
+            throw new IllegalArgumentException("A valid reviewer is required for a review.");
+        }
+
+        if (review.getUser() == null || review.getUser().getId() <= 0) {
+            throw new IllegalArgumentException("A valid user is required for a review.");
+        }
+
+        if (review.getRating() < 0 || review.getRating() > 5) {
+            throw new IllegalArgumentException("Rating must be between 0 and 5.");
+        }
+
+        if (!RolesUtil.hasRole(review.getReviewer().getRoles(), Roles.REVIEWER)) {
+            throw new IllegalArgumentException("Reviewers must have the REVIEWER role.");
+        }
+    }
+
+    public static void validateReviewerRequest(ReviewerRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("ReviewerRequest cannot be null.");
+        }
+        if (request.getRequester() == null || request.getRequester().getId() <= 0) {
+            throw new IllegalArgumentException("A valid requester is required.");
+        }
+        if (request.getInstructor() != null) {
+            if (request.getInstructor().getId() <= 0) {
+                throw new IllegalArgumentException("A valid instructor is required.");
+            }
+            if (!RolesUtil.hasRole(request.getInstructor().getRoles(), Roles.INSTRUCTOR)) {
+                throw new IllegalArgumentException("The instructor user must have the INSTRUCTOR role.");
+            }
         }
     }
 }
