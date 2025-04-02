@@ -24,7 +24,7 @@ import java.util.List;
 @Route(MyPages.TRUSTED_REVIEWER)
 @View(title = "Manage Trusted Reviewers")
 public class TrustedReviewerPage extends BasePage {
-    // VBox, AnchorPan, and ScrollPane to contain the trusted reviewers
+    // ListView, AnchorPane, and ScrollPane to contain the trusted reviewers
     private final ListView<HBox> reviewersListView = new ListView<HBox>();
     private final AnchorPane reviewersAnchorPane = new AnchorPane(reviewersListView);
     private final ScrollPane reviewersScrollPane = new ScrollPane(reviewersAnchorPane);
@@ -39,6 +39,16 @@ public class TrustedReviewerPage extends BasePage {
         reviewersListView.prefHeightProperty().bind(layout.heightProperty().multiply(.75));
         reviewersListView.setFixedCellSize(65);
         reviewersListView.setPlaceholder(new Label("No Trusted Reviewers"));
+
+        // Double Click to go to the profile of the trusted reviewer
+        reviewersListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                HBox selectedReviewer = (HBox) reviewersListView.getSelectionModel().getSelectedItem();
+                if (selectedReviewer != null) {
+                    //TODO: Go to profile of the reviewer
+                }
+            }
+        });
 
         // Retrieve the active user from session.
         User user = context.getSession().getActiveUser();
