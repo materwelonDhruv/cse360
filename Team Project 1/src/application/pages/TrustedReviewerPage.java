@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * This page allows students to add or remove reviewers from their personal trusted reviewers list.
- * Students may also assign a weight to each of their trusted reviewers to be used when ordering
+ * Students may also rank each of their trusted reviewers and this ranking will be used when ordering
  * the reviews of a question or answer so that the review that is most likely to be useful will
  * appear highest.
  */
