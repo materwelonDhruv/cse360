@@ -128,8 +128,11 @@ public class UserHomePage extends BasePage {
                 "Role: " + userCurrentRole, f ->
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
-        // Create Question Display buttons.
+        //Create Question Display button
         Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
+
+        //Create Trusted Reviewer button
+        Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
 
         //Add button to add a question
         Button addQuestionButton = UIFactory.createButton("Add", e -> e.onAction(a -> ShowQuestionWindow()));
@@ -177,7 +180,7 @@ public class UserHomePage extends BasePage {
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, logoutButton);
+        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -210,8 +213,13 @@ public class UserHomePage extends BasePage {
             }
         });
 
+        // HBox for option buttons
+        HBox optionBar = new HBox(10, questionDisplayButton);
 
-        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
+        // Add the trusted reviewer button only if the user is a student
+        if (userCurrentRole == Roles.STUDENT) {optionBar.getChildren().add(trustedReviewerButton);}
+
+        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
@@ -219,7 +227,7 @@ public class UserHomePage extends BasePage {
 
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
             
-            buttonBar.getChildren().addAll(roleMenu);
+            optionBar.getChildren().addAll(roleMenu, logoutButton);
         }
         return layout;
     }
