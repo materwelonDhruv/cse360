@@ -125,8 +125,12 @@ public class TrustedReviewerPage extends BasePage {
         Label reviewerNameLabel = UIFactory.createLabel(reviewer.getReviewer().getUserName());
 
         // Buttons for increasing or decreasing the ranking of the trusted reviewer
-        Button increaseRankingButton = UIFactory.createButton("⬆");
-        Button decreaseRankingButton = UIFactory.createButton("⬇");
+        Button increaseRankingButton = UIFactory.createButton("⬆", e -> e.onAction(
+                a -> swapTrustedReviewerRankings(trustedReviewerHBox, -1)));
+        Button decreaseRankingButton = UIFactory.createButton("⬇", e -> e.onAction(
+                a -> swapTrustedReviewerRankings(trustedReviewerHBox, 1)));
+
+        // Set up VBox to contain ranking buttons
         VBox rankingVBox = new VBox(5, increaseRankingButton, decreaseRankingButton);
         rankingVBox.setAlignment(Pos.TOP_CENTER);
 
@@ -141,6 +145,46 @@ public class TrustedReviewerPage extends BasePage {
         reviewerNameLabel.setMaxWidth(Double.MAX_VALUE);
         trustedReviewerHBox.setAlignment(Pos.CENTER_LEFT);
         return trustedReviewerHBox;
+    }
+
+    // Method to swap the ranking of the given reviewer with another in the student's trusted reviewers list.
+    // The reviewer to swap with is found using an offset from the given reviewer's index
+    private void swapTrustedReviewerRankings(HBox trustedReviewerHBox1, int offset) {
+        if (!reviewersListView.getItems().contains(trustedReviewerHBox1)) {return;}
+        // Get the two indices of the reviewers to swap
+        int index1 = reviewersListView.getItems().indexOf(trustedReviewerHBox1);
+        int index2 = index1 + offset;
+        if (index2 >= reviewersListView.getItems().size() || index2 < 0) {return;}
+
+        // Get second HBox and Reviews
+        HBox trustedReviewerHBox2 = reviewersListView.getItems().get(index2);
+        Review r1 = getReviewFromHBox(trustedReviewerHBox1);
+        Review r2 = getReviewFromHBox(trustedReviewerHBox2);
+
+        // Swap Rankings
+        int temp = r1.getRating();
+        r1.setRating(r2.getRating());
+        r2.setRating(temp);
+
+        // Update database
+        context.reviews().update(r1);
+        context.reviews().update(r2);
+
+        // Get VBoxes containing the ranking buttons
+        VBox VBox1 = (VBox) trustedReviewerHBox1.getChildren().getLast();
+        VBox VBox2 = (VBox) trustedReviewerHBox2.getChildren().getLast();
+
+        // Swap button disable properties
+        boolean tempIncreaseDisable = VBox1.getChildren().getFirst().isDisable();
+        boolean tempDecreaseDisable = VBox1.getChildren().getLast().isDisable();
+        VBox1.getChildren().getFirst().setDisable(VBox2.getChildren().getFirst().isDisable());
+        VBox1.getChildren().getLast().setDisable(VBox2.getChildren().getLast().isDisable());
+        VBox2.getChildren().getFirst().setDisable(tempIncreaseDisable);
+        VBox2.getChildren().getLast().setDisable(tempDecreaseDisable);
+
+        // Swap HBoxes in the list view
+        reviewersListView.getItems().set(index1, trustedReviewerHBox2);
+        reviewersListView.getItems().set(index2, trustedReviewerHBox1);
     }
 
     // Method to remove a reviewer from the student's trusted reviewers list
