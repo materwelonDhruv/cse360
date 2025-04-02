@@ -20,7 +20,8 @@ public enum MyPages {
     USER_LOGIN("/userLogin"),
     USER_QUESTION_DISPLAY("/userQuestionDisplay"),
     PRIVATE_MESSAGE("/privateMessagePage"),
-    PRIVATE_CONVERSATION("/privateConversation");
+    PRIVATE_CONVERSATION("/privateConversation"),
+    REVIEWER_PROFILE("/reviewerprofile");
 
     private final String route;
 
