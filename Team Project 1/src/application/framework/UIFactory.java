@@ -112,8 +112,8 @@ public final class UIFactory {
     }
 
     @SafeVarargs
-    public static MenuButton createNavMenu(AppContext context, Session session, Consumer<NavMenuBuilder>... configs) {
-        NavMenuBuilder builder = new NavMenuBuilder(context, session);
+    public static MenuButton createNavMenu(AppContext context, Consumer<NavMenuBuilder>... configs) {
+        NavMenuBuilder builder = new NavMenuBuilder(context);
         for (Consumer<NavMenuBuilder> config : configs) {
             config.accept(builder);
         }
@@ -369,8 +369,8 @@ public final class UIFactory {
     public static class NavMenuBuilder {
         private final MenuButton menuButton;
 
-        public NavMenuBuilder(AppContext context, Session session) {
-            Roles[] userRoles = utils.permissions.RolesUtil.intToRoles(session.getActiveUser().getRoles());
+        public NavMenuBuilder(AppContext context) {
+            Roles[] userRoles = utils.permissions.RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles());
             menuButton = new MenuButton("Select Role");
             for (Roles role : userRoles) {
                 MenuItem roleItem = new MenuItem(role.toString());
