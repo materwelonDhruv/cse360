@@ -91,6 +91,26 @@ public class TrustedReviewerPage extends BasePage {
         // Add trusted reviewers in order of their rankings
         for (Review trustedReviewer : trustedReviewers) {
             HBox trustedReviewerHBox = createTrustedReviewerHBox(trustedReviewer);
+
+            // Disable ranking buttons if necessary
+            if (trustedReviewers.size() == 1) {
+                // Disable both ranking buttons
+                VBox rankingButtonsVBox = (VBox) trustedReviewerHBox.getChildren().getLast();
+                rankingButtonsVBox.getChildren().getFirst().setDisable(true);
+                rankingButtonsVBox.getChildren().getLast().setDisable(true);
+            } else {
+                // Disable a ranking button if the reviewer is first or last in the list
+                if (reviewersListView.getItems().isEmpty()) {
+                    // Disable increaseRankingButton
+                    VBox rankingButtonsVBox = (VBox) trustedReviewerHBox.getChildren().getLast();
+                    rankingButtonsVBox.getChildren().getFirst().setDisable(true);
+                } else if (reviewersListView.getItems().size() == trustedReviewers.size() - 1) {
+                    // Disable decreaseRankingButton
+                    VBox rankingButtonsVBox = (VBox) trustedReviewerHBox.getChildren().getLast();
+                    rankingButtonsVBox.getChildren().getLast().setDisable(true);
+                }
+            }
+
             reviewersListView.getItems().add(trustedReviewerHBox);
         }
     }
