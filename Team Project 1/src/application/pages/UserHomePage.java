@@ -230,7 +230,7 @@ public class UserHomePage extends BasePage {
             optionBar.getChildren().addAll(roleMenu);
         }
         optionBar.getChildren().add(logoutButton);
-        
+
         return layout;
     }
 
