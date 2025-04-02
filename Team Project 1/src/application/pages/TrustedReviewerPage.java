@@ -56,13 +56,13 @@ public class TrustedReviewerPage extends BasePage {
         loadTrustedReviewers();
 
         // Button to open a menu for adding new reviewers to the trusted reviewer list
-        Button addAReviewerButton = UIFactory.createButton("Add A Reviewer");
+        Button addReviewersButton = UIFactory.createButton("Add Reviewers", e -> e.routeToPage(MyPages.ADD_TRUSTED_REVIEWER, context));
 
         // Navigation buttons using UIFactory; navigation via the shared router.
         Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
 
         // HBox for option buttons
-        HBox optionBar = new HBox(15, addAReviewerButton, backButton);
+        HBox optionBar = new HBox(15, addReviewersButton, backButton);
         optionBar.setAlignment(Pos.BASELINE_CENTER);
 
         layout.getChildren().addAll(titleLabel, reviewersScrollPane, optionBar);
