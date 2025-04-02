@@ -6,7 +6,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
+import utils.permissions.Roles;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -15,8 +18,18 @@ import java.util.function.Supplier;
  * Utility class to reduce JavaFX boilerplate.
  */
 public final class UIFactory {
+    private static final Map<Roles, MyPages> ROLE_PAGE_MAP = new HashMap<>();
+
+    static {
+        ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
+        ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
+    }
 
     private UIFactory() {
+    }
+
+    public static MyPages getPageForRole(Roles role) {
+        return ROLE_PAGE_MAP.getOrDefault(role, MyPages.USER_HOME);
     }
 
     // TextField creation using builder lambdas
@@ -97,6 +110,17 @@ public final class UIFactory {
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }
+
+    @SafeVarargs
+    public static MenuButton createNavMenu(AppContext context, Session session, Consumer<NavMenuBuilder>... configs) {
+        NavMenuBuilder builder = new NavMenuBuilder(context, session);
+        for (Consumer<NavMenuBuilder> config : configs) {
+            config.accept(builder);
+        }
+        return builder.build();
+    }
+
+
     // --- Builder Classes ---
 
     public static class TextFieldBuilder {
@@ -314,7 +338,7 @@ public final class UIFactory {
             return button;
         }
     }
-    
+
     public static class AlertBuilder {
         private final Alert alert;
 
@@ -339,6 +363,35 @@ public final class UIFactory {
 
         public Alert build() {
             return alert;
+        }
+    }
+
+    public static class NavMenuBuilder {
+        private final MenuButton menuButton;
+
+        public NavMenuBuilder(AppContext context, Session session) {
+            Roles[] userRoles = utils.permissions.RolesUtil.intToRoles(session.getActiveUser().getRoles());
+            menuButton = new MenuButton("Select Role");
+            for (Roles role : userRoles) {
+                MenuItem roleItem = new MenuItem(role.toString());
+                roleItem.setOnAction(e -> {
+                    MyPages page = UIFactory.getPageForRole(role);
+                    if (page == null) {
+                        context.router().navigate(MyPages.USER_HOME);
+                    }
+                    context.router().navigate(page);
+                });
+                menuButton.getItems().add(roleItem);
+            }
+        }
+
+        public NavMenuBuilder text(String text) {
+            menuButton.setText(text);
+            return this;
+        }
+
+        public MenuButton build() {
+            return menuButton;
         }
     }
 }
