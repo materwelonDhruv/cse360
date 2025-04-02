@@ -371,11 +371,16 @@ public final class UIFactory {
             Roles currentRole = context.getSession().getCurrentRole();
             Roles[] allRoles = utils.permissions.RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles());
             List<Roles> menuRoles = new ArrayList<>();
-            for (Roles role : allRoles) {
-                if (!role.equals(currentRole)) {
-                    menuRoles.add(role);
+            if (currentRole == null) {
+                menuRoles.addAll(Arrays.asList(allRoles));
+            } else {
+                for (Roles role : allRoles) {
+                    if (!role.equals(currentRole)) {
+                        menuRoles.add(role);
+                    }
                 }
             }
+            
             menuButton = new MenuButton(menuText);
             for (Roles role : menuRoles) {
                 MenuItem roleItem = new MenuItem(role.toString());
