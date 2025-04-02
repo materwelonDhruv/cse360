@@ -8,9 +8,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
 import utils.permissions.Roles;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -112,8 +110,8 @@ public final class UIFactory {
     }
 
     @SafeVarargs
-    public static MenuButton createNavMenu(AppContext context, Consumer<NavMenuBuilder>... configs) {
-        NavMenuBuilder builder = new NavMenuBuilder(context);
+    public static MenuButton createNavMenu(AppContext context, String menuText, Consumer<NavMenuBuilder>... configs) {
+        NavMenuBuilder builder = new NavMenuBuilder(context, menuText);
         for (Consumer<NavMenuBuilder> config : configs) {
             config.accept(builder);
         }
@@ -369,16 +367,24 @@ public final class UIFactory {
     public static class NavMenuBuilder {
         private final MenuButton menuButton;
 
-        public NavMenuBuilder(AppContext context) {
-            Roles[] userRoles = utils.permissions.RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles());
-            menuButton = new MenuButton("Select Role");
-            for (Roles role : userRoles) {
+        public NavMenuBuilder(AppContext context, String menuText) {
+            Roles currentRole = context.getSession().getCurrentRole();
+            Roles[] allRoles = utils.permissions.RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles());
+            List<Roles> menuRoles = new ArrayList<>();
+            for (Roles role : allRoles) {
+                if (!role.equals(currentRole)) {
+                    menuRoles.add(role);
+                }
+            }
+            menuButton = new MenuButton(menuText);
+            for (Roles role : menuRoles) {
                 MenuItem roleItem = new MenuItem(role.toString());
                 roleItem.setOnAction(e -> {
                     MyPages page = UIFactory.getPageForRole(role);
                     if (page == null) {
-                        context.router().navigate(MyPages.USER_HOME);
+                        throw new IllegalArgumentException("No page mapping found for role: " + role);
                     }
+                    context.getSession().setCurrentRole(role);
                     context.router().navigate(page);
                 });
                 menuButton.getItems().add(roleItem);
