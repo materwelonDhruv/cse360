@@ -143,9 +143,12 @@ public class TrustedReviewerPage extends BasePage {
         return trustedReviewerHBox;
     }
 
+    // Method to remove a reviewer from the student's trusted reviewers list
     private void removeTrustedReviewer(HBox trustedReviewerHBox, Review reviewer) {
         if (!reviewersListView.getItems().contains(trustedReviewerHBox)) {return;}
+        // Delete the trusted reviewer from the database
         context.reviews().delete(reviewer.getReviewer().getId(), reviewer.getUser().getId());
+
         // Disable a ranking button of new first or last trustedReviewerHBox in list view
         if (reviewersListView.getItems().size() > 1) {
             if (reviewersListView.getItems().getFirst().equals(trustedReviewerHBox)) {
@@ -159,6 +162,7 @@ public class TrustedReviewerPage extends BasePage {
                 rankingButtonsVBox.getChildren().getLast().setDisable(true);
             }
         }
+
         reviewersListView.getItems().remove(trustedReviewerHBox);
     }
 }
