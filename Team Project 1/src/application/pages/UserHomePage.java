@@ -128,11 +128,8 @@ public class UserHomePage extends BasePage {
                 "Role: " + userCurrentRole, f ->
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
-        //Create Question Display button
+        // Create Question Display buttons.
         Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
-
-        //Create Trusted Reviewer button
-        Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
 
         //Add button to add a question
         Button addQuestionButton = UIFactory.createButton("Add", e -> e.onAction(a -> ShowQuestionWindow()));
@@ -179,8 +176,8 @@ public class UserHomePage extends BasePage {
         //Add spacer for better UI
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
-        //Button Bar above question list
-        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
+        //Button Bar above ListView for horizontal orientation
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, logoutButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -213,40 +210,16 @@ public class UserHomePage extends BasePage {
             }
         });
 
-        //Button bar below question list for options
-        HBox optionBar = new HBox(10, questionDisplayButton);
 
-        //Add trusted reviewer button only if the user is a student
-        if (userCurrentRole == Roles.STUDENT) {optionBar.getChildren().add(trustedReviewerButton);}
-
-        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
+        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
             final Roles[] selectedRole = new Roles[1];
 
-            MenuButton roleMenu = new MenuButton("Select Role");
-
-            for (Roles rol : allRoles) {
-                if (!rol.equals(userCurrentRole)) {
-                    MenuItem roleItem = new MenuItem(rol.toString());
-                    roleItem.setOnAction(e -> {
-                        selectedRole[0] = rol;
-                        roleMenu.setText(rol.toString());
-                    });
-                    roleMenu.getItems().add(roleItem);
-                }
-            }
-
-            Button goButton = UIFactory.createButton("Go", e -> e.onAction(a -> {
-                if (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
-                    context.router().navigate(MyPages.ADMIN_HOME);
-                } else if (selectedRole[0] != null) {
-                    context.getSession().setCurrentRole(selectedRole[0]);
-                    context.router().navigate(MyPages.USER_HOME);
-                }
-            }));
-            optionBar.getChildren().addAll(roleMenu, goButton, logoutButton);
+            MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
+            
+            buttonBar.getChildren().addAll(roleMenu);
         }
         return layout;
     }
@@ -294,7 +267,9 @@ public class UserHomePage extends BasePage {
                 r = "Replies";
             }
             title += " [" + numAnswers + "] " + r;
-            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
+            if (context.questions().hasPinnedAnswer(q.getId())) {
+                title += " ✔";
+            }
             questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }

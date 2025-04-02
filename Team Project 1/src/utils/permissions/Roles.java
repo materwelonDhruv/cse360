@@ -19,6 +19,7 @@ public enum Roles {
     }
 
     public String toString() {
-        return this.name();
+        String name = this.name().toLowerCase();
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 }
