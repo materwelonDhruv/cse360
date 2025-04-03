@@ -118,6 +118,15 @@ public final class UIFactory {
         return builder.build();
     }
 
+    @SafeVarargs
+    public static Button createHomepageButton(String text, AppContext context, Consumer<HomepageButtonBuilder>... configs) {
+        HomepageButtonBuilder builder = new HomepageButtonBuilder(text, context);
+        for (Consumer<HomepageButtonBuilder> config : configs) {
+            config.accept(builder);
+        }
+        return builder.build();
+    }
+
 
     // --- Builder Classes ---
 
@@ -386,10 +395,6 @@ public final class UIFactory {
                 MenuItem roleItem = new MenuItem(role.toString());
                 roleItem.setOnAction(e -> {
                     MyPages page = UIFactory.getPageForRole(role);
-                    if (page == null) {
-                        context.getSession().setCurrentRole(role);
-                        context.router().navigate(MyPages.USER_HOME);
-                    }
                     context.getSession().setCurrentRole(role);
                     context.router().navigate(page);
                 });
@@ -404,6 +409,31 @@ public final class UIFactory {
 
         public MenuButton build() {
             return menuButton;
+        }
+    }
+
+    public static class HomepageButtonBuilder {
+        private final Button button;
+
+        public HomepageButtonBuilder(String text, AppContext context) {
+            this.button = new Button(text);
+            button.setOnAction(e -> {
+                Roles currentRole = context.getSession().getCurrentRole();
+                MyPages homepage = UIFactory.getPageForRole(currentRole);
+                context.router().navigate(homepage);
+            });
+        }
+
+        /**
+         * Override default action
+         */
+        public HomepageButtonBuilder onAction(EventHandler<javafx.event.ActionEvent> handler) {
+            button.setOnAction(handler);
+            return this;
+        }
+
+        public Button build() {
+            return button;
         }
     }
 }
