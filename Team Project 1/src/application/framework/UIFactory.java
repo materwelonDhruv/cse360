@@ -21,6 +21,7 @@ public final class UIFactory {
     static {
         ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
+        ROLE_PAGE_MAP.put(Roles.STUDENT, MyPages.USER_QUESTION_DISPLAY);
     }
 
     private UIFactory() {
@@ -116,6 +117,25 @@ public final class UIFactory {
             config.accept(builder);
         }
         return builder.build();
+    }
+
+    @SafeVarargs
+    public static Button createHomepageButton(String text, AppContext context, Consumer<HomepageButtonBuilder>... configs) {
+        HomepageButtonBuilder builder = new HomepageButtonBuilder(text, context);
+        for (Consumer<HomepageButtonBuilder> config : configs) {
+            config.accept(builder);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Creates a logout button that clears the current role and navigates to the login page.
+     */
+    public static Button createLogoutButton(AppContext context) {
+        return UIFactory.createButton("Logout", e -> e.onAction(a -> {
+            context.getSession().setCurrentRole(null);
+            context.router().navigate(MyPages.USER_LOGIN);
+        }));
     }
 
 
@@ -331,10 +351,6 @@ public final class UIFactory {
             });
             return this;
         }
-
-        public Button build() {
-            return button;
-        }
     }
 
     public static class AlertBuilder {
@@ -386,10 +402,6 @@ public final class UIFactory {
                 MenuItem roleItem = new MenuItem(role.toString());
                 roleItem.setOnAction(e -> {
                     MyPages page = UIFactory.getPageForRole(role);
-                    if (page == null) {
-                        context.getSession().setCurrentRole(role);
-                        context.router().navigate(MyPages.USER_HOME);
-                    }
                     context.getSession().setCurrentRole(role);
                     context.router().navigate(page);
                 });
@@ -404,6 +416,23 @@ public final class UIFactory {
 
         public MenuButton build() {
             return menuButton;
+        }
+    }
+
+    public static class HomepageButtonBuilder extends ButtonBuilder {
+        public HomepageButtonBuilder(String text, AppContext context) {
+            super(text);
+            Button button = super.getSource();
+            button.setOnAction(e -> {
+                if (context.router().getCurrentPage() == MyPages.USER_HOME) {
+                    Roles currentRole = context.getSession().getCurrentRole();
+                    MyPages homepage = UIFactory.getPageForRole(currentRole);
+                    context.router().navigate(homepage);
+                } else {
+                    context.router().navigate(MyPages.USER_HOME);
+                }
+
+            });
         }
     }
 }
