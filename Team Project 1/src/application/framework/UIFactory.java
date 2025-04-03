@@ -120,6 +120,39 @@ public final class UIFactory {
         return builder.build();
     }
 
+    @SafeVarargs
+    public static Button createHomepageButton(String text, AppContext context, Consumer<HomepageButtonBuilder>... configs) {
+        HomepageButtonBuilder builder = new HomepageButtonBuilder(text, context);
+        for (Consumer<HomepageButtonBuilder> config : configs) {
+            config.accept(builder);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Creates a logout button that clears the current role and navigates to the login page.
+     */
+    public static Button createLogoutButton(AppContext context) {
+        return UIFactory.createButton("Logout", e -> e.onAction(a -> {
+            context.getSession().setCurrentRole(null);
+            context.router().navigate(MyPages.USER_LOGIN);
+        }));
+    }
+
+    /**
+     * Creates a back button that navigates to the previous page.
+     */
+    public static Button createBackButton(AppContext context) {
+        return UIFactory.createButton("Back", e -> e.onAction(a -> {
+            MyPages previousPage = context.router().getPreviousPage();
+            if (previousPage != null) {
+                context.router().navigate(previousPage);
+            } else {
+                context.router().navigate(MyPages.USER_HOME);
+            }
+        }));
+    }
+
 
     // --- Builder Classes ---
 
@@ -333,10 +366,6 @@ public final class UIFactory {
             });
             return this;
         }
-
-        public Button build() {
-            return button;
-        }
     }
 
     public static class AlertBuilder {
@@ -388,10 +417,6 @@ public final class UIFactory {
                 MenuItem roleItem = new MenuItem(role.toString());
                 roleItem.setOnAction(e -> {
                     MyPages page = UIFactory.getPageForRole(role);
-                    if (page == null) {
-                        context.getSession().setCurrentRole(role);
-                        context.router().navigate(MyPages.USER_HOME);
-                    }
                     context.getSession().setCurrentRole(role);
                     context.router().navigate(page);
                 });
