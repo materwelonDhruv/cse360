@@ -418,9 +418,14 @@ public final class UIFactory {
         public HomepageButtonBuilder(String text, AppContext context) {
             this.button = new Button(text);
             button.setOnAction(e -> {
-                Roles currentRole = context.getSession().getCurrentRole();
-                MyPages homepage = UIFactory.getPageForRole(currentRole);
-                context.router().navigate(homepage);
+                if (context.router().getCurrentPage() == MyPages.USER_HOME) {
+                    Roles currentRole = context.getSession().getCurrentRole();
+                    MyPages homepage = UIFactory.getPageForRole(currentRole);
+                    context.router().navigate(homepage);
+                } else {
+                    context.router().navigate(MyPages.USER_HOME);
+                }
+
             });
         }
 
