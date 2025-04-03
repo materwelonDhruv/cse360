@@ -22,7 +22,8 @@ public enum MyPages {
     PRIVATE_MESSAGE("/privateMessagePage"),
     PRIVATE_CONVERSATION("/privateConversation"),
     INSTRUCTOR_HOME("/instructorHome"),
-    REVIEW_HOME("/reviewHome");
+    REVIEW_HOME("/reviewHome"),
+    REVIEW_LIST("/reviewList");
 
     private final String route;
 

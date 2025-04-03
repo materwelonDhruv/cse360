@@ -2,7 +2,6 @@ package application.pages;
 
 import application.framework.*;
 import database.model.entities.Answer;
-import database.model.entities.Message;
 import database.model.entities.Question;
 import database.model.entities.User;
 import database.repository.repos.Answers;
@@ -243,9 +242,6 @@ public class ReviewerHomePage extends BasePage {
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
         Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;-fx"));
 
-        //Adding answer UI
-        Button addReviewButton = UIFactory.createButton("Add Review", e -> e.onAction(
-                a -> addAnswer()));
 
         //Close answerStage UI
         Button closeButton = UIFactory.createButton("Close", e -> e.onAction(
@@ -254,16 +250,6 @@ public class ReviewerHomePage extends BasePage {
                     answerStage.close();
                 }));
 
-        //Edit Answer Button
-        Button editAnswerButton = UIFactory.createButton("Edit Answer", e -> e.onAction(a -> {
-            Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
-            if (selectedAnswer != null) {
-                editAnswerWindow(selectedAnswer.getKey());
-            }
-        }));
-
-        //Delete Answer Button
-        Button deleteReviewButton = UIFactory.createButton("Delete Review", e -> e.onAction(a -> deleteAnswer()));
 
         //Adding answer UI
         Button addPMButton = UIFactory.createButton("Private Message", e -> e.onAction(
@@ -284,8 +270,18 @@ public class ReviewerHomePage extends BasePage {
             }
         });
 
-        HBox addUI = new HBox(10, addReviewButton, answerInput);
-        HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteReviewButton, addPMButton);
+        answerListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    final int currentlySelectedAnswerId = selectedItem.getKey();
+                    context.router().navigate(MyPages.REVIEW_LIST);
+                }
+            }
+        });
+
+        HBox addUI = new HBox(10, answerInput);
+        HBox editUI = new HBox(10, answerLabelList, addPMButton);
 
         //Layout to show every UI
         VBox answerLayout = new VBox(questionContent, addUI, editUI, answerListView, closeButton);
@@ -308,74 +304,6 @@ public class ReviewerHomePage extends BasePage {
         }
     }
 
-    //method to add an answer
-    private void addAnswer() {
-        if (currentlySelectedQuestionId == -1) return;
-        String content = answerInput.getText().trim();
-        if (!content.isEmpty()) {
-            Message message = new Message(context.getSession().getActiveUser().getId(), content);
-            Answer newAnswer = new Answer(message, currentlySelectedQuestionId, null, false);
-
-            Answer createdAnswer = null;
-            try {
-                createdAnswer = context.answers().create(newAnswer);
-                loadQuestions();
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            }
-            answerListView.getItems().add(new Pair<>(createdAnswer.getId(), createdAnswer.getMessage().getContent()));
-            answerInput.clear();
-
-        }
-    }
-
-    //method to delete answer
-    private void deleteAnswer() {
-        Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-            boolean isPinned = context.answers().getById(selectedItem.getKey()).getIsPinned();
-            context.answers().delete(selectedItem.getKey()); // Use the Answers instance to delete
-            //if answer is pinned, loadQuestions to update questionViewList
-            if (isPinned) {
-                currentlySelectedQuestionResolved = false;
-                loadQuestions();
-            }
-            answerListView.getItems().remove(selectedItem); // Remove the item from the ListView
-        }
-        loadQuestions();
-    }
-
-    //edit answer window to edit an answer
-    private void editAnswerWindow(int answerId) {
-        Stage answerEditStage = new Stage();
-        answerEditStage.initModality(Modality.APPLICATION_MODAL);
-        answerEditStage.setTitle("Edit Answer");
-
-        //getting current content
-        String currentContent = context.answers().getById(answerId).getMessage().getContent().trim();
-
-        //UI for cancelling or saving a new answer
-        Label label = UIFactory.createLabel("Edit Answer:");
-        TextField answerInputField = UIFactory.createTextField("", f ->
-                f.defaultText(currentContent));
-
-        Button saveButton = UIFactory.createButton("Save", e -> e.onAction(a -> {
-            String newContent = answerInputField.getText();
-            context.answers().updateAnswerContent(answerId, newContent);
-            loadAnswers(currentlySelectedQuestionId);
-            answerEditStage.close();
-        }));
-        //Button to close the answer stage
-        Button cancelButton = UIFactory.createButton("Cancel", e -> e.onAction(a -> {
-            answerInputField.clear();
-            answerEditStage.close();
-        }));
-
-        VBox layout = new VBox(10, label, answerInputField, saveButton, cancelButton);
-        Scene scene = new Scene(layout, 300, 150);
-        answerEditStage.setScene(scene);
-        answerEditStage.showAndWait();
-    }
 
     //Opening the answers window
     private void showAnswerWindow(int questionID) {

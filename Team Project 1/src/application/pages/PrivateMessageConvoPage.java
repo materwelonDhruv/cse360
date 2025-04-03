@@ -96,14 +96,12 @@ public class PrivateMessageConvoPage extends BasePage {
     private PrivateMessage getMostRecentReply() {
         PrivateMessage pm = privateMessage;
         while (pm != null) {
-            System.out.println("HELLO!!!:" + pm.getMessage().getContent());
             if (!context.privateMessages().getRepliesToPrivateMessage(pm.getId()).isEmpty()) {
                 pm = context.privateMessages().getRepliesToPrivateMessage(pm.getId()).getFirst();
             } else {
                 break;
             }
         }
-        System.out.println("FINAL!!!:" + pm.getMessage().getContent());
         return pm;
     }
 }
