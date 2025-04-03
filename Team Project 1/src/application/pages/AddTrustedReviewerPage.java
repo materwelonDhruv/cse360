@@ -73,11 +73,11 @@ public class AddTrustedReviewerPage extends BasePage {
             }
         }));
 
-        // Button to cancel and route back to the TrustedReviewerPage
-        Button cancelButton = UIFactory.createButton("Cancel", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
+        // Button to route back to the TrustedReviewerPage
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
 
         // HBox to contain the add and cancel buttons
-        HBox buttonHBox = new HBox(20, addButton, cancelButton);
+        HBox buttonHBox = new HBox(20, addButton, backButton);
         buttonHBox.setAlignment(Pos.BASELINE_CENTER);
 
         layout.getChildren().addAll(titleLabel, reviewerNameInput, resultView, buttonHBox);
