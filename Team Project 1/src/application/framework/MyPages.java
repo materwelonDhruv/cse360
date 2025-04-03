@@ -23,7 +23,10 @@ public enum MyPages {
     PRIVATE_CONVERSATION("/privateConversation"),
     INSTRUCTOR_HOME("/instructorHome"),
     REVIEW_HOME("/reviewHome"),
-    REVIEW_LIST("/reviewList");
+    REVIEW_LIST("/reviewList"),
+    INSTRUCTOR_HOME("/instructorHome"),
+    TRUSTED_REVIEWER("/trustedReviewer"),
+    ADD_TRUSTED_REVIEWER("/addTrustedReviewer");
 
     private final String route;
 

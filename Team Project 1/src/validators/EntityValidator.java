@@ -113,8 +113,8 @@ public class EntityValidator {
             throw new IllegalArgumentException("A valid user is required for a review.");
         }
 
-        if (review.getRating() < 0 || review.getRating() > 10) {
-            throw new IllegalArgumentException("Rating must be between 0 and 10.");
+        if (review.getRating() <= 0) {
+            throw new IllegalArgumentException("Rating order must be greater than 0.");
         }
 
         if (!RolesUtil.hasRole(review.getReviewer().getRoles(), Roles.REVIEWER)) {

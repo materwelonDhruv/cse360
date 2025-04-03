@@ -22,6 +22,7 @@ public final class UIFactory {
         ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
         ROLE_PAGE_MAP.put(Roles.REVIEWER, MyPages.REVIEW_HOME);
+        ROLE_PAGE_MAP.put(Roles.STUDENT, MyPages.USER_QUESTION_DISPLAY);
     }
 
     private UIFactory() {
@@ -405,6 +406,23 @@ public final class UIFactory {
 
         public MenuButton build() {
             return menuButton;
+        }
+    }
+
+    public static class HomepageButtonBuilder extends ButtonBuilder {
+        public HomepageButtonBuilder(String text, AppContext context) {
+            super(text);
+            Button button = super.getSource();
+            button.setOnAction(e -> {
+                if (context.router().getCurrentPage() == MyPages.USER_HOME) {
+                    Roles currentRole = context.getSession().getCurrentRole();
+                    MyPages homepage = UIFactory.getPageForRole(currentRole);
+                    context.router().navigate(homepage);
+                } else {
+                    context.router().navigate(MyPages.USER_HOME);
+                }
+
+            });
         }
     }
 }
