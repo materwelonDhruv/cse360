@@ -129,7 +129,7 @@ public class UserHomePage extends BasePage {
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
         // Create Question Display buttons.
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
+        Button questionDisplayButton = UIFactory.createHomepageButton("Your Homepage", context);
 
         //Add button to add a question
         Button addQuestionButton = UIFactory.createButton("Add", e -> e.onAction(a -> ShowQuestionWindow()));
@@ -171,7 +171,7 @@ public class UserHomePage extends BasePage {
         });
 
         //Creating log out button
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
 
         //Add spacer for better UI
         //Region spacer = new Region();
@@ -218,7 +218,7 @@ public class UserHomePage extends BasePage {
             final Roles[] selectedRole = new Roles[1];
 
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
-            
+
             buttonBar.getChildren().addAll(roleMenu);
         }
         return layout;

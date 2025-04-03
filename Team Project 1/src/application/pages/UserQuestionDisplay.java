@@ -177,7 +177,7 @@ public class UserQuestionDisplay extends BasePage {
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
         Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
         // Add reviewer request button
         Button requestReviewerButton = UIFactory.createButton("Request Reviewer Status", e -> e.onAction(a -> {
             User currentUser = context.getSession().getActiveUser();
