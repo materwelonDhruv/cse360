@@ -21,7 +21,8 @@ public enum MyPages {
     USER_QUESTION_DISPLAY("/userQuestionDisplay"),
     PRIVATE_MESSAGE("/privateMessagePage"),
     PRIVATE_CONVERSATION("/privateConversation"),
-    INSTRUCTOR_HOME("/instructorHome");
+    INSTRUCTOR_HOME("/instructorHome"),
+    REVIEW_HOME("/reviewHome");
 
     private final String route;
 
