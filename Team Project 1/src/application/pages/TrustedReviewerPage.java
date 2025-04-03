@@ -8,11 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
-import utils.permissions.Roles;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,7 +22,7 @@ import java.util.List;
 @View(title = "Manage Trusted Reviewers")
 public class TrustedReviewerPage extends BasePage {
     // ListView to contain the trusted reviewers
-    private final ListView<HBox> reviewersListView = new ListView<HBox>();
+    private final ListView<HBox> reviewersListView = new ListView<>();
 
     @Override
     public Pane createView() {
@@ -39,7 +36,7 @@ public class TrustedReviewerPage extends BasePage {
         // Double Click to go to the profile of the trusted reviewer
         reviewersListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                HBox selectedReviewer = (HBox) reviewersListView.getSelectionModel().getSelectedItem();
+                HBox selectedReviewer = reviewersListView.getSelectionModel().getSelectedItem();
                 if (selectedReviewer != null) {
                     //TODO: Open profile of the reviewer
                 }
@@ -66,10 +63,13 @@ public class TrustedReviewerPage extends BasePage {
     }
 
     // Method to load all trusted reviewers in the student's list into the trustedReviewerHBox
-    public void loadTrustedReviewers() {
+    private void loadTrustedReviewers() {
         reviewersListView.getItems().clear();
         // Get the student's ordered trusted reviewers list from the database
         List<Review> trustedReviewers = context.reviews().getReviewersByUserId(context.getSession().getActiveUser().getId());
+
+        // Count for newly added reviewers; used to give them proper rankings
+        int numNewAdditions = 0;
 
         // Add trusted reviewers in order of their rankings
         for (Review trustedReviewer : trustedReviewers) {
@@ -84,17 +84,24 @@ public class TrustedReviewerPage extends BasePage {
             } else {
                 // Disable a ranking button if the reviewer is first or last in the list
                 if (reviewersListView.getItems().isEmpty()) {
-                    // Disable increaseRankingButton
-                    VBox rankingButtonsVBox = (VBox) trustedReviewerHBox.getChildren().getLast();
-                    rankingButtonsVBox.getChildren().getFirst().setDisable(true);
-                } else if (reviewersListView.getItems().size() == trustedReviewers.size() - 1) {
                     // Disable decreaseRankingButton
                     VBox rankingButtonsVBox = (VBox) trustedReviewerHBox.getChildren().getLast();
                     rankingButtonsVBox.getChildren().getLast().setDisable(true);
+                } else if (reviewersListView.getItems().size() == trustedReviewers.size() - 1) {
+                    // Disable increaseRankingButton
+                    VBox rankingButtonsVBox = (VBox) trustedReviewerHBox.getChildren().getLast();
+                    rankingButtonsVBox.getChildren().getFirst().setDisable(true);
                 }
             }
 
-            reviewersListView.getItems().addLast(trustedReviewerHBox);
+            // Set ranking of the reviewer to the size of the list view + numNewAdditions if it is a new addition
+            if (trustedReviewer.getRating() == Integer.MAX_VALUE) {
+                trustedReviewer.setRating(trustedReviewers.size() - numNewAdditions);
+                numNewAdditions++;
+                context.reviews().update(trustedReviewer);
+            }
+
+            reviewersListView.getItems().addFirst(trustedReviewerHBox);
         }
     }
 

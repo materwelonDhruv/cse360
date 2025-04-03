@@ -1,18 +1,22 @@
 package application.pages;
 
 import application.framework.*;
+import database.model.entities.User;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.SearchUtil;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This page allows students to search for reviewers that are not on their trusted reviewer list and
- * select as many as they want to add to that list.
+ * select as many as they want to add to that list. They may also double-click on a reviewer to view
+ * their profile.
  */
 @Route(MyPages.ADD_TRUSTED_REVIEWER)
 @View(title = "Add Trusted Reviewers")
@@ -25,17 +29,49 @@ public class AddTrustedReviewerPage extends BasePage {
 
     @Override
     public Pane createView() {
+        // Retrieve the active user from session.
+        User user = context.getSession().getActiveUser();
+        if (user == null) {
+            return new VBox(new Label("No active user found."));
+        }
+
         VBox layout = new VBox(15);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         Label titleLabel = UIFactory.createLabel("Add Trusted Reviewers");
 
         // Set up resultView
+        resultView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         resultView.setFixedCellSize(26);
         resultView.setPlaceholder(new Label("No Existing Reviewers"));
 
+        // Load all untrusted reviewers into the resultView
+        loadUntrustedReviewers();
+        // Double Click to go to the profile of the trusted reviewer
+        resultView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                List<String> selectedReviewer = resultView.getSelectionModel().getSelectedItems();
+                if (selectedReviewer.size() == 1) {
+                    //TODO: Open profile of the reviewer
+                }
+            }
+        });
+
         // Button to add all selected reviewers into the student's trusted reviewers list
-        Button addButton = UIFactory.createButton("Add Selected Reviewers");
+        Button addButton = UIFactory.createButton("Add Selected Reviewers", e -> e.onAction(a -> {
+            List<String> selectedReviewers = resultView.getSelectionModel().getSelectedItems();
+            if (!selectedReviewers.isEmpty()) {
+                for (String reviewerName : selectedReviewers) {
+                    User reviewer = context.users().getByUsername(reviewerName);
+                    context.reviews().setRating(reviewer, context.getSession().getActiveUser(), Integer.MAX_VALUE);
+                }
+                resultView.getItems().removeAll(selectedReviewers);
+                // Route back to TrustedReviewerPage if no more reviewers are untrusted
+                if (resultView.getItems().isEmpty() && reviewerNameInput.getText().isEmpty()) {
+                    context.router().navigate(MyPages.TRUSTED_REVIEWER);
+                }
+            }
+        }));
 
         // Button to cancel and route back to the TrustedReviewerPage
         Button cancelButton = UIFactory.createButton("Cancel", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
@@ -46,5 +82,17 @@ public class AddTrustedReviewerPage extends BasePage {
 
         layout.getChildren().addAll(titleLabel, reviewerNameInput, resultView, buttonHBox);
         return layout;
+    }
+
+    // Method to load all untrusted reviewers into the resultView
+    private void loadUntrustedReviewers() {
+        try {
+            User currentUser = context.getSession().getActiveUser();
+            List<User> untrustedReviewers = context.users().getReviewersNotRatedByUser(currentUser.getId());
+            resultView.getItems().clear();
+            for (User user : untrustedReviewers) {resultView.getItems().add(user.getUserName());}
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
