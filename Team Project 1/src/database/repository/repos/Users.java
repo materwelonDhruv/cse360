@@ -160,7 +160,8 @@ public class Users extends Repository<User> {
                 .toList();
 
         return allReviewers.stream()
-                .filter(reviewer -> !ratedReviewerIds.contains(reviewer.getId()))
+                .filter(reviewer -> !ratedReviewerIds.contains(reviewer.getId())
+                        && reviewer.getId() != userId)
                 .toList();
     }
 }
