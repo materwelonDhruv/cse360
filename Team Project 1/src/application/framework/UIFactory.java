@@ -21,6 +21,7 @@ public final class UIFactory {
     static {
         ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
+        ROLE_PAGE_MAP.put(Roles.STUDENT, MyPages.USER_QUESTION_DISPLAY);
     }
 
     private UIFactory() {
@@ -125,6 +126,16 @@ public final class UIFactory {
             config.accept(builder);
         }
         return builder.build();
+    }
+
+    /**
+     * Creates a logout button that clears the current role and navigates to the login page.
+     */
+    public static Button createLogoutButton(AppContext context) {
+        return UIFactory.createButton("Logout", e -> e.onAction(a -> {
+            context.getSession().setCurrentRole(null);
+            context.router().navigate(MyPages.USER_LOGIN);
+        }));
     }
 
 
