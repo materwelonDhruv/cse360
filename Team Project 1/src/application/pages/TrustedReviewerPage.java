@@ -41,7 +41,7 @@ public class TrustedReviewerPage extends BasePage {
             if (event.getClickCount() == 2) {
                 HBox selectedReviewer = (HBox) reviewersListView.getSelectionModel().getSelectedItem();
                 if (selectedReviewer != null) {
-                    //TODO: Go to profile of the reviewer
+                    //TODO: Open profile of the reviewer
                 }
             }
         });
@@ -68,15 +68,8 @@ public class TrustedReviewerPage extends BasePage {
     // Method to load all trusted reviewers in the student's list into the trustedReviewerHBox
     public void loadTrustedReviewers() {
         reviewersListView.getItems().clear();
-        // Get the student's trusted reviewers list from the database
+        // Get the student's ordered trusted reviewers list from the database
         List<Review> trustedReviewers = context.reviews().getReviewersByUserId(context.getSession().getActiveUser().getId());
-
-        // Sort the reviewers by their rating
-        trustedReviewers.sort(new Comparator<Review>() {
-            public int compare(Review r1, Review r2) {
-                return r1.getRating() - r2.getRating();
-            }
-        });
 
         // Add trusted reviewers in order of their rankings
         for (Review trustedReviewer : trustedReviewers) {
@@ -101,7 +94,7 @@ public class TrustedReviewerPage extends BasePage {
                 }
             }
 
-            reviewersListView.getItems().add(trustedReviewerHBox);
+            reviewersListView.getItems().addLast(trustedReviewerHBox);
         }
     }
 
