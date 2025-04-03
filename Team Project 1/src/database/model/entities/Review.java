@@ -5,7 +5,7 @@ import database.model.BaseEntity;
 public class Review extends BaseEntity {
     private User reviewer;
     private User user;
-    private int rating; // 0-5
+    private int rating; // 0-10
 
     public Review() {
     }
