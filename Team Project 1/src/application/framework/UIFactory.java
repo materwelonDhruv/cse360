@@ -138,6 +138,20 @@ public final class UIFactory {
         }));
     }
 
+    /**
+     * Creates a back button that navigates to the previous page.
+     */
+    public static Button createBackButton(AppContext context) {
+        return UIFactory.createButton("Back", e -> e.onAction(a -> {
+            MyPages previousPage = context.router().getPreviousPage();
+            if (previousPage != null) {
+                context.router().navigate(previousPage);
+            } else {
+                context.router().navigate(MyPages.USER_HOME);
+            }
+        }));
+    }
+
 
     // --- Builder Classes ---
 

@@ -18,6 +18,7 @@ public class PageRouter {
     private static final Logger logger = Logger.getLogger(PageRouter.class.getName());
     private final Stage primaryStage;
     private final Map<application.framework.MyPages, Class<? extends application.framework.BasePage>> routeMap = new HashMap<>();
+    private MyPages previousPage = null;
     private MyPages currentPage = null;
 
     public PageRouter(Stage primaryStage) {
@@ -56,11 +57,16 @@ public class PageRouter {
             Constructor<? extends BasePage> ctor = pageClass.getDeclaredConstructor();
             BasePage pageInstance = ctor.newInstance();
             pageInstance.init(primaryStage);
+            previousPage = currentPage;
             currentPage = page;
             pageInstance.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public MyPages getPreviousPage() {
+        return previousPage;
     }
 
     public MyPages getCurrentPage() {
