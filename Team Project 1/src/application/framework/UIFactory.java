@@ -351,10 +351,6 @@ public final class UIFactory {
             });
             return this;
         }
-
-        public Button build() {
-            return button;
-        }
     }
 
     public static class AlertBuilder {
@@ -423,11 +419,10 @@ public final class UIFactory {
         }
     }
 
-    public static class HomepageButtonBuilder {
-        private final Button button;
-
+    public static class HomepageButtonBuilder extends ButtonBuilder {
         public HomepageButtonBuilder(String text, AppContext context) {
-            this.button = new Button(text);
+            super(text);
+            Button button = super.getSource();
             button.setOnAction(e -> {
                 if (context.router().getCurrentPage() == MyPages.USER_HOME) {
                     Roles currentRole = context.getSession().getCurrentRole();
@@ -438,18 +433,6 @@ public final class UIFactory {
                 }
 
             });
-        }
-
-        /**
-         * Override default action
-         */
-        public HomepageButtonBuilder onAction(EventHandler<javafx.event.ActionEvent> handler) {
-            button.setOnAction(handler);
-            return this;
-        }
-
-        public Button build() {
-            return button;
         }
     }
 }
