@@ -47,6 +47,28 @@ public class AddTrustedReviewerPage extends BasePage {
 
         // Load all untrusted reviewers into the resultView
         loadUntrustedReviewers();
+
+        // Perform a search when a key is released or load
+        // all untrusted reviewers if reviewerNameInput is empty
+        reviewerNameInput.setOnKeyReleased(event -> {
+            String inputText = reviewerNameInput.getText();
+            if (!inputText.isEmpty()) {
+                try {
+                    resultView.getItems().clear();
+                    // Get all untrusted reviewers
+                    List<User> reviewersToSearch = context.users().getReviewersNotRatedByUser(user.getId());
+                    // Get search results and update the resultView
+                    List<User> searchList = new ArrayList<>(SearchUtil.fullTextSearch(reviewersToSearch, inputText,
+                            r -> r.getUserName() + " " + r.getFirstName() + " " + r.getLastName()));
+                    updateResults(searchList);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                loadUntrustedReviewers();
+            }
+        });
+
         // Double Click to go to the profile of the trusted reviewer
         resultView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -93,6 +115,14 @@ public class AddTrustedReviewerPage extends BasePage {
             for (User user : untrustedReviewers) {resultView.getItems().add(user.getUserName());}
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    // Method to update the resultView with the results of the search
+    private void updateResults(List<User> list) {
+        resultView.getItems().clear();
+        for (User u : list) {
+            resultView.getItems().add(u.getUserName());
         }
     }
 }
