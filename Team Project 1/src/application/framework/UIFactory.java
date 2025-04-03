@@ -26,7 +26,7 @@ public final class UIFactory {
     private UIFactory() {
     }
 
-    public static MyPages getPageForRole(Roles role) {
+    private static MyPages getPageForRole(Roles role) {
         return ROLE_PAGE_MAP.getOrDefault(role, MyPages.USER_HOME);
     }
 
@@ -113,6 +113,15 @@ public final class UIFactory {
     public static MenuButton createNavMenu(AppContext context, String menuText, Consumer<NavMenuBuilder>... configs) {
         NavMenuBuilder builder = new NavMenuBuilder(context, menuText);
         for (Consumer<NavMenuBuilder> config : configs) {
+            config.accept(builder);
+        }
+        return builder.build();
+    }
+
+    @SafeVarargs
+    public static Button createHomepageButton(String text, AppContext context, Consumer<HomepageButtonBuilder>... configs) {
+        HomepageButtonBuilder builder = new HomepageButtonBuilder(text, context);
+        for (Consumer<HomepageButtonBuilder> config : configs) {
             config.accept(builder);
         }
         return builder.build();
@@ -380,15 +389,12 @@ public final class UIFactory {
                     }
                 }
             }
-            
+
             menuButton = new MenuButton(menuText);
             for (Roles role : menuRoles) {
                 MenuItem roleItem = new MenuItem(role.toString());
                 roleItem.setOnAction(e -> {
                     MyPages page = UIFactory.getPageForRole(role);
-                    if (page == null) {
-                        throw new IllegalArgumentException("No page mapping found for role: " + role);
-                    }
                     context.getSession().setCurrentRole(role);
                     context.router().navigate(page);
                 });
@@ -403,6 +409,31 @@ public final class UIFactory {
 
         public MenuButton build() {
             return menuButton;
+        }
+    }
+
+    public static class HomepageButtonBuilder {
+        private final Button button;
+
+        public HomepageButtonBuilder(String text, AppContext context) {
+            this.button = new Button(text);
+            button.setOnAction(e -> {
+                Roles currentRole = context.getSession().getCurrentRole();
+                MyPages homepage = UIFactory.getPageForRole(currentRole);
+                context.router().navigate(homepage);
+            });
+        }
+
+        /**
+         * Override default action
+         */
+        public HomepageButtonBuilder onAction(EventHandler<javafx.event.ActionEvent> handler) {
+            button.setOnAction(handler);
+            return this;
+        }
+
+        public Button build() {
+            return button;
         }
     }
 }

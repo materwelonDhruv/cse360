@@ -1,8 +1,11 @@
 package database.repository.repos;
 
+import database.model.entities.Review;
 import database.model.entities.User;
 import database.repository.Repository;
 import utils.PasswordUtil;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -129,4 +132,36 @@ public class Users extends Repository<User> {
         );
     }
 
+    /**
+     * Returns a list of all users with the REVIEWER role.
+     */
+    public List<User> getAllReviewers() {
+        List<User> users = getAll();
+
+        return users.stream()
+                .filter(user -> {
+                    Roles[] userRoles = RolesUtil.intToRoles(user.getRoles());
+                    return RolesUtil.hasRole(userRoles, Roles.REVIEWER);
+                })
+                .toList();
+    }
+
+    /**
+     * Returns a list of all reviewers that a user hasn't yet rated.
+     *
+     * @param userId The ID of the user who is rating/trusting reviewers.
+     */
+    public List<User> getReviewersNotRatedByUser(int userId) throws SQLException {
+        List<User> allReviewers = getAllReviewers();
+        List<Review> userReviews = new Reviews(this.connection).getReviewersByUserId(userId);
+
+        List<Integer> ratedReviewerIds = userReviews.stream()
+                .map(review -> review.getReviewer().getId())
+                .toList();
+
+        return allReviewers.stream()
+                .filter(reviewer -> !ratedReviewerIds.contains(reviewer.getId())
+                        && reviewer.getId() != userId)
+                .toList();
+    }
 }
