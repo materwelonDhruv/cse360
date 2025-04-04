@@ -22,6 +22,8 @@ public enum MyPages {
     PRIVATE_MESSAGE("/privateMessagePage"),
     PRIVATE_CONVERSATION("/privateConversation"),
     INSTRUCTOR_HOME("/instructorHome"),
+    REVIEW_HOME("/reviewHome"),
+    REPLY_LIST("/replyList"),
     TRUSTED_REVIEWER("/trustedReviewer"),
     ADD_TRUSTED_REVIEWER("/addTrustedReviewer");
 
