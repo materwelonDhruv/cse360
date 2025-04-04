@@ -217,7 +217,9 @@ public class UserHomePage extends BasePage {
         HBox optionBar = new HBox(10, questionDisplayButton);
 
         // Add the trusted reviewer button only if the user is a student
-        if (userCurrentRole == Roles.STUDENT) {optionBar.getChildren().add(trustedReviewerButton);}
+        if (userCurrentRole == Roles.STUDENT) {
+            optionBar.getChildren().add(trustedReviewerButton);
+        }
 
         layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
 
@@ -226,7 +228,7 @@ public class UserHomePage extends BasePage {
             final Roles[] selectedRole = new Roles[1];
 
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
-            
+
             optionBar.getChildren().addAll(roleMenu);
         }
         optionBar.getChildren().add(logoutButton);
@@ -443,6 +445,16 @@ public class UserHomePage extends BasePage {
                     setText(null);
                 } else {
                     setText(item.getValue()); // Display only the answer content
+                }
+            }
+        });
+        answerListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    final int currentlySelectedAnswerId = selectedItem.getKey();
+                    ReplyList.setAnswer(context.answers().getById(currentlySelectedAnswerId));
+                    context.router().navigate(MyPages.REPLY_LIST);
                 }
             }
         });
