@@ -100,21 +100,21 @@ public class InstructorHomePage extends BasePage {
         // Add placeholder text when there are no requests
         requestTable.setPlaceholder(new Label("No pending reviewer requests"));
 
+        //Button to go the question_display page
+        Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
         // Add a refresh button
         Button refreshButton = UIFactory.createButton("Refresh Requests", e -> {
             refreshRequestsTable();
         });
 
         // Add logout button
-        Button logoutButton = UIFactory.createButton("Logout", e -> {
-            e.routeToPage(MyPages.USER_LOGIN, context);
-        });
+        Button logoutButton = UIFactory.createLogoutButton(context);
 
         // RoleMenu to change role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
         // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu);
+        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPadding(new Insets(10, 0, 0, 0));
 

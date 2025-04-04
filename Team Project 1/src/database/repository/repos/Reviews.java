@@ -93,12 +93,21 @@ public class Reviews extends Repository<Review> {
     }
 
     public Review setRating(User reviewer, User user, int newRating) {
-        String sql = "UPDATE Reviews SET rating=? WHERE reviewerID=? AND userID=?";
-        int rows = executeUpdate(sql, pstmt -> {
-            pstmt.setInt(1, newRating);
-            pstmt.setInt(2, reviewer.getId());
-            pstmt.setInt(3, user.getId());
-        });
-        return rows > 0 ? getByCompositeKey(reviewer.getId(), user.getId()) : null;
+        Review existing = getByCompositeKey(reviewer.getId(), user.getId());
+        if (existing != null) {
+            String sql = "UPDATE Reviews SET rating=? WHERE reviewerID=? AND userID=?";
+            executeUpdate(sql, pstmt -> {
+                pstmt.setInt(1, newRating);
+                pstmt.setInt(2, reviewer.getId());
+                pstmt.setInt(3, user.getId());
+            });
+            return getByCompositeKey(reviewer.getId(), user.getId());
+        } else {
+            Review newReview = new Review();
+            newReview.setRating(newRating);
+            newReview.setReviewer(reviewer);
+            newReview.setUser(user);
+            return create(newReview);
+        }
     }
 }

@@ -172,7 +172,7 @@ public class UserHomePage extends BasePage {
         Button reviwerProfileButton = UIFactory.createButton("Reviewer Profiles", e -> e.routeToPage(MyPages.REVIEWER_PROFILE, context));
 
         //Creating log out button
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
 
         //Add spacer for better UI
         //Region spacer = new Region();
@@ -214,25 +214,14 @@ public class UserHomePage extends BasePage {
 
         layout.getChildren().addAll(userLabel, buttonBar, questionListView);
 
+        // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
             final Roles[] selectedRole = new Roles[1];
-            MenuButton roleMenu = new MenuButton("Select Role");
 
-            for (Roles rol : allRoles) {
-                if (!rol.equals(userCurrentRole)) {
-                    MenuItem roleItem = new MenuItem(rol.toString());
-                    roleItem.setOnAction(e -> {
-                        selectedRole[0] = rol;
-                        roleMenu.setText(rol.toString());
-                        context.getSession().setCurrentRole(rol);
-                    });
-                    roleMenu.getItems().add(roleItem);
-                }
-            }
+            MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
-            layout.getChildren().add(roleMenu);
+            buttonBar.getChildren().addAll(roleMenu);
         }
-
         return layout;
     }
 
