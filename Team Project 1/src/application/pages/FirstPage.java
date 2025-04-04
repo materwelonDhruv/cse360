@@ -18,6 +18,10 @@ public class FirstPage extends BasePage {
         super();
     }
 
+    /**
+     * @return layout
+     * Builds the layout for FirstPage
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
