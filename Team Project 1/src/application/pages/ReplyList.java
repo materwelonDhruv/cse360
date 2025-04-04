@@ -35,6 +35,8 @@ public class ReplyList extends BasePage {
      */
     @Override
     public Pane createView() {
+        //TODO: more robust input validation
+        //TODO: add username displays
         //Setup layout
         BorderPane layout = new BorderPane();
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
