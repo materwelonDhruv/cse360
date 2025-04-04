@@ -12,8 +12,23 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for the {@link SearchUtil} class.
+ * <p>
+ * This test class ensures that the {@code fuzzySearch} and {@code fullTextSearch} methods function correctly
+ * by verifying their behavior with various inputs, including keyword searches and relevance ordering.
+ * </p>
+ *
+ * @author Dhruv
+ * @see SearchUtil
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SearchUtilTest {
+
+    /**
+     * Tests the {@code fuzzySearch} method with a basic keyword search.
+     * Ensures that the relevant item containing the keyword is found.
+     */
     @Test
     @Order(1)
     public void testFuzzyFilter() {
@@ -22,6 +37,10 @@ public class SearchUtilTest {
         assertTrue(results.contains("hello world"), "Should find 'hello world'");
     }
 
+    /**
+     * Tests the {@code fuzzySearch} method with multiple matches expected.
+     * Verifies that all relevant items are returned.
+     */
     @Test
     @Order(2)
     public void testMultipleMatches() {
@@ -31,8 +50,11 @@ public class SearchUtilTest {
     }
 
     /**
-     * Test fullTextSearch with short text documents.
+     * Tests the {@code fullTextSearch} method with short text documents.
      * Expects that documents mentioning "software" are returned.
+     *
+     * @throws Exception if an error occurs during full-text search execution.
+     * @see SearchUtil#fullTextSearch(List, String, java.util.function.Function)
      */
     @Test
     @Order(2)
@@ -56,8 +78,8 @@ public class SearchUtilTest {
     }
 
     /**
-     * Test fuzzySearch with long text documents.
-     * Expects that no results are returned because the documents are too long.
+     * Tests the {@code fuzzySearch} method with long text documents.
+     * Ensures that fuzzy search is not effective for large documents.
      */
     @Test
     @Order(3)
@@ -77,8 +99,11 @@ public class SearchUtilTest {
     }
 
     /**
-     * Test that verifies ordering of results by relevance.
+     * Tests that results are ordered by relevance when using {@code fullTextSearch}.
      * Documents that clearly mention "software" should rank higher.
+     *
+     * @throws Exception if an error occurs during full-text search execution.
+     * @see SearchUtil#fullTextSearch(List, String, java.util.function.Function)
      */
     @Test
     @Order(4)
@@ -94,7 +119,7 @@ public class SearchUtilTest {
         assertEquals(3, fullTextResults.size(), "Expected three full-text search results");
 
         // The highest scoring document should clearly include the term "software".
-        String topResult = fullTextResults.getFirst().toLowerCase();
+        String topResult = fullTextResults.get(0).toLowerCase();
         assertTrue(topResult.contains("software"), "Top result should clearly mention 'software'");
     }
 }

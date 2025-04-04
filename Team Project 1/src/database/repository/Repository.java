@@ -9,16 +9,36 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract repository class providing common database operations for entities extending {@link BaseEntity}.
+ * <p>
+ * This class provides a centralized mechanism for performing CRUD operations using a shared database connection.
+ * Subclasses should implement the specific logic for their respective entities.
+ * </p>
+ *
+ * @param <T> The type of entity managed by the repository, which must extend {@link BaseEntity}.
+ * @author Dhruv
+ */
 public abstract class Repository<T extends BaseEntity> implements IRepository<T> {
     protected final Connection connection;
 
+    /**
+     * Constructs a new repository with the provided database connection.
+     *
+     * @param connection The database connection to be used by all operations.
+     * @throws SQLException if there is an error initializing the connection.
+     */
     protected Repository(Connection connection) throws SQLException {
         // Store a single DB connection to be used by all operations in the subclass
         this.connection = connection;
     }
 
     /**
-     * Wraps an SQL operation, catching SQLException and throwing DataAccessException.
+     * Wraps an SQL operation, catching {@link SQLException} and throwing {@link DataAccessException}.
+     *
+     * @param operation The SQL operation to be executed.
+     * @param <R>       The type of result returned by the operation.
+     * @return The result of the operation.
      */
     protected <R> R wrap(SqlOperation<R> operation) {
         try {
@@ -30,6 +50,12 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
 
     /**
      * Executes a query expecting a single row result, returning that object or null.
+     *
+     * @param sql         The SQL query to execute.
+     * @param paramSetter A lambda function to set parameters on the {@link PreparedStatement}.
+     * @param rowMapper   A lambda function to map the {@link ResultSet} to a result object.
+     * @param <R>         The type of the result object.
+     * @return The result object, or null if no row was found.
      */
     protected <R> R queryForObject(String sql, SqlConsumer paramSetter, SqlFunction<R> rowMapper) {
         return wrap(() -> {
@@ -47,6 +73,12 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
 
     /**
      * Executes a query expecting multiple rows, returning them as a list.
+     *
+     * @param sql         The SQL query to execute.
+     * @param paramSetter A lambda function to set parameters on the {@link PreparedStatement}.
+     * @param rowMapper   A lambda function to map the {@link ResultSet} to result objects.
+     * @param <R>         The type of the result object.
+     * @return A list of result objects.
      */
     protected <R> List<R> queryForList(String sql, SqlConsumer paramSetter, SqlFunction<R> rowMapper) {
         return wrap(() -> {
@@ -65,6 +97,10 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
 
     /**
      * Executes a query expecting a boolean result.
+     *
+     * @param sql         The SQL query to execute.
+     * @param paramSetter A lambda function to set parameters on the {@link PreparedStatement}.
+     * @return true if the query returns a row with a true boolean value, otherwise false.
      */
     protected boolean queryForBoolean(String sql, SqlConsumer paramSetter) {
         return wrap(() -> {
@@ -80,7 +116,9 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
     /**
      * Executes an update (INSERT, UPDATE, DELETE) that does not need generated keys.
      *
-     * @return number of rows affected
+     * @param sql         The SQL query to execute.
+     * @param paramSetter A lambda function to set parameters on the {@link PreparedStatement}.
+     * @return The number of rows affected.
      */
     protected int executeUpdate(String sql, SqlConsumer paramSetter) {
         return wrap(() -> {
@@ -94,7 +132,9 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
     /**
      * Executes an INSERT statement that returns a generated key (if any).
      *
-     * @return the generated key or -1 if none
+     * @param sql         The SQL query to execute.
+     * @param paramSetter A lambda function to set parameters on the {@link PreparedStatement}.
+     * @return The generated key or -1 if none.
      */
     protected int executeInsert(String sql, SqlConsumer paramSetter) {
         return wrap(() -> {
@@ -111,6 +151,7 @@ public abstract class Repository<T extends BaseEntity> implements IRepository<T>
         });
     }
 
+    // CRUD methods (to be implemented by subclasses)
     @Override
     public T create(T entity) throws SQLException {
         throw new UnsupportedOperationException("Create method not implemented");

@@ -4,6 +4,16 @@ import database.model.entities.*;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
+/**
+ * Provides validation methods for various entities within the system.
+ * <p>
+ * This class includes validation mechanisms for entities such as Question, Answer, PrivateMessage,
+ * Message, Review, and ReviewerRequest. It ensures required fields are present and valid according
+ * to specified criteria.
+ * </p>
+ *
+ * @author Dhruv
+ */
 public class EntityValidator {
     private final static int MIN_TITLE_LENGTH = 5;
     private final static int MAX_TITLE_LENGTH = 100;
@@ -11,7 +21,11 @@ public class EntityValidator {
     private final static int MAX_CONTENT_LENGTH = 2000;
 
     /**
-     * Validates a Question object. Throws IllegalArgumentException if invalid.
+     * Validates a Question object.
+     *
+     * @param question The Question object to validate.
+     * @throws IllegalArgumentException if the question is null, lacks a valid userId,
+     *                                  or fails validation for title or content length.
      */
     public static void validateQuestion(Question question) throws IllegalArgumentException {
         if (question == null) {
@@ -30,7 +44,11 @@ public class EntityValidator {
     }
 
     /**
-     * Validates an Answer object. Throws IllegalArgumentException if invalid.
+     * Validates an Answer object.
+     *
+     * @param answer The Answer object to validate.
+     * @throws IllegalArgumentException if the answer is null, lacks a valid userId,
+     *                                  references both a question and an answer, references neither, or has invalid content length.
      */
     public static void validateAnswer(Answer answer) throws IllegalArgumentException {
         if (answer == null) {
@@ -54,7 +72,13 @@ public class EntityValidator {
     }
 
     /**
-     * Private method to validate the length of a string.
+     * Validates the length of a provided string.
+     *
+     * @param value   The string to validate.
+     * @param min     The minimum acceptable length.
+     * @param max     The maximum acceptable length.
+     * @param message The error message to be thrown if validation fails.
+     * @throws IllegalArgumentException if the string is null or its length is outside the specified bounds.
      */
     private static void validateLength(String value, int min, int max, String message) {
         if (value == null || value.length() < min || value.length() > max) {
@@ -62,6 +86,13 @@ public class EntityValidator {
         }
     }
 
+    /**
+     * Validates a PrivateMessage object.
+     *
+     * @param privateMessage The PrivateMessage object to validate.
+     * @throws IllegalArgumentException if the privateMessage is null, lacks a valid userId,
+     *                                  references both a question and another message, references neither, or has invalid content length.
+     */
     public static void validatePrivateMessage(PrivateMessage privateMessage) {
         if (privateMessage == null) {
             throw new IllegalArgumentException("PrivateMessage cannot be null.");
@@ -84,6 +115,12 @@ public class EntityValidator {
         validateLength(privateMessage.getMessage().getContent(), MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH, "Private message content must be between 10 and 2000 characters.");
     }
 
+    /**
+     * Validates a Message object.
+     *
+     * @param message The Message object to validate.
+     * @throws IllegalArgumentException if the message is null, lacks a valid userId, or has invalid content.
+     */
     public static void validateMessage(Message message) {
         if (message == null) {
             throw new IllegalArgumentException("Message cannot be null.");
@@ -94,12 +131,25 @@ public class EntityValidator {
         validateMessageContent(message.getContent());
     }
 
+    /**
+     * Validates the content of a message.
+     *
+     * @param content The content string to validate.
+     * @throws IllegalArgumentException if the content is null or empty.
+     */
     public static void validateMessageContent(String content) {
         if (content == null || content.trim().isEmpty()) {
             throw new IllegalArgumentException("Message content cannot be empty.");
         }
     }
 
+    /**
+     * Validates a Review object.
+     *
+     * @param review The Review object to validate.
+     * @throws IllegalArgumentException if the review is null, lacks a valid reviewer or user,
+     *                                  has an invalid rating, or if the reviewer does not have the REVIEWER role.
+     */
     public static void validateReview(Review review) {
         if (review == null) {
             throw new IllegalArgumentException("Review cannot be null.");
@@ -122,6 +172,13 @@ public class EntityValidator {
         }
     }
 
+    /**
+     * Validates a ReviewerRequest object.
+     *
+     * @param request The ReviewerRequest object to validate.
+     * @throws IllegalArgumentException if the request is null, the requester is invalid,
+     *                                  or if the instructor is invalid or lacks the INSTRUCTOR role.
+     */
     public static void validateReviewerRequest(ReviewerRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("ReviewerRequest cannot be null.");
