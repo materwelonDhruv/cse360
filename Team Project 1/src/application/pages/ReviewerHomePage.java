@@ -2,7 +2,6 @@ package application.pages;
 
 import application.framework.*;
 import database.model.entities.Answer;
-import database.model.entities.Message;
 import database.model.entities.Question;
 import database.model.entities.User;
 import database.repository.repos.Answers;
@@ -25,9 +24,9 @@ import java.util.List;
  * This page displays a simple welcome message for the user and provides navigation.
  * It shows the user's current role and, if multiple roles exist, a dropdown to select another.
  */
-@Route(MyPages.USER_HOME)
-@View(title = "User Page")
-public class UserHomePage extends BasePage {
+@Route(MyPages.REVIEW_HOME)
+@View(title = "Review Page")
+public class ReviewerHomePage extends BasePage {
     //max length for number of characters in the text field
     private static final int MAX_LENGTH = 300;
     //Creates list view to display search results
@@ -46,24 +45,19 @@ public class UserHomePage extends BasePage {
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
     private final Questions questionsRepo;
     private final Answers answersRepo;
-
+    //keeping track of whether only the user's questions are being shown
+    private final boolean showingUserQuestionsOnly = false;
     //keeping track of whether the current question is resolved
     private boolean currentlySelectedQuestionResolved = false;
-
     //keeping track of selected element in listViews
     private int currentlySelectedQuestionId = -1;
-
     //keeping track of whether resolved questions are being shown or only unresolved
     private boolean showingResolvedQuestions = true;
-
-    //keeping track of whether only the user's questions are being shown
-    private boolean showingUserQuestionsOnly = false;
-
     //Questions and Answer Stages
     private Stage questionStage;
     private Stage answerStage;
 
-    public UserHomePage() {
+    public ReviewerHomePage() {
         super();
         this.questionsRepo = context.questions();
         this.answersRepo = context.answers();
@@ -131,24 +125,6 @@ public class UserHomePage extends BasePage {
         // Create Question Display buttons.
         Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
 
-        //Create Trusted Reviewer button
-        Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
-
-        //Add button to add a question
-        Button addQuestionButton = UIFactory.createButton("Add", e -> e.onAction(a -> ShowQuestionWindow()));
-
-        //Edit button to edit a question
-        Button editQuestionButton = UIFactory.createButton("Edit", e -> e.onAction(a -> {
-            Pair<Integer, String> selectedQuestion = questionListView.getSelectionModel().getSelectedItem();
-            if (selectedQuestion != null) {
-                editQuestionWindow(selectedQuestion.getKey());
-            }
-        }));
-
-        //Delete button to delete a question
-        Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
-                (a -> deleteQuestion()));
-
         //Toggle unresolved questions only button
         Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved Only");
         unresolvedQuestionsButton.setOnAction(a -> {
@@ -161,31 +137,14 @@ public class UserHomePage extends BasePage {
             }
         });
 
-        //Toggle user questions only button
-        Button myQuestionsButton = UIFactory.createButton("Show Mine Only");
-        myQuestionsButton.setOnAction(a -> {
-            showingUserQuestionsOnly = !showingUserQuestionsOnly;
-            loadQuestions();
-            if (showingUserQuestionsOnly) {
-                myQuestionsButton.setText("Show Others");
-            } else {
-                myQuestionsButton.setText("Show Mine Only");
-            }
-        });
-        Button reviwerProfileButton = UIFactory.createButton("Reviewer Profiles", e -> e.routeToPage(MyPages.REVIEWER_PROFILE, context));
-
         //Creating log out button
-        Button logoutButton = UIFactory.createLogoutButton(context);
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
 
         //Add spacer for better UI
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
-        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
-
-        //Call the Question stage and Answer stage
-        createQuestionStage(user.getId());
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, unresolvedQuestionsButton, logoutButton);
 
         //Go to answer list on double-click
         questionListView.setOnMouseClicked(event -> {
@@ -215,15 +174,8 @@ public class UserHomePage extends BasePage {
             }
         });
 
-        // HBox for option buttons
-        HBox optionBar = new HBox(10, questionDisplayButton);
 
-        // Add the trusted reviewer button only if the user is a student
-        if (userCurrentRole == Roles.STUDENT) {
-            optionBar.getChildren().add(trustedReviewerButton);
-        }
-
-        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
+        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
@@ -231,29 +183,9 @@ public class UserHomePage extends BasePage {
 
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
-            optionBar.getChildren().addAll(roleMenu);
+            buttonBar.getChildren().addAll(roleMenu);
         }
-        optionBar.getChildren().add(logoutButton);
-
         return layout;
-    }
-
-    //Creating a stage for question
-    private void createQuestionStage(int userID) {
-        questionStage = new Stage();
-        questionStage.initModality(Modality.NONE);
-
-        //UI for question window
-        Label questionContent = UIFactory.createLabel("Question", f -> f.style("-fx-font-weight: bold;"));
-        Label questionTitle = UIFactory.createLabel("Title", f -> f.style("-fx-font-weight: bold;"));
-        Button createButton = UIFactory.createButton("Add Question", e -> e.onAction(a -> addQuestion(userID)));
-        Button closeButton = UIFactory.createButton("Close", e -> e.onAction(a -> questionStage.close()));
-
-        // Opening the answer window after a double click is detected on the list item
-
-
-        VBox questionLayout = new VBox(10, questionTitle, questionTitleInput, resultView, questionContent, questionInput, createButton, closeButton);
-        questionStage.setScene(new Scene(questionLayout, 300, 400));
     }
 
     //Method to load all the questions from the database
@@ -288,77 +220,6 @@ public class UserHomePage extends BasePage {
         }
     }
 
-
-    //Method to add a question with the userID
-    private void addQuestion(int userID) {
-        String title = questionTitleInput.getText();
-        String content = questionInput.getText().trim();
-        if (!content.isEmpty()) {
-            Message message = new Message(userID, content);
-            Question newQuestion = new Question(message, title);
-
-            Question createdQuestion = null;
-            try {
-                createdQuestion = context.questions().create(newQuestion);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            }
-            questionListView.getItems().add(new Pair<>(createdQuestion.getId(), createdQuestion.getTitle()));
-            questionInput.clear();
-        }
-        loadQuestions();
-    }
-
-    private void deleteQuestion() {
-        Pair<Integer, String> selectedItem = questionListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-            context.questions().delete(selectedItem.getKey());// Use Questions class
-            questionListView.getItems().remove(selectedItem);
-        }
-    }
-
-    private void editQuestionWindow(int questionId) {
-        Stage editorStage = new Stage();
-        editorStage.initModality(Modality.APPLICATION_MODAL);
-
-        //labels for editing title and content
-        Label editQuestionTitle = UIFactory.createLabel("Edit Question Title");
-        Label editQuestionContent = UIFactory.createLabel("Edit Question Content");
-
-        String currentTitle = context.questions().getById(questionId).getTitle().trim();
-        String currentContent = context.questions().getById(questionId).getMessage().getContent().trim();
-
-        TextField editQuestionTitleField = UIFactory.createTextField("New title", f -> f.defaultText(currentTitle));
-        TextField editQuestionField = UIFactory.createTextField("New content", f -> f.defaultText(currentContent));
-
-        //save button to save the updated content
-        Button saveButton = UIFactory.createButton("Save", e -> e.onAction(a -> {
-            String newContent = editQuestionField.getText();
-            context.questions().updateQuestionFields(questionId, currentTitle, newContent);
-            loadQuestions(); // Refresh the question list
-            editorStage.close();
-        }));
-
-        //cancel button to close the edit window
-        Button cancelButton = UIFactory.createButton("Cancel", e -> e.onAction(
-                a -> {
-                    editQuestionTitleField.clear();
-                    editQuestionField.clear();
-                    editorStage.close();
-                }));
-
-        VBox editorLayout = new VBox(10, editQuestionTitle, editQuestionTitleField, editQuestionContent, editQuestionField, saveButton, cancelButton);
-        editorStage.setScene(new Scene(editorLayout, 400, 200));
-        editorStage.show();
-    }
-
-    //Opening the Question window
-    private void ShowQuestionWindow() {
-        questionStage.setTitle("Create Question");
-        questionStage.show();
-    }
-
-
 //------------------------------------------------------------------------------------------------------------------------//
 //------------------------------------------------------------------------------------------------------------------------//
 //Answer stage and methods
@@ -381,9 +242,6 @@ public class UserHomePage extends BasePage {
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
         Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;-fx"));
 
-        //Adding answer UI
-        Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
-                a -> addAnswer()));
 
         //Close answerStage UI
         Button closeButton = UIFactory.createButton("Close", e -> e.onAction(
@@ -392,45 +250,6 @@ public class UserHomePage extends BasePage {
                     answerStage.close();
                 }));
 
-        //Edit Answer Button
-        Button editAnswerButton = UIFactory.createButton("Edit Answer", e -> e.onAction(a -> {
-            Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
-            if (selectedAnswer != null) {
-                editAnswerWindow(selectedAnswer.getKey());
-            }
-        }));
-
-        //Delete Answer Button
-        Button deleteAnswerButton = UIFactory.createButton("Delete Answer", e -> e.onAction(a -> deleteAnswer()));
-
-        //Mark and Unmark Solution Button
-        Button markAnswerButton = UIFactory.createButton("Mark Answer As Solution");
-        if (context.questions().hasPinnedAnswer(questionId)) {
-            markAnswerButton.setText("Unmark Answer As Solution");
-        }
-
-        markAnswerButton.setOnAction(a -> {
-            Pair<Integer, String> selectedAnswer = answerListView.getSelectionModel().getSelectedItem();
-            if (currentlySelectedQuestionResolved) {
-                //unmark the solution
-                for (Pair<Integer, String> answer : answerListView.getItems()) {
-                    if (context.answers().getById(answer.getKey()).getIsPinned()) {
-                        context.answers().togglePin(answer.getKey());
-                        break;
-                    }
-                }
-                //update answerListView, questionListView, and button text
-                loadAnswers(questionId);
-                loadQuestions();
-                markAnswerButton.setText("Mark Answer As Solution");
-            } else if (selectedAnswer != null) {
-                context.answers().togglePin(selectedAnswer.getKey());
-                //update answerListView, questionListView, and button text
-                loadAnswers(questionId);
-                loadQuestions();
-                markAnswerButton.setText("Unmark Answer As Solution");
-            }
-        });
 
         //Adding answer UI
         Button addPMButton = UIFactory.createButton("Private Message", e -> e.onAction(
@@ -450,6 +269,7 @@ public class UserHomePage extends BasePage {
                 }
             }
         });
+        //send to reply window
         answerListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
@@ -461,11 +281,8 @@ public class UserHomePage extends BasePage {
             }
         });
 
-        HBox addUI = new HBox(10, addAnswerButton, answerInput);
-        HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteAnswerButton, addPMButton);
-        if (context.getSession().getActiveUser().getId() == queContent.getMessage().getUserId()) {
-            editUI.getChildren().add(markAnswerButton);
-        }
+        HBox addUI = new HBox(10, answerInput);
+        HBox editUI = new HBox(10, answerLabelList, addPMButton);
 
         //Layout to show every UI
         VBox answerLayout = new VBox(questionContent, addUI, editUI, answerListView, closeButton);
@@ -488,74 +305,6 @@ public class UserHomePage extends BasePage {
         }
     }
 
-    //method to add an answer
-    private void addAnswer() {
-        if (currentlySelectedQuestionId == -1) return;
-        String content = answerInput.getText().trim();
-        if (!content.isEmpty()) {
-            Message message = new Message(context.getSession().getActiveUser().getId(), content);
-            Answer newAnswer = new Answer(message, currentlySelectedQuestionId, null, false);
-
-            Answer createdAnswer = null;
-            try {
-                createdAnswer = context.answers().create(newAnswer);
-                loadQuestions();
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            }
-            answerListView.getItems().add(new Pair<>(createdAnswer.getId(), createdAnswer.getMessage().getContent()));
-            answerInput.clear();
-
-        }
-    }
-
-    //method to delete answer
-    private void deleteAnswer() {
-        Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-            boolean isPinned = context.answers().getById(selectedItem.getKey()).getIsPinned();
-            context.answers().delete(selectedItem.getKey()); // Use the Answers instance to delete
-            //if answer is pinned, loadQuestions to update questionViewList
-            if (isPinned) {
-                currentlySelectedQuestionResolved = false;
-                loadQuestions();
-            }
-            answerListView.getItems().remove(selectedItem); // Remove the item from the ListView
-        }
-        loadQuestions();
-    }
-
-    //edit answer window to edit an answer
-    private void editAnswerWindow(int answerId) {
-        Stage answerEditStage = new Stage();
-        answerEditStage.initModality(Modality.APPLICATION_MODAL);
-        answerEditStage.setTitle("Edit Answer");
-
-        //getting current content
-        String currentContent = context.answers().getById(answerId).getMessage().getContent().trim();
-
-        //UI for cancelling or saving a new answer
-        Label label = UIFactory.createLabel("Edit Answer:");
-        TextField answerInputField = UIFactory.createTextField("", f ->
-                f.defaultText(currentContent));
-
-        Button saveButton = UIFactory.createButton("Save", e -> e.onAction(a -> {
-            String newContent = answerInputField.getText();
-            context.answers().updateAnswerContent(answerId, newContent);
-            loadAnswers(currentlySelectedQuestionId);
-            answerEditStage.close();
-        }));
-        //Button to close the answer stage
-        Button cancelButton = UIFactory.createButton("Cancel", e -> e.onAction(a -> {
-            answerInputField.clear();
-            answerEditStage.close();
-        }));
-
-        VBox layout = new VBox(10, label, answerInputField, saveButton, cancelButton);
-        Scene scene = new Scene(layout, 300, 150);
-        answerEditStage.setScene(scene);
-        answerEditStage.showAndWait();
-    }
 
     //Opening the answers window
     private void showAnswerWindow(int questionID) {

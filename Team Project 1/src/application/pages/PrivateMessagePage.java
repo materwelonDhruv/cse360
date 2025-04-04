@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.permissions.Roles;
 
 @Route(MyPages.PRIVATE_MESSAGE)
 @View(title = "Private Message Page")
@@ -36,7 +37,15 @@ public class PrivateMessagePage extends BasePage {
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        Roles role = context.getSession().getCurrentRole();
+        Button backButton;
+        if (role == Roles.INSTRUCTOR) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
+        } else if (role == Roles.REVIEWER) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
+        } else {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        }
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);

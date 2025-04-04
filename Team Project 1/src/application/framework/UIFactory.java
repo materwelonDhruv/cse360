@@ -21,6 +21,7 @@ public final class UIFactory {
     static {
         ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
+        ROLE_PAGE_MAP.put(Roles.REVIEWER, MyPages.REVIEW_HOME);
         ROLE_PAGE_MAP.put(Roles.STUDENT, MyPages.USER_QUESTION_DISPLAY);
     }
 
@@ -135,6 +136,20 @@ public final class UIFactory {
         return UIFactory.createButton("Logout", e -> e.onAction(a -> {
             context.getSession().setCurrentRole(null);
             context.router().navigate(MyPages.USER_LOGIN);
+        }));
+    }
+
+    /**
+     * Creates a back button that navigates to the previous page.
+     */
+    public static Button createBackButton(AppContext context) {
+        return UIFactory.createButton("Back", e -> e.onAction(a -> {
+            MyPages previousPage = context.router().getPreviousPage();
+            if (previousPage != null) {
+                context.router().navigate(previousPage);
+            } else {
+                context.router().navigate(MyPages.USER_HOME);
+            }
         }));
     }
 
