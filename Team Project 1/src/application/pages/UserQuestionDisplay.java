@@ -57,10 +57,9 @@ public class UserQuestionDisplay extends BasePage {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     Question q = row.getItem();
-                    System.out.println("Load details for: " + q.getTitle());
                     if (q != null) {
-                        //createAnswerStage(q.getId());
-                        //showAnswerWindow(q.getId());
+//                        createAnswerStage(q.getId());
+//                        showAnswerWindow(q.getId());
                     }
                 }
             });

@@ -12,20 +12,38 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Represents the private message conversation page.
+ * This page allows users to view and reply to private messages.
+ */
+
 @Route(MyPages.PRIVATE_CONVERSATION)
 @View(title = "Private Conversation Page")
 public class PrivateMessageConvoPage extends BasePage {
     private static PrivateMessage privateMessage;
     private static User user;
 
+    /**
+     * Default constructor.
+     */
     public PrivateMessageConvoPage() {
         super();
     }
 
+    /**
+     * Sets the target private message for the conversation.
+     *
+     * @param pm The private message to be displayed.
+     */
     public static void setTargetPM(PrivateMessage pm) {
         privateMessage = pm;
     }
 
+    /**
+     * Creates the UI view for the private message conversation page.
+     *
+     * @return The constructed JavaFX Pane containing the UI elements.
+     */
     @Override
     public Pane createView() {
         int MAX_LENGTH = 300;
@@ -67,6 +85,12 @@ public class PrivateMessageConvoPage extends BasePage {
         return view;
     }
 
+    /**
+     * Retrieves the entire conversation thread of a private message.
+     *
+     * @param pm The starting private message of the conversation.
+     * @return The formatted conversation as a string.
+     */
     private String getConversation(PrivateMessage pm) {
         StringBuilder conversation = new StringBuilder();
         User pmSender;
@@ -86,6 +110,12 @@ public class PrivateMessageConvoPage extends BasePage {
         return conversation.toString();
     }
 
+    /**
+     * Sends a reply to a private message.
+     *
+     * @param replyText The text field containing the reply message.
+     * @param parent    The private message being replied to.
+     */
     private void sendReply(TextField replyText, PrivateMessage parent) {
         Message tempMessage = new Message(user.getId(), replyText.getText());
         System.out.println("Parent: " + parent.getMessage().getContent());
@@ -93,6 +123,11 @@ public class PrivateMessageConvoPage extends BasePage {
         context.privateMessages().create(pm);
     }
 
+    /**
+     * Retrieves the most recent reply in the conversation thread.
+     *
+     * @return The latest private message reply in the thread.
+     */
     private PrivateMessage getMostRecentReply() {
         PrivateMessage pm = privateMessage;
         while (pm != null) {

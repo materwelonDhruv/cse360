@@ -12,19 +12,39 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Represents the page where users can send a private message in response to a specific question.
+ * This page provides a text field to input the message and a button to send it.
+ * After sending, the message is stored and the user is redirected back to their home page.
+ */
 @Route(MyPages.PRIVATE_MESSAGE)
 @View(title = "Private Message Page")
 public class PrivateMessagePage extends BasePage {
     private static Question question;
 
+    /**
+     * Default constructor for the PrivateMessagePage.
+     */
     public PrivateMessagePage() {
         super();
     }
 
+    /**
+     * Sets the question that the private message will be in response to.
+     *
+     * @param q The target question.
+     */
     public static void setTargetQuestion(Question q) {
         question = q;
     }
 
+    /**
+     * Creates and returns the UI view for the private message page.
+     * It includes a text field for entering a message, a send button,
+     * and a bottom toolbar with navigation options.
+     *
+     * @return The fully constructed JavaFX Pane for this view.
+     */
     public Pane createView() {
         int MAX_LENGTH = 300;
         //Declare fields
