@@ -1,8 +1,12 @@
 package application.pages;
 
 import application.framework.*;
+import database.model.entities.Review;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -11,7 +15,7 @@ import javafx.scene.layout.VBox;
  * It provides navigation to user management, invitation generation, OTP setup, and logout.
  */
 @Route(MyPages.REVIEWER_PROFILE)
-@View(title = "Admin Page")
+@View(title = "Reviewer Profile")
 public class ReviewerProfilePage extends BasePage {
 
     public ReviewerProfilePage() {
@@ -25,15 +29,21 @@ public class ReviewerProfilePage extends BasePage {
 
         //Labels for displaying information about the reviewer
         Label title = new Label("ReviewerName | Reviewer");
-        Label name = new Label("ReviewerName");
         Label email = new Label("ReviewerEmail@gmail.com");
+        Label reviewsLabel = new Label("My Reviews");
 
         //Button to allow reviewer to edit their profile
         Button editButton = new Button("Edit");
-
         //Fields to allow users to see reviewers reviews
+        TableView<Review> reviewTable = new TableView<>();
+        ObservableList<Review> reviews = FXCollections.observableArrayList();
+        reviews.addAll(context.reviews().getAll());
+        reviewTable.setItems(reviews);
+        Button pmButton = UIFactory.createButton("Private Message", e -> e.routeToPage(MyPages.PRIVATE_MESSAGE, context));
+        Button addTrustedButton = UIFactory.createButton("Add as trusted reviewer");
+        layout.getChildren().addAll(title, email, pmButton, addTrustedButton, reviewsLabel, reviewTable);
 
-        layout.getChildren().addAll();
         return layout;
+
     }
 }
