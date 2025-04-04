@@ -11,7 +11,15 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * Finds pages annotated with @Route(MyPages.XYZ) and sets up navigation.
+ * Handles page navigation in the application.
+ * <p>
+ * This class is responsible for scanning pages annotated with {@link Route} in the "application.pages" package,
+ * mapping them to the corresponding {@link MyPages} enum, and handling the navigation between pages.
+ * </p>
+ *
+ * @author Dhruv
+ * @see Route
+ * @see MyPages
  */
 public class PageRouter {
 
@@ -21,11 +29,27 @@ public class PageRouter {
     private MyPages previousPage = null;
     private MyPages currentPage = null;
 
+    /**
+     * Constructs a {@code PageRouter} with the given primary stage.
+     * <p>
+     * This constructor initializes the primary stage and automatically registers all pages annotated with
+     * {@link Route} in the "application.pages" package.
+     * </p>
+     *
+     * @param primaryStage The primary stage of the application.
+     */
     public PageRouter(Stage primaryStage) {
         this.primaryStage = primaryStage;
         autoRegister();
     }
 
+    /**
+     * Automatically registers pages annotated with {@link Route} from the "application.pages" package.
+     * <p>
+     * This method uses the Reflections library to scan the package for classes with the {@link Route} annotation,
+     * mapping them to the corresponding {@link MyPages} enum value.
+     * </p>
+     */
     private void autoRegister() {
         // 1) Use Reflections to scan package "application.pages" for annotated classes
         Reflections reflections = new Reflections("application.pages", Scanners.TypesAnnotated);
@@ -45,7 +69,13 @@ public class PageRouter {
     }
 
     /**
-     * Navigate to the specified route in MyPages enum.
+     * Navigates to the specified page route.
+     * <p>
+     * This method creates an instance of the page, initializes it with the primary stage, and shows the page.
+     * It also updates the current and previous pages for navigation history.
+     * </p>
+     *
+     * @param page The {@link MyPages} enum value representing the page to navigate to.
      */
     public void navigate(application.framework.MyPages page) {
         Class<? extends BasePage> pageClass = routeMap.get(page);
@@ -65,10 +95,20 @@ public class PageRouter {
         }
     }
 
+    /**
+     * Returns the previously visited page.
+     *
+     * @return The {@link MyPages} enum value representing the previous page, or {@code null} if no previous page exists.
+     */
     public MyPages getPreviousPage() {
         return previousPage;
     }
 
+    /**
+     * Returns the currently displayed page.
+     *
+     * @return The {@link MyPages} enum value representing the current page.
+     */
     public MyPages getCurrentPage() {
         return currentPage;
     }

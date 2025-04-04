@@ -3,9 +3,23 @@ package tests.password;
 import org.junit.jupiter.api.*;
 import validators.PasswordValidator;
 
+/**
+ * Unit tests for the {@link PasswordValidator} class.
+ * <p>
+ * This test class verifies the correct functionality of the {@code validatePassword} method
+ * by checking various valid and invalid password inputs according to defined criteria.
+ * </p>
+ *
+ * @author Dhruv
+ * @see PasswordValidator
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PasswordValidatorTest {
 
+    /**
+     * Tests the {@code validatePassword} method with an empty password string.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     @Order(1)
     public void testEmptyPassword() {
@@ -14,6 +28,10 @@ public class PasswordValidatorTest {
         }, "Should throw for empty password");
     }
 
+    /**
+     * Tests the {@code validatePassword} method with a valid password.
+     * Ensures no exception is thrown for a properly formatted password.
+     */
     @Test
     @Order(2)
     public void testValidPassword() {
@@ -22,6 +40,10 @@ public class PasswordValidatorTest {
         }, "Password should be valid");
     }
 
+    /**
+     * Tests the {@code validatePassword} method with a password missing an uppercase letter.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     @Order(3)
     public void testMissingUppercase() {
@@ -30,6 +52,10 @@ public class PasswordValidatorTest {
         }, "Should throw for missing uppercase");
     }
 
+    /**
+     * Tests the {@code validatePassword} method with a password missing a lowercase letter.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     @Order(4)
     public void testMissingLowercase() {
@@ -38,6 +64,10 @@ public class PasswordValidatorTest {
         }, "Should throw for missing lowercase");
     }
 
+    /**
+     * Tests the {@code validatePassword} method with a password missing a numeric digit.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     @Order(5)
     public void testMissingDigit() {
@@ -46,6 +76,10 @@ public class PasswordValidatorTest {
         }, "Should throw for missing numeric digit");
     }
 
+    /**
+     * Tests the {@code validatePassword} method with a password missing a special character.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     @Order(6)
     public void testMissingSpecial() {
@@ -54,6 +88,10 @@ public class PasswordValidatorTest {
         }, "Should throw for missing special character");
     }
 
+    /**
+     * Tests the {@code validatePassword} method with a password that is too short.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     @Order(7)
     public void testTooShortPassword() {

@@ -14,6 +14,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link ReadMessages} repository.
+ * <p>
+ * This test class verifies various operations related to marking messages as read or unread,
+ * including single and batch updates, and querying read messages for a specific user.
+ * </p>
+ *
+ * <p>
+ * It interacts with the {@link Users} and {@link Questions} repositories to ensure messages
+ * are created, read status is updated, and queries return expected results.
+ * </p>
+ *
+ * @author Dhruv
+ * @see ReadMessages
+ * @see Users
+ * @see Questions
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReadMessagesTest extends BaseDatabaseTest {
 
@@ -21,6 +38,9 @@ public class ReadMessagesTest extends BaseDatabaseTest {
     private static Questions questionsRepo;
     private static int testUserId;
 
+    /**
+     * Sets up the repository instances and initializes users for testing.
+     */
     @BeforeAll
     public static void setupReadMessages() {
         Users userRepo = appContext.users();
@@ -39,6 +59,9 @@ public class ReadMessagesTest extends BaseDatabaseTest {
         readMessagesRepo.markAsRead(testUserId, dummyMessageId);
     }
 
+    /**
+     * Tests marking a single message as read.
+     */
     @Test
     @Order(1)
     public void testMarkAsReadSingle() {
@@ -56,6 +79,9 @@ public class ReadMessagesTest extends BaseDatabaseTest {
         assertTrue(readMsgs.contains(messageId), "Message should be marked as read");
     }
 
+    /**
+     * Tests marking a list of messages as read.
+     */
     @Test
     @Order(2)
     public void testMarkAsReadList() {
@@ -79,6 +105,9 @@ public class ReadMessagesTest extends BaseDatabaseTest {
         assertTrue(readMsgs.contains(m2), "Should contain second message");
     }
 
+    /**
+     * Tests marking a message as unread.
+     */
     @Test
     @Order(3)
     public void testMarkAsUnread() {
@@ -96,6 +125,9 @@ public class ReadMessagesTest extends BaseDatabaseTest {
         assertFalse(readMsgs.contains(messageId), "Message should be marked as unread");
     }
 
+    /**
+     * Tests querying read messages for a user.
+     */
     @Test
     @Order(4)
     public void testFindReadMessages() {

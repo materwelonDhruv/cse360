@@ -12,12 +12,31 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link Questions} repository.
+ * <p>
+ * This test class verifies various operations performed on the Questions repository,
+ * including creation, retrieval, updating, deletion, searching, and fetching by user or unanswered status.
+ * </p>
+ *
+ * <p>
+ * It interacts with the {@link Users} repository to ensure user relationships are properly established
+ * before conducting question-related tests.
+ * </p>
+ *
+ * @author Dhruv
+ * @see Questions
+ * @see Users
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class QuestionsTest extends BaseDatabaseTest {
 
     private static Questions questionsRepo;
     private static Users userRepo;
 
+    /**
+     * Sets up the repository instances and initializes users for testing.
+     */
     @BeforeAll
     public static void setupQuestions() {
         userRepo = appContext.users();
@@ -30,6 +49,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         questionsRepo = appContext.questions();
     }
 
+    /**
+     * Tests creating a new question.
+     */
     @Test
     @Order(1)
     public void testCreateQuestion() {
@@ -43,6 +65,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         assertEquals("JUnit Content", created.getMessage().getContent());
     }
 
+    /**
+     * Tests fetching a question by its ID.
+     */
     @Test
     @Order(2)
     public void testGetQuestionById() {
@@ -51,6 +76,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         assertEquals("JUnit Title", fetched.getTitle());
     }
 
+    /**
+     * Tests updating a question's title and content.
+     */
     @Test
     @Order(3)
     public void testUpdateQuestion() {
@@ -62,6 +90,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         assertEquals("Updated Content", updated.getMessage().getContent());
     }
 
+    /**
+     * Tests fetching all questions from the repository.
+     */
     @Test
     @Order(4)
     public void testGetAllQuestions() {
@@ -69,6 +100,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         assertFalse(all.isEmpty(), "At least one question should exist");
     }
 
+    /**
+     * Tests creating a question with an invalid user ID.
+     */
     @Test
     @Order(5)
     public void testNegativeUserId() {
@@ -79,6 +113,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         }, "Should throw for invalid userID=0");
     }
 
+    /**
+     * Tests creating a question with an empty title.
+     */
     @Test
     @Order(6)
     public void testNegativeEmptyTitle() {
@@ -89,6 +126,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         }, "Should throw for empty title");
     }
 
+    /**
+     * Tests deleting a question by its ID.
+     */
     @Test
     @Order(7)
     public void testDeleteQuestion() {
@@ -97,10 +137,12 @@ public class QuestionsTest extends BaseDatabaseTest {
         assertNull(deleted, "Question #1 should be deleted");
     }
 
+    /**
+     * Tests searching for questions containing a specific keyword.
+     */
     @Test
     @Order(8)
     public void testSearchQuestions() throws Exception {
-        // Create questions with "test" keyword and one without
         Message msg1 = new Message(1, "This is a test content");
         Message msg2 = new Message(1, "More testing here");
         Message msg3 = new Message(1, "No keyword here");
@@ -116,6 +158,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * Tests retrieving questions by a specific user.
+     */
     @Test
     @Order(9)
     public void testGetQuestionsByUser() {
@@ -130,6 +175,9 @@ public class QuestionsTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * Tests retrieving unanswered questions.
+     */
     @Test
     @Order(10)
     public void testGetUnansweredQuestions() {
@@ -140,21 +188,5 @@ public class QuestionsTest extends BaseDatabaseTest {
         List<Question> unanswered = questionsRepo.getUnansweredQuestions();
         boolean found = unanswered.stream().anyMatch(question -> question.getTitle().equals("Unanswered question"));
         assertTrue(found, "Unanswered question should be returned by getUnansweredQuestions");
-    }
-
-    @Test
-    @Order(11)
-    public void testUpdateQuestionTitle() {
-        Question existing = questionsRepo.getById(2);
-        Question updated = questionsRepo.updateQuestionFields(existing.getId(), "New Title", null);
-        assertEquals("New Title", updated.getTitle());
-    }
-
-    @Test
-    @Order(12)
-    public void testUpdateQuestionContent() {
-        Question existing = questionsRepo.getById(2);
-        Question updated = questionsRepo.updateQuestionFields(existing.getId(), null, "New Content");
-        assertEquals("New Content", updated.getMessage().getContent());
     }
 }

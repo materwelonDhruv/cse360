@@ -1,7 +1,16 @@
 package application.framework;
 
 /**
- * Enum of all page routes. Each entry has a string route.
+ * Enum representing all the page routes in the application.
+ * <p>
+ * Each entry in this enum corresponds to a route string that is used to navigate between different pages.
+ * The routes are used by the {@link PageRouter} for page navigation.
+ * </p>
+ *
+ * @author Dhruv
+ * @see PageRouter
+ * @see BasePage
+ * @see Route
  */
 public enum MyPages {
     START("/start"),
@@ -25,10 +34,20 @@ public enum MyPages {
 
     private final String route;
 
+    /**
+     * Constructor to initialize the route for each page.
+     *
+     * @param route The route string for the page.
+     */
     MyPages(String route) {
         this.route = route;
     }
 
+    /**
+     * Returns the route associated with the page.
+     *
+     * @return The route string of the page.
+     */
     public String getRoute() {
         return route;
     }

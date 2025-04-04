@@ -1,9 +1,36 @@
 package validators;
 
+/**
+ * Provides methods for validating password strings according to specified criteria.
+ * <p>
+ * Criteria include length, uppercase letters, lowercase letters, numeric digits,
+ * special characters, and avoidance of invalid characters.
+ * </p>
+ *
+ * @author Dhruv
+ */
 public class PasswordValidator {
 
     private static final String SPECIAL_CHARS = "!@#$%&";
 
+    /**
+     * Validates the provided password string against a set of defined criteria.
+     *
+     * <ul>
+     *   <li>Password must be at least 8 characters long.</li>
+     *   <li>Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character from: {!@#$%&}.</li>
+     *   <li>Password must not contain any invalid characters.</li>
+     * </ul>
+     *
+     * @param input The password string to be validated.
+     * @throws IllegalArgumentException if the password is invalid for any reason, including:
+     *                                  <ul>
+     *                                    <li>Being null or empty.</li>
+     *                                    <li>Containing invalid characters.</li>
+     *                                    <li>Not meeting any of the specified criteria.</li>
+     *                                  </ul>
+     * @see IllegalArgumentException
+     */
     public static void validatePassword(String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
             throw new IllegalArgumentException("Password is empty");
@@ -45,5 +72,14 @@ public class PasswordValidator {
         }
     }
 
+    /**
+     * Enumeration representing the different states of password processing.
+     *
+     * <ul>
+     *   <li>{@code START} - Initial state before processing.</li>
+     *   <li>{@code PROCESSING} - During password validation processing.</li>
+     *   <li>{@code DONE} - After validation is completed.</li>
+     * </ul>
+     */
     private enum State {START, PROCESSING, DONE}
 }

@@ -7,6 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * This utility class provides methods for hashing passwords and verifying hashed passwords
+ * using the Argon2 hashing algorithm. It supports generating new hashes and verifying
+ * provided plaintext passwords against existing hashes.
+ *
+ * @author Dhruv
+ */
 public class PasswordUtil {
 
     private static final int SALT_LENGTH = 16;
@@ -15,6 +22,13 @@ public class PasswordUtil {
     private static final int MEMORY_COST = 65536;     // in kilobytes (64 MB)
     private static final int PARALLELISM = 1;
 
+    /**
+     * Hashes a plaintext password using the Argon2id algorithm.
+     * A new salt is generated for each password.
+     *
+     * @param plainPassword The plaintext password to be hashed.
+     * @return The hashed password, formatted as "salt$hash" using Base64 encoding.
+     */
     public static String hashPassword(String plainPassword) {
         // Generate a new salt for this password
         PasswordUtil util = new PasswordUtil();
@@ -40,6 +54,15 @@ public class PasswordUtil {
                 + Base64.getEncoder().encodeToString(hash);
     }
 
+    /**
+     * Verifies if a plaintext password matches a previously hashed password.
+     * The hashed password must be in the format "salt$hash".
+     *
+     * @param hashed The stored hashed password.
+     * @param plain  The plaintext password to verify.
+     * @return {@code true} if the password matches; {@code false} otherwise.
+     * @throws IllegalArgumentException if the hashed password format is invalid.
+     */
     public static boolean verifyPassword(String hashed, String plain) {
         // The stored hashed password should be in the format "salt$hash"
         String[] parts = hashed.split("\\$");
@@ -73,6 +96,11 @@ public class PasswordUtil {
         return diff == 0;
     }
 
+    /**
+     * Generates a random salt for hashing purposes.
+     *
+     * @return A newly generated salt as a byte array.
+     */
     private byte[] generateSalt() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[SALT_LENGTH];

@@ -3,12 +3,28 @@ package tests.password;
 import org.junit.jupiter.api.Test;
 import utils.PasswordUtil;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.Base64;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Unit tests for the {@link PasswordUtil} class.
+ * <p>
+ * This test class verifies the correct functionality of the password hashing and verification
+ * methods in {@link PasswordUtil} by checking various scenarios such as valid hashes,
+ * incorrect passwords, differing salts, and invalid hash formats.
+ * </p>
+ *
+ * @author Dhruv
+ * @see PasswordUtil
+ */
 public class PasswordUtilTest {
 
+    /**
+     * Tests the {@code hashPassword} method to ensure that the generated hash contains a valid salt
+     * and hash separated by a single '$' delimiter. Also verifies that the salt and hash are valid
+     * Base64 strings.
+     */
     @Test
     public void testHashFormat() {
         String password = "password123";
@@ -27,6 +43,10 @@ public class PasswordUtilTest {
         }
     }
 
+    /**
+     * Tests the {@code verifyPassword} method to ensure successful verification when the
+     * correct password is provided.
+     */
     @Test
     public void testVerifyPasswordSuccess() {
         String password = "securePassword!";
@@ -37,6 +57,10 @@ public class PasswordUtilTest {
                 "Password verification should succeed for the correct password.");
     }
 
+    /**
+     * Tests the {@code verifyPassword} method to ensure failure when an incorrect password
+     * is provided.
+     */
     @Test
     public void testVerifyPasswordFailure() {
         String password = "securePassword!";
@@ -48,6 +72,10 @@ public class PasswordUtilTest {
                 "Password verification should fail for an incorrect password.");
     }
 
+    /**
+     * Tests the {@code hashPassword} method to ensure that different salts are used
+     * for the same password across different hashing attempts, resulting in different hashes.
+     */
     @Test
     public void testDifferentSalts() {
         String password = "repeatedPassword";
@@ -58,6 +86,10 @@ public class PasswordUtilTest {
         assertNotEquals(hash1, hash2, "Hashes should be different due to different salts.");
     }
 
+    /**
+     * Tests the {@code verifyPassword} method to ensure that an invalid hash format
+     * triggers an {@link IllegalArgumentException}.
+     */
     @Test
     public void testVerifyPasswordInvalidFormat() {
         // An invalid hash format should trigger an IllegalArgumentException.

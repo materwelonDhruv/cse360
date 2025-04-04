@@ -20,12 +20,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * This utility class provides search functionalities using fuzzy matching and full-text indexing.
+ * It supports keyword-based searching using both FuzzyWuzzy and Apache Lucene libraries.
+ *
+ * @author Dhruv
+ */
 public class SearchUtil {
 
     /**
-     * Simple fuzzy search.
-     * Returns items whose text (via textExtractor) scores at least 60
-     * when compared to the keyword (case-insensitive).
+     * Performs a simple fuzzy search using the FuzzyWuzzy library.
+     * <p>
+     * Returns items whose extracted text matches the keyword with a score of at least 60.
+     *
+     * @param items         The list of items to search through.
+     * @param keyword       The search keyword to compare against item text.
+     * @param textExtractor A function to extract searchable text from each item.
+     * @param <T>           The type of items being searched.
+     * @return A list of items matching the keyword above the specified threshold.
      */
     public static <T> List<T> fuzzySearch(List<T> items, String keyword, Function<T, String> textExtractor) {
         final int threshold = 60;
@@ -43,9 +55,19 @@ public class SearchUtil {
     }
 
     /**
-     * Full-text search using Lucene.
-     * Indexes the items in memory and searches for the keyword.
+     * Performs a full-text search using Apache Lucene.
+     * <p>
+     * Indexes the provided items in memory and searches for matches against the keyword.
      * Returns matching items sorted by relevance.
+     *
+     * @param items         The list of items to index and search through.
+     * @param keyword       The search keyword to query.
+     * @param textExtractor A function to extract searchable text from each item.
+     * @param <T>           The type of items being searched.
+     * @return A list of items matching the keyword, sorted by relevance.
+     * @throws Exception If an error occurs during indexing or searching.
+     * @see org.apache.lucene.search.IndexSearcher
+     * @see org.apache.lucene.queryparser.classic.QueryParser
      */
     public static <T> List<T> fullTextSearch(List<T> items, String keyword, Function<T, String> textExtractor) throws Exception {
         Directory directory = new ByteBuffersDirectory();
@@ -86,7 +108,13 @@ public class SearchUtil {
         return results;
     }
 
-    // Converts a query string into a fuzzy query by appending "~" after each term.
+    /**
+     * Converts a query string into a fuzzy query format by appending a tilde ("~")
+     * after each term for use with Lucene's fuzzy matching.
+     *
+     * @param keyword The keyword to be converted into a fuzzy query string.
+     * @return A fuzzy query string where each term is suffixed with "~".
+     */
     private static String toFuzzyQuery(String keyword) {
         String[] terms = keyword.split("\\s+");
         StringBuilder sb = new StringBuilder();
