@@ -269,13 +269,14 @@ public class ReviewerHomePage extends BasePage {
                 }
             }
         });
-
+        //send to reply window
         answerListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
                 if (selectedItem != null) {
                     final int currentlySelectedAnswerId = selectedItem.getKey();
-                    context.router().navigate(MyPages.REVIEW_LIST);
+                    ReplyList.setAnswer(context.answers().getById(currentlySelectedAnswerId));
+                    context.router().navigate(MyPages.REPLY_LIST);
                 }
             }
         });
