@@ -11,14 +11,12 @@ import java.util.List;
  * <p>
  * This class manages the initialization and synchronization of all database tables
  * by invoking the {@code syncTable()} method of each table.
- * </p>
  *
  * <p>
  * The {@link SchemaManager} ensures that tables are created or modified to match their expected schemas.
  * It also provides an inspection feature to log table structures and row counts for verification purposes.
- * </p>
  *
- * <p><strong>Note:</strong> The {@code UserTable} must be created first due to foreign key dependencies.</p>
+ * <p><strong>Note:</strong> The {@code UserTable} must be created first due to foreign key dependencies.
  *
  * @author Dhruv
  * @see BaseTable
@@ -81,7 +79,6 @@ public class SchemaManager {
      *     <li>The number of rows present in the table.</li>
      * </ul>
      * This method helps verify that tables are correctly synchronized and populated as expected.
-     * </p>
      *
      * @param connection The active database connection to use for table inspection.
      * @throws SQLException If a database access error occurs.

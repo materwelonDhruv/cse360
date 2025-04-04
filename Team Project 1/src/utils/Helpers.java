@@ -25,7 +25,7 @@ public class Helpers {
      * The generated code can include uppercase and lowercase letters, digits, and optionally special characters.
      *
      * @param length       The length of the random code to be generated.
-     * @param highSecurity If true, special characters (!@#$%&) will be included in the code.
+     * @param highSecurity If true, special characters {@literal !@#$%&} will be included in the code.
      * @return A randomly generated code of the specified length.
      */
     public static String generateRandomCode(int length, boolean highSecurity) {

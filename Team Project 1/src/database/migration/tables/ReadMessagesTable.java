@@ -54,7 +54,6 @@ public class ReadMessagesTable extends BaseTable {
      *     <li>A foreign key constraint on {@code userID} referencing the "Users" table, with cascading deletes.</li>
      *     <li>A foreign key constraint on {@code messageID} referencing the "Messages" table, with cascading deletes.</li>
      * </ul>
-     * </p>
      *
      * @return An array containing the foreign key constraints and primary key constraint as {@code String}.
      */

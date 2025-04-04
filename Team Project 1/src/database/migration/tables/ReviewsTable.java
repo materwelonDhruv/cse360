@@ -54,7 +54,6 @@ public class ReviewsTable extends BaseTable {
      *     <li>A foreign key constraint for {@code userID} referencing the "Users" table, with cascading deletes.</li>
      *     <li>A foreign key constraint for {@code reviewerID} referencing the "Users" table, with cascading deletes.</li>
      * </ul>
-     * </p>
      *
      * @return An array containing the foreign key constraints and primary key constraint as {@code String}.
      */

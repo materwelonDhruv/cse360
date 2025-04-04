@@ -16,7 +16,6 @@ import java.sql.SQLException;
  * This class is responsible for initializing the database connection, managing the session,
  * and providing access to various repositories (e.g., {@link Users}, {@link Messages}, etc.).
  * It also creates a single {@link PageRouter} for navigating between different pages.
- * </p>
  *
  * @author Dhruv
  * @see DatabaseConnection

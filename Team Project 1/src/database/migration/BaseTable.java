@@ -43,7 +43,6 @@ public abstract class BaseTable {
      * "createdAt" -> "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
      * </pre>
      * This information is used to generate the CREATE TABLE statement or detect missing columns for ALTER TABLE.
-     * </p>
      *
      * @return A {@code Map} containing column names and their definitions.
      */
@@ -59,7 +58,6 @@ public abstract class BaseTable {
      * </pre>
      * Each string in the array is appended to the CREATE TABLE statement after the column definitions.
      * Return an empty array if no constraints are required.
-     * </p>
      *
      * @return An array of constraint definitions as {@code String}s.
      */
@@ -97,7 +95,6 @@ public abstract class BaseTable {
      *     CONSTRAINT fk_roleID FOREIGN KEY (roleID) REFERENCES Roles(roleID)
      * )
      * </pre>
-     * </p>
      *
      * @return The full {@code CREATE TABLE} statement as a {@code String}.
      */

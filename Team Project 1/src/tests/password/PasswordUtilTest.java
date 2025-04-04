@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * This test class verifies the correct functionality of the password hashing and verification
  * methods in {@link PasswordUtil} by checking various scenarios such as valid hashes,
  * incorrect passwords, differing salts, and invalid hash formats.
- * </p>
  *
  * @author Dhruv
  * @see PasswordUtil

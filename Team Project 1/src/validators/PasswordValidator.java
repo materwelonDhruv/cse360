@@ -18,7 +18,7 @@ public class PasswordValidator {
      *
      * <ul>
      *   <li>Password must be at least 8 characters long.</li>
-     *   <li>Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character from: {!@#$%&}.</li>
+     *   <li>Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character from: {@literal !@#$%&}.</li>
      *   <li>Password must not contain any invalid characters.</li>
      * </ul>
      *

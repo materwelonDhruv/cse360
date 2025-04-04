@@ -1,0 +1,19 @@
+unnamed package
+application
+application.framework
+application.pages
+database.connection
+database.migration
+database.migration.tables
+database.model
+database.model.entities
+database.repository
+database.repository.repos
+development
+tests
+tests.database
+tests.database.tests
+tests.password
+utils
+utils.permissions
+validators

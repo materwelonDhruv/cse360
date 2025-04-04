@@ -5,7 +5,6 @@ package database.model;
  * <p>
  * This class is intended to be extended by other entities that require a primary key.
  * It provides a common {@code id} field along with getter and setter methods for accessing and modifying it.
- * </p>
  *
  * @author Dhruv
  */
