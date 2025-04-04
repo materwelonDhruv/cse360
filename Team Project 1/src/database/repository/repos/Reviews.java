@@ -92,11 +92,6 @@ public class Reviews extends Repository<Review> {
         return queryForList(sql, pstmt -> pstmt.setInt(1, userId), this::build);
     }
 
-    public List<Review> getReviewsByReviewerID(int reviewerId) {
-        String sql = "SELECT reviewerID, userID, rating FROM Reviews WHERE reviewerID=? ORDER BY rating DESC";
-        return queryForList(sql, pstmt -> pstmt.setInt(1, reviewerId), this::build);
-    }
-
     public Review setRating(User reviewer, User user, int newRating) {
         Review existing = getByCompositeKey(reviewer.getId(), user.getId());
         if (existing != null) {

@@ -21,6 +21,7 @@ public final class UIFactory {
     static {
         ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
+        ROLE_PAGE_MAP.put(Roles.REVIEWER, MyPages.REVIEW_HOME);
         ROLE_PAGE_MAP.put(Roles.STUDENT, MyPages.USER_QUESTION_DISPLAY);
     }
 

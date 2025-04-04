@@ -1,7 +1,10 @@
 package application.pages;
 
 import application.framework.*;
-import database.model.entities.*;
+import database.model.entities.PrivateMessage;
+import database.model.entities.Question;
+import database.model.entities.ReviewerRequest;
+import database.model.entities.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,6 +66,7 @@ public class UserQuestionDisplay extends BasePage {
             });
             return row;
         });
+
         // Populate columns using CellValueFactory (if needed, otherwise use PropertyValueFactory)
         TableColumn<Question, String> idCol = new TableColumn<>("QuestionID");
         idCol.setCellValueFactory(param -> {
@@ -82,13 +86,6 @@ public class UserQuestionDisplay extends BasePage {
         });
 
         questionTable.getColumns().addAll(idCol, titleCol, timeCol);
-
-        // Create table for Reviewer's reviews
-        ListView<Review> reviewTable = new ListView<>();
-        ObservableList<Review> obReviews = FXCollections.observableArrayList(
-                context.reviews().getReviewsByReviewerID(context.getSession().getActiveUser().getId())
-        );
-        reviewTable.setItems(obReviews);
 
         //Private message table declaration
         TableView<PrivateMessage> privateMessageTable = new TableView<>();
@@ -175,12 +172,7 @@ public class UserQuestionDisplay extends BasePage {
         // Add tables to the split pane
         SplitPane sp = new SplitPane();
         sp.getItems().addAll(privateMessageTable, sentPrivateMessageTable);
-        if (context.getSession().getCurrentRole() == Roles.REVIEWER) {
-            System.out.println(context.getSession().getCurrentRole());
-            splitPane.getItems().addAll(reviewTable, sp);
-        } else {
-            splitPane.getItems().addAll(questionTable, sp);
-        }
+        splitPane.getItems().addAll(questionTable, sp);
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
@@ -188,6 +180,8 @@ public class UserQuestionDisplay extends BasePage {
         Button backButton;
         if (role == Roles.INSTRUCTOR) {
             backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
+        } else if (role == Roles.REVIEWER) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
         } else {
             backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
         }
