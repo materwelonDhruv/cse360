@@ -51,8 +51,8 @@ public class ReplyList extends BasePage {
         //Setup top toolbar
         TextField replyInput = UIFactory.createTextField("Reply:", f -> f.minWidth(200).maxWidth(600).minChars(10).maxChars(2000));
         Button addReply = replyAddButtonSetup(replyList, replyInput);
-        Button editReply = replyEditButtonSetup();
-        Button deleteReply = replyDeleteButtonSetup(replyList.getSelectionModel().getSelectedItem());
+        Button editReply = replyEditButtonSetup(replyList, replyInput);
+        Button deleteReply = replyDeleteButtonSetup(replyList);
         Button addReplyToSelected = replyToSelectedButtonSetup(replyList, replyInput);
         topBar.getChildren().addAll(replyInput, addReply, addReplyToSelected, editReply, deleteReply);
         layout.setTop(topBar);
@@ -126,22 +126,33 @@ public class ReplyList extends BasePage {
     /**
      * @return editReplyButton
      */
-    private Button replyEditButtonSetup() {
+    private Button replyEditButtonSetup(ListView<Answer> replyTable, TextField replyInput) {
         Button editReplyButton = UIFactory.createButton("Edit Reply",
                 e -> e.onAction(
                         a -> {
-                            //TODO: implement edit
+                            String text = replyInput.getText();
+                            if (context.getSession().getCurrentRole() == Roles.REVIEWER) {
+                                text = "φ " + text + " φ";
+                            }
+                            Answer targetAnswer = replyTable.getSelectionModel().getSelectedItem();
+                            targetAnswer.getMessage().setContent(text);
+                            context.answers().update(targetAnswer);
+                            updateList();
+                            replyTable.setItems(replies);
                         }
                 )
         );
         return editReplyButton;
     }
 
-    private Button replyDeleteButtonSetup(Answer selectedAnswer) {
+    private Button replyDeleteButtonSetup(ListView<Answer> replyTable) {
         Button deleteReplyButton = UIFactory.createButton("Delete Reply",
                 e -> e.onAction(
                         a -> {
-                            context.answers().delete(selectedAnswer.getId());
+                            Answer selectedAnswer = replyTable.getSelectionModel().getSelectedItem();
+                            selectedAnswer.getMessage().setContent("[DELETED]");
+                            updateList();
+                            replyTable.setItems(replies);
                         }
                 )
         );
