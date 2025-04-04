@@ -27,30 +27,41 @@ public class PrivateMessages extends Repository<PrivateMessage> {
     @Override
     public PrivateMessage create(PrivateMessage pm) throws IllegalArgumentException {
         EntityValidator.validatePrivateMessage(pm);
+
         Message msg = pm.getMessage();
         if (msg == null) {
-            throw new IllegalArgumentException("PrivateMessage must have a Message");
+            throw new IllegalArgumentException("PrivateMessage must have a Message.");
         }
-        messagesRepo.create(msg);
 
-        String sql = "INSERT INTO PrivateMessages (messageID, questionID, parentPrivateMessageID) VALUES (?, ?, ?)";
+
+        messagesRepo.create(msg); // inserts the message first
+
+        String sql = "INSERT INTO PrivateMessages (userID, content, createdAt, messageID, questionID, parentPrivateMessageID) VALUES (?, ?, ?, ?, ?, ?)";
+
         int generatedId = executeInsert(sql, pstmt -> {
-            pstmt.setInt(1, msg.getId());
+            pstmt.setInt(1, msg.getUserId());
+            pstmt.setString(2, msg.getContent());
+            pstmt.setTimestamp(3, msg.getCreatedAt());
+            pstmt.setInt(4, msg.getId());
+
             if (pm.getQuestionId() != null) {
-                pstmt.setInt(2, pm.getQuestionId());
+                pstmt.setInt(5, pm.getQuestionId());
             } else {
-                pstmt.setNull(2, java.sql.Types.INTEGER);
+                pstmt.setNull(5, java.sql.Types.INTEGER);
             }
+
             if (pm.getParentPrivateMessageId() != null) {
-                pstmt.setInt(3, pm.getParentPrivateMessageId());
+                pstmt.setInt(6, pm.getParentPrivateMessageId());
             } else {
-                pstmt.setNull(3, java.sql.Types.INTEGER);
+                pstmt.setNull(6, java.sql.Types.INTEGER);
             }
         });
+
 
         if (generatedId > 0) {
             pm.setId(generatedId);
         }
+
         return pm;
     }
 
@@ -100,6 +111,7 @@ public class PrivateMessages extends Repository<PrivateMessage> {
         if (pm.getMessage() == null) {
             throw new IllegalArgumentException("PrivateMessage must have a Message");
         }
+
         messagesRepo.update(pm.getMessage());
 
         String sql = "UPDATE PrivateMessages SET questionID = ?, parentPrivateMessageID = ? WHERE privateMessageID = ?";
@@ -109,19 +121,22 @@ public class PrivateMessages extends Repository<PrivateMessage> {
             } else {
                 pstmt.setNull(1, java.sql.Types.INTEGER);
             }
+
             if (pm.getParentPrivateMessageId() != null) {
                 pstmt.setInt(2, pm.getParentPrivateMessageId());
             } else {
                 pstmt.setNull(2, java.sql.Types.INTEGER);
             }
+
             pstmt.setInt(3, pm.getId());
         });
+
         return rows > 0 ? pm : null;
     }
 
+    // Only delete from PrivateMessages; DB cascade can handle Messages if set
     @Override
     public void delete(int id) {
-        // Only delete from PrivateMessages; DB cascade can handle Messages if set
         String sql = "DELETE FROM PrivateMessages WHERE privateMessageID = ?";
         executeUpdate(sql, pstmt -> pstmt.setInt(1, id));
     }
