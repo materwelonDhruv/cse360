@@ -41,8 +41,6 @@ public class PrivateMessagePage extends BasePage {
         Button backButton;
         if (role == Roles.INSTRUCTOR) {
             backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.REVIEWER) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
         } else {
             backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
         }
