@@ -22,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RolesUtilTest {
 
+    /**
+     * Tests converting integer 0 to roles, expecting no roles.
+     */
     @Test
     @Order(1)
     public void testIntToRoles_Zero() {
@@ -29,6 +32,9 @@ public class RolesUtilTest {
         assertEquals(0, roles.length, "Empty string should return no roles");
     }
 
+    /**
+     * Tests converting negative integer to roles, expecting no roles.
+     */
     @Test
     @Order(2)
     public void testIntToRoles_NegativeNum() {
@@ -36,6 +42,9 @@ public class RolesUtilTest {
         assertEquals(0, roles.length, "Null string should return no roles");
     }
 
+    /**
+     * Tests converting integer representing only ADMIN role.
+     */
     @Test
     @Order(3)
     public void testIntToRoles_SingleRole_Admin() {
@@ -45,6 +54,9 @@ public class RolesUtilTest {
         assertEquals(Roles.ADMIN, roles[0]);
     }
 
+    /**
+     * Tests converting integer representing all possible roles.
+     */
     @Test
     @Order(4)
     public void testIntToRoles_AllRoles() {
@@ -54,6 +66,9 @@ public class RolesUtilTest {
         assertEquals(6, roles.length, "All roles should be present");
     }
 
+    /**
+     * Tests converting empty roles array to integer, expecting 0.
+     */
     @Test
     @Order(5)
     public void testRolesToString_NoRoles() {
@@ -61,6 +76,9 @@ public class RolesUtilTest {
         assertEquals(0, result, "No roles should produce '0'");
     }
 
+    /**
+     * Tests converting null roles array to integer, expecting 0.
+     */
     @Test
     @Order(6)
     public void testRolesToString_Null() {
@@ -68,6 +86,9 @@ public class RolesUtilTest {
         assertEquals(0, result, "Null array should produce '0'");
     }
 
+    /**
+     * Tests converting USER and INSTRUCTOR roles to integer representation.
+     */
     @Test
     @Order(7)
     public void testRolesToString_UserInstructor() {
@@ -77,6 +98,9 @@ public class RolesUtilTest {
         assertEquals(5, result, "Should produce 5 for USER+INSTRUCTOR");
     }
 
+    /**
+     * Tests converting REVIEWER and STAFF roles to integer representation.
+     */
     @Test
     @Order(8)
     public void testRolesToString_ReviewerStaff() {
@@ -86,6 +110,9 @@ public class RolesUtilTest {
         assertEquals(48, result, "Should produce 48 for REVIEWER+STAFF");
     }
 
+    /**
+     * Tests converting all roles to integer representation.
+     */
     @Test
     @Order(9)
     public void testRolesToString_AllRoles() {
@@ -95,6 +122,9 @@ public class RolesUtilTest {
         assertEquals(63, result, "All roles combined is decimal 63");
     }
 
+    /**
+     * Tests checking if a role is present in the given roles array.
+     */
     @Test
     @Order(10)
     public void testHasRole_RoleFound() {
@@ -102,6 +132,9 @@ public class RolesUtilTest {
         assertTrue(RolesUtil.hasRole(roles, Roles.ADMIN), "Should return true when the role is present");
     }
 
+    /**
+     * Tests checking if a role is not present in the given roles array.
+     */
     @Test
     @Order(11)
     public void testHasRole_RoleNotFound() {
@@ -109,6 +142,9 @@ public class RolesUtilTest {
         assertFalse(RolesUtil.hasRole(roles, Roles.STAFF), "Should return false when the role is not present");
     }
 
+    /**
+     * Tests checking a single role's presence.
+     */
     @Test
     @Order(12)
     public void testHasRole_SingleRole() {
@@ -116,6 +152,9 @@ public class RolesUtilTest {
         assertTrue(RolesUtil.hasRole(role, Roles.STUDENT), "Should return true when the role is present");
     }
 
+    /**
+     * Tests checking if all required roles are present.
+     */
     @Test
     @Order(13)
     public void testHasAllRoles_AllPresent() {
@@ -124,6 +163,9 @@ public class RolesUtilTest {
         assertTrue(RolesUtil.hasAllRoles(roles, required), "Should return true when all required roles are present");
     }
 
+    /**
+     * Tests checking if all required roles are not present.
+     */
     @Test
     @Order(14)
     public void testHasAllRoles_NotAllPresent() {
@@ -132,6 +174,9 @@ public class RolesUtilTest {
         assertFalse(RolesUtil.hasAllRoles(roles, required), "Should return false if any required role is missing");
     }
 
+    /**
+     * Tests checking when required roles are empty.
+     */
     @Test
     @Order(15)
     public void testHasAllRoles_EmptyRequired() {
@@ -140,6 +185,9 @@ public class RolesUtilTest {
         assertTrue(RolesUtil.hasAllRoles(roles, required), "Empty required roles should return true");
     }
 
+    /**
+     * Tests checking if at least one required role is present.
+     */
     @Test
     @Order(16)
     public void testHasAnyRole_OnePresent() {
@@ -148,6 +196,9 @@ public class RolesUtilTest {
         assertTrue(RolesUtil.hasAnyRole(roles, required), "Should return true when at least one required role is present");
     }
 
+    /**
+     * Tests checking if none of the required roles are present.
+     */
     @Test
     @Order(17)
     public void testHasAnyRole_NonePresent() {
@@ -156,6 +207,9 @@ public class RolesUtilTest {
         assertFalse(RolesUtil.hasAnyRole(roles, required), "Should return false when none of the required roles are present");
     }
 
+    /**
+     * Tests checking when required roles array is empty.
+     */
     @Test
     @Order(18)
     public void testHasAnyRole_EmptyRequired() {
@@ -164,6 +218,9 @@ public class RolesUtilTest {
         assertFalse(RolesUtil.hasAnyRole(roles, required), "Empty required roles should return false");
     }
 
+    /**
+     * Tests converting role to string representation.
+     */
     @Test
     @Order(19)
     public void testRoleNameAsString() {
@@ -175,6 +232,9 @@ public class RolesUtilTest {
         assertEquals("Staff", RolesUtil.roleName(Roles.STAFF), "Staff role should be 'Staff'");
     }
 
+    /**
+     * Tests adding a new role to an empty roles integer.
+     */
     @Test
     @Order(20)
     public void testAddRole_NewRole() {
@@ -183,6 +243,9 @@ public class RolesUtilTest {
         assertEquals(2, result, "Adding ADMIN should result in bitwise value 2");
     }
 
+    /**
+     * Tests adding an existing role, expecting no change.
+     */
     @Test
     @Order(21)
     public void testAddRole_ExistingRole() {
@@ -191,6 +254,9 @@ public class RolesUtilTest {
         assertEquals(2, result, "Adding ADMIN again should not change the value");
     }
 
+    /**
+     * Tests adding multiple roles sequentially.
+     */
     @Test
     @Order(22)
     public void testAddRole_MultipleRoles() {
@@ -199,6 +265,9 @@ public class RolesUtilTest {
         assertEquals(5, rolesInt, "Adding USER (1) and INSTRUCTOR (4) should result in 5");
     }
 
+    /**
+     * Tests removing an existing role from a roles integer.
+     */
     @Test
     @Order(23)
     public void testRemoveRole_ExistingRole() {
@@ -207,6 +276,9 @@ public class RolesUtilTest {
         assertEquals(1, result, "Removing ADMIN should leave only USER");
     }
 
+    /**
+     * Tests removing a role that is not present, expecting no change.
+     */
     @Test
     @Order(24)
     public void testRemoveRole_NonExistingRole() {
@@ -215,6 +287,9 @@ public class RolesUtilTest {
         assertEquals(1, result, "Removing ADMIN from USER-only roles should not change value");
     }
 
+    /**
+     * Tests removing a role from a full roles integer (all roles combined).
+     */
     @Test
     @Order(25)
     public void testRemoveRole_AllRoles() {
