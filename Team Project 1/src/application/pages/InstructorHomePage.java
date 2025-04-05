@@ -18,12 +18,25 @@ import utils.permissions.RolesUtil;
 
 import java.util.List;
 
+/**
+ * The InstructorHomePage class provides an interface for instructors to manage reviewer requests.
+ * Instructors can approve or reject pending reviewer requests and navigate to other sections.
+ */
 @Route(MyPages.INSTRUCTOR_HOME)
 @View(title = "Instructor Page")
 public class InstructorHomePage extends BasePage {
     private TableView<ReviewerRequest> requestTable;
     private ObservableList<ReviewerRequest> requestsData;
 
+    /**
+     * Creates and returns the main UI layout for the instructor's home page.
+     * The page includes:
+     * - A welcome message for instructors.
+     * - A table displaying pending reviewer requests.
+     * - Buttons to approve/reject requests, refresh, logout, change roles, and navigate to the question display.
+     *
+     * @return A Pane containing the instructor's dashboard.
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
@@ -130,7 +143,11 @@ public class InstructorHomePage extends BasePage {
     }
 
     /**
-     * Handle approve/reject actions for reviewer requests
+     * Handles the approval or rejection of a reviewer request.
+     * If approved, the user is assigned the REVIEWER role.
+     *
+     * @param request  The reviewer request to process.
+     * @param approved True if the request is approved, false if rejected.
      */
     private void handleRequestAction(ReviewerRequest request, boolean approved) {
         try {
@@ -174,7 +191,7 @@ public class InstructorHomePage extends BasePage {
     }
 
     /**
-     * Refresh the requests table with current data
+     * Refreshes the reviewer requests table with the latest data.
      */
     private void refreshRequestsTable() {
         User instructor = context.getSession().getActiveUser();

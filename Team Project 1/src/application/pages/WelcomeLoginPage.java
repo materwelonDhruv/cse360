@@ -20,10 +20,15 @@ import java.sql.SQLException;
 @View(title = "Role Select")
 public class WelcomeLoginPage extends BasePage {
 
-    public WelcomeLoginPage() {
-        super();
-    }
-
+    /**
+     * Creates and returns the main UI layout for the welcome screen.
+     * This includes:
+     * - A welcome message displaying the logged-in username.
+     * - A dropdown menu (MenuButton) for role selection.
+     * - A quit button to close the application safely.
+     *
+     * @return A Pane containing the UI elements for the welcome screen.
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(5);
