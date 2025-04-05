@@ -52,7 +52,8 @@ public class ReviewerProfileWindow {
         ListView<String> reviewTable = new ListView<>();
         ObservableList<String> reviews = FXCollections.observableArrayList();
         for (Answer a : context.answers().getAnswersByUser(reviewerId)) {
-            reviews.add(a.getMessage().getContent());
+            if (a.getMessage().getContent().contains("φ"))
+                reviews.add(a.getMessage().getContent());
         }
         for (String s : reviews) {
             reviewTable.getItems().add(s);
