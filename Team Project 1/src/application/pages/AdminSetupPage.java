@@ -16,15 +16,24 @@ import validators.UsernameValidator;
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
  * This page is used to initialize the system with admin credentials.
+ *
+ * @author Mike
  */
 @Route(MyPages.ADMIN_SETUP)
 @View(title = "Administrator Setup")
 public class AdminSetupPage extends BasePage {
 
+    /**
+     * Constructor using BasePage
+     */
     public AdminSetupPage() {
         super();
     }
 
+    /**
+     * @return layout
+     * Creates layout for Admin Home page, including buttons to traverse to other pages
+     */
     @Override
     public Pane createView() {
         // Create a vertically aligned layout with consistent padding and centering.
@@ -45,7 +54,7 @@ public class AdminSetupPage extends BasePage {
 
         // Create an error label.
         Label errorLabel = UIFactory.createLabel("",
-                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
+                l -> l.style(DesignGuide.ERROR_LABEL));
 
         // Create Setup and Back buttons.
         // Create Setup button using UIFactory with reduced nesting
@@ -59,6 +68,15 @@ public class AdminSetupPage extends BasePage {
         return layout;
     }
 
+    /**
+     * @param userNameField  TextField for username
+     * @param firstNameField TextField for firstName
+     * @param lastNameField  TextField for lastName
+     * @param passwordField  TextField for password
+     * @param emailField     TextField for email
+     * @param errorLabel     Label for error display
+     *                       private message that handles Javadoc setup of listed elements
+     */
     private void handleSetup(TextField userNameField, TextField firstNameField, TextField lastNameField,
                              TextField passwordField, TextField emailField, Label errorLabel) {
         String userName = userNameField.getText();

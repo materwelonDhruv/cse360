@@ -3,6 +3,12 @@ package utils.permissions;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This utility class provides methods for managing user roles represented as bitwise integers.
+ * Includes functionalities for role conversion, role checking, addition, and removal.
+ *
+ * @author Dhruv
+ */
 public class RolesUtil {
 
     /**

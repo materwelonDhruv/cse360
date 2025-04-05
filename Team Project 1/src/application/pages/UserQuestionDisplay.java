@@ -1,9 +1,7 @@
 package application.pages;
 
 import application.framework.*;
-import database.model.entities.PrivateMessage;
-import database.model.entities.Question;
-import database.model.entities.User;
+import database.model.entities.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,23 +10,35 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * UserQuestionDisplay page shows the current user's questions
+ * <p> UserQuestionDisplay page shows the current user's questions
  * (and reserved space for answers). Double-clicking a question is intended
- * to load its detail page.
+ * to load its detail page.</p>
+ *
+ * @author Mike
  */
+
 @Route(MyPages.USER_QUESTION_DISPLAY)
 @View(title = "User Questions")
 public class UserQuestionDisplay extends BasePage {
+
+    private User user;
 
     public UserQuestionDisplay() {
         super();
     }
 
+    /**
+     * @return container
+     * Creates the view to display a user's questions, private messages, and a reviewer request tool
+     */
     @Override
     public Pane createView() {
         // Main container with consistent styling from DesignGuide
@@ -37,53 +47,195 @@ public class UserQuestionDisplay extends BasePage {
 
         // Create a split pane: left for Questions, right for Private Messages (future use)
         SplitPane splitPane = new SplitPane();
-
-        User user = context.getSession().getActiveUser();
+        user = context.getSession().getActiveUser();
 
         // Create table for user's questions
-        TableView<Question> questionTable = new TableView<>();
-        ObservableList<Question> obQuestions = FXCollections.observableArrayList(
-                context.questions().getQuestionsByUser(context.getSession().getActiveUser().getId())
-        );
-        questionTable.setItems(obQuestions);
+        TableView<Question> questionTable = questionTableSetup();
+        // Create table for Reviewer's reviews
+        TableView<Answer> reviewTable = reviewTableSetup();
 
-        // Set up double-click on a row to load question details
-        questionTable.setRowFactory(tv -> {
-            TableRow<Question> row = new TableRow<>();
+        //Private message table declaration
+        TableView<PrivateMessage> privateMessageTable = privateMessageTableSetup();
+
+        //Set up SentPMTable
+        TableView<PrivateMessage> sentPrivateMessageTable = sentPrivateMessageTableSetup();
+
+        // Add tables to the split pane
+        SplitPane sp = new SplitPane();
+        sp.getItems().addAll(privateMessageTable, sentPrivateMessageTable);
+        splitPane.getItems().addAll(questionTable, sp);
+
+        // Bottom toolbar with Back and Logout buttons using UIFactory
+        HBox toolbar = new HBox(10);
+        Roles role = context.getSession().getCurrentRole();
+        Button backButton;
+        if (role == Roles.INSTRUCTOR) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
+        } else if (role == Roles.REVIEWER) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
+        } else {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        }
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        // Add reviewer request button
+        Button requestReviewerButton = UIFactory.createButton("Request Reviewer Status", e -> e.onAction(a -> {
+            User currentUser = context.getSession().getActiveUser();
+
+            // Check if the user already has a pending request
+            List<ReviewerRequest> userRequests = context.reviewerRequests().getRequestsByUser(currentUser.getId());
+            boolean hasPendingRequest = userRequests.stream()
+                    .anyMatch(request -> request.getStatus() == null || !request.getStatus());
+
+            if (hasPendingRequest) {
+                UIFactory.showAlert(Alert.AlertType.WARNING, "Request Pending",
+                        "You already have a pending reviewer status request.");
+                return;
+            }
+
+            // Check if user already has reviewer role
+            if (RolesUtil.hasRole(currentUser.getRoles(), Roles.REVIEWER)) {
+                UIFactory.showAlert(Alert.AlertType.INFORMATION, "Already a Reviewer",
+                        "You already have reviewer status.");
+                return;
+            }
+
+            // Find available instructors
+            List<User> all_users = context.users().getAll();
+            List<User> instructors = new ArrayList<>(); // Fix: Initialize as ArrayList
+            for (User usr : all_users) {
+                Roles[] all_usr_roles = RolesUtil.intToRoles(usr.getRoles());
+                if (RolesUtil.hasRole(all_usr_roles, Roles.INSTRUCTOR)) {
+                    instructors.add(usr);
+                }
+            }
+
+            if (instructors.isEmpty()) {
+                UIFactory.showAlert(Alert.AlertType.ERROR, "No Instructors",
+                        "No instructors available to process your request.");
+                return;
+            }
+
+            // Create a dialog to select an instructor
+            Dialog<User> dialog = new Dialog<>();
+            dialog.setTitle("Select Instructor");
+            dialog.setHeaderText("Please select an instructor to review your request:");
+
+            // Set button types
+            ButtonType selectButtonType = new ButtonType("Select", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(selectButtonType, ButtonType.CANCEL);
+
+            // Create a list view with all instructors
+            ListView<User> listView = new ListView<>();
+            listView.getItems().addAll(instructors);
+
+            // Display instructor username in the list
+            listView.setCellFactory(param -> new ListCell<User>() {
+                @Override
+                protected void updateItem(User item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getUserName());
+                    }
+                }
+            });
+
+            // Set the list view as the dialog content
+            dialog.getDialogPane().setContent(listView);
+
+            // Disable the select button until a selection is made
+            Button selectButton = (Button) dialog.getDialogPane().lookupButton(selectButtonType);
+            selectButton.setDisable(true);
+
+            // Enable select button when an instructor is selected
+            listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                selectButton.setDisable(newValue == null);
+            });
+
+            // Convert the result when select button is clicked
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == selectButtonType) {
+                    return listView.getSelectionModel().getSelectedItem();
+                }
+                return null;
+            });
+
+            // Show dialog and process result
+            dialog.showAndWait().ifPresent(instructor -> {
+                // Create a new reviewer request with the selected instructor
+                ReviewerRequest request = new ReviewerRequest();
+                request.setRequester(currentUser);
+                request.setInstructor(instructor);
+                request.setStatus(null); // null means pending
+
+                // Save the request
+                ReviewerRequest savedRequest = context.reviewerRequests().create(request);
+
+                if (savedRequest != null && savedRequest.getId() > 0) {
+                    UIFactory.showAlert(Alert.AlertType.INFORMATION, "Request Sent",
+                            "Your reviewer status request has been sent to " + instructor.getUserName() + ".");
+                } else {
+                    UIFactory.showAlert(Alert.AlertType.ERROR, "Request Failed",
+                            "Failed to send reviewer request. Please try again later.");
+                }
+            });
+        }));
+
+        toolbar.getChildren().addAll(backButton, requestReviewerButton, logoutButton);
+
+        container.getChildren().addAll(splitPane, toolbar);
+        return container;
+    }
+
+    private TableView<Answer> reviewTableSetup() {
+        //TODO: write this method and make it work
+        return null;
+    }
+
+    private TableView<PrivateMessage> sentPrivateMessageTableSetup() {
+        TableView<PrivateMessage> sentPrivateMessageTable = new TableView<>();
+        ObservableList<PrivateMessage> obSPMs = FXCollections.observableArrayList();
+        for (PrivateMessage pm : context.privateMessages().getPrivateMessagesByUser(user.getId())) {
+            if (pm.doesQuestionIdExist()) {
+                obSPMs.add(pm);
+            }
+        }
+        sentPrivateMessageTable.setItems(obSPMs);
+
+        //Set up double click functionality for sentPrivateMessageTable
+        sentPrivateMessageTable.setRowFactory(tv -> {
+            TableRow<PrivateMessage> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    Question q = row.getItem();
-                    System.out.println("Load details for: " + q.getTitle());
-                    if (q != null) {
-                        //createAnswerStage(q.getId());
-                        //showAnswerWindow(q.getId());
-                    }
+                    PrivateMessage pm = row.getItem();
+                    PrivateMessageConvoPage.setTargetPM(pm);
+                    context.router().navigate(MyPages.PRIVATE_CONVERSATION);
                 }
             });
             return row;
         });
 
-        // Populate columns using CellValueFactory (if needed, otherwise use PropertyValueFactory)
-        TableColumn<Question, String> idCol = new TableColumn<>("QuestionID");
-        idCol.setCellValueFactory(param -> {
-            Question q = param.getValue();
-            int questionInt = q.getId();
+        //Populate SPM table w/ QuestionIds
+        TableColumn<PrivateMessage, String> spmCol = new TableColumn<>("QuestionID");
+        spmCol.setCellValueFactory(param -> {
+            PrivateMessage pm = param.getValue();
+            int questionInt = pm.getQuestionId();
             return new SimpleStringProperty(String.valueOf(questionInt).trim());
         });
-
-        TableColumn<Question, String> titleCol = new TableColumn<>("Title");
-        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-        TableColumn<Question, String> timeCol = new TableColumn<>("Time");
-        timeCol.setCellValueFactory(param -> {
-            Question q = param.getValue();
-            Timestamp timestamp = q.getMessage().getCreatedAt();
-            return new SimpleStringProperty(timestamp.toString());
+        //Populate SPM table w/ usernames
+        TableColumn<PrivateMessage, String> spmUserCol = new TableColumn<>("Username");
+        spmUserCol.setCellValueFactory(param -> {
+            PrivateMessage pm = param.getValue();
+            int userId = pm.getMessage().getUserId();
+            String userName = context.users().getById(userId).getUserName();
+            return new SimpleStringProperty(userName.trim());
         });
+        sentPrivateMessageTable.getColumns().addAll(spmCol, spmUserCol);
+        return sentPrivateMessageTable;
+    }
 
-        questionTable.getColumns().addAll(idCol, titleCol, timeCol);
-
-        //Private message table declaration
+    private TableView<PrivateMessage> privateMessageTableSetup() {
         TableView<PrivateMessage> privateMessageTable = new TableView<>();
         ArrayList<PrivateMessage> tempList;
         ObservableList<PrivateMessage> obPMs = FXCollections.observableArrayList();
@@ -123,61 +275,49 @@ public class UserQuestionDisplay extends BasePage {
         });
         //Add PM columns
         privateMessageTable.getColumns().addAll(pmCol, pmUserCol);
+        return privateMessageTable;
+    }
 
-        //Set up SentPMTable
-        //Private message table declaration
-        TableView<PrivateMessage> sentPrivateMessageTable = new TableView<>();
-        ObservableList<PrivateMessage> obSPMs = FXCollections.observableArrayList();
-        for (PrivateMessage pm : context.privateMessages().getPrivateMessagesByUser(user.getId())) {
-            if (pm.doesQuestionIdExist()) {
-                obSPMs.add(pm);
-            }
-        }
-        sentPrivateMessageTable.setItems(obSPMs);
-
-        //Set up double click functionality for sentPrivateMessageTable
-        sentPrivateMessageTable.setRowFactory(tv -> {
-            TableRow<PrivateMessage> row = new TableRow<>();
+    private TableView<Question> questionTableSetup() {
+        TableView<Question> questionTable = new TableView<>();
+        ObservableList<Question> obQuestions = FXCollections.observableArrayList(
+                context.questions().getQuestionsByUser(context.getSession().getActiveUser().getId())
+        );
+        questionTable.setItems(obQuestions);
+        // Set up double-click on a row to load question details
+        questionTable.setRowFactory(tv -> {
+            TableRow<Question> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    PrivateMessage pm = row.getItem();
-                    PrivateMessageConvoPage.setTargetPM(pm);
-                    context.router().navigate(MyPages.PRIVATE_CONVERSATION);
+                    Question q = row.getItem();
+                    System.out.println("Load details for: " + q.getTitle());
+                    if (q != null) {
+                        //createAnswerStage(q.getId());
+                        //showAnswerWindow(q.getId());
+                    }
                 }
             });
             return row;
         });
-
-        //Populate SPM table w/ QuestionIds
-        TableColumn<PrivateMessage, String> spmCol = new TableColumn<>("QuestionID");
-        spmCol.setCellValueFactory(param -> {
-            PrivateMessage pm = param.getValue();
-            int questionInt = pm.getQuestionId();
+        // Populate columns using CellValueFactory (if needed, otherwise use PropertyValueFactory)
+        TableColumn<Question, String> idCol = new TableColumn<>("QuestionID");
+        idCol.setCellValueFactory(param -> {
+            Question q = param.getValue();
+            int questionInt = q.getId();
             return new SimpleStringProperty(String.valueOf(questionInt).trim());
         });
-        //Populate SPM table w/ usernames
-        TableColumn<PrivateMessage, String> spmUserCol = new TableColumn<>("Username");
-        spmUserCol.setCellValueFactory(param -> {
-            PrivateMessage pm = param.getValue();
-            int userId = pm.getMessage().getUserId();
-            String userName = context.users().getById(userId).getUserName();
-            return new SimpleStringProperty(userName.trim());
+
+        TableColumn<Question, String> titleCol = new TableColumn<>("Title");
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+        TableColumn<Question, String> timeCol = new TableColumn<>("Time");
+        timeCol.setCellValueFactory(param -> {
+            Question q = param.getValue();
+            Timestamp timestamp = q.getMessage().getCreatedAt();
+            return new SimpleStringProperty(timestamp.toString());
         });
-        sentPrivateMessageTable.getColumns().addAll(spmCol, spmUserCol);
 
-        // Add tables to the split pane
-        SplitPane sp = new SplitPane();
-        sp.getItems().addAll(privateMessageTable, sentPrivateMessageTable);
-        splitPane.getItems().addAll(questionTable, sp);
-
-        // Bottom toolbar with Back and Logout buttons using UIFactory
-        HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
-
-        toolbar.getChildren().addAll(backButton, logoutButton);
-
-        container.getChildren().addAll(splitPane, toolbar);
-        return container;
+        questionTable.getColumns().addAll(idCol, titleCol, timeCol);
+        return questionTable;
     }
 }

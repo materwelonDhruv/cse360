@@ -13,15 +13,25 @@ import java.util.ArrayList;
 
 import static utils.permissions.RolesUtil.*;
 
+/**
+ * A page that displays details on a user, allowing creation, updating, and deletion of user roles.
+ * The page also allows for deletion of users, and for modification of an admins own roles.
+ *
+ * @author Mike
+ */
 @Route(MyPages.ADMIN_USER_MODIFY)
 @View(title = "Modify User")
 public class AdminUserModifyPage extends BasePage {
-
+    private static User admin;
     // The target user that is to be modified.
     private static User targetUser;
 
     public AdminUserModifyPage() {
         super();
+    }
+
+    public static void setAdmin(User user) {
+        admin = user;
     }
 
     /**
@@ -69,6 +79,11 @@ public class AdminUserModifyPage extends BasePage {
                 if (event.getSource() instanceof CheckBox cb) {
                     switch (cb.getText()) {
                         case "Admin":
+                            if (targetUser.getId() == admin.getId()) {
+                                cb.setSelected(true);
+                                new Alert(Alert.AlertType.ERROR, "Cannot remove your own role as admin!").show();
+                                return;
+                            }
                             if (!cb.isSelected()) {
                                 if (isLastAdmin(targetUser)) {
                                     cb.setSelected(true);

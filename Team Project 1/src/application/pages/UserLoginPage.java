@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
  * The UserLoginPage class provides a login interface for users to access their
  * accounts. It validates the user's credentials and navigates to the appropriate page
  * upon successful login.
+ *
+ * @author Dhruv
  */
 @Route(MyPages.USER_LOGIN)
 @View(title = "User Login")
@@ -33,7 +35,7 @@ public class UserLoginPage extends BasePage {
                 p -> p.maxWidth(250).minChars(8).maxChars(30));
 
         Label errorLabel = UIFactory.createLabel("",
-                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
+                l -> l.style(DesignGuide.ERROR_LABEL));
 
         // Login button using UIFactory
         // Login button using UIFactory

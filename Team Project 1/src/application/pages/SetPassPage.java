@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.OneTimePassword;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,9 +12,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 /**
- * SetPassPage represents the page where an admin can generate a one-time password
- * for a selected user.
+ * <p> SetPassPage represents the page where an admin can generate a one-time password
+ * for a selected user.</p>
+ *
+ * @author Riley
  */
+
 @Route(MyPages.SET_PASS)
 @View(title = "Set User Password")
 public class SetPassPage extends BasePage {
@@ -26,6 +30,10 @@ public class SetPassPage extends BasePage {
         super();
     }
 
+    /*
+     * Creates the window (view) adding the elements to allow admin user to set a one time password for
+     * a specified user
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
@@ -50,7 +58,7 @@ public class SetPassPage extends BasePage {
         Button setOTPButton = UIFactory.createButton("Set One-Time Password",
                 e -> handleSetOneTimePassword(passLabel));
 
-        Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
+        Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, CopyButtonBuilder::onCopy);
 
         Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 
@@ -58,6 +66,9 @@ public class SetPassPage extends BasePage {
         return layout;
     }
 
+    /**
+     * @param passLabel Gets the selected user, then generates a one time password for the admin to give a user
+     */
     private void handleSetOneTimePassword(Label passLabel) {
         if (targetUser == null || targetID == 0) {
             passLabel.setText("Please select a user first.");

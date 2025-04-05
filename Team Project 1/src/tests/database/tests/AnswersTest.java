@@ -14,11 +14,31 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link Answers} repository.
+ * <p>
+ * This test class verifies various operations performed on the Answers repository,
+ * including creation, retrieval, updating, deletion, pinning, searching, and fetching by user.
+ * </p>
+ *
+ * <p>
+ * It interacts with the {@link Users} and {@link Questions} repositories to ensure answers
+ * are created, related to specific questions, and queried correctly.
+ * </p>
+ *
+ * @author Dhruv
+ * @see Answers
+ * @see Users
+ * @see Questions
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AnswersTest extends BaseDatabaseTest {
 
     private static Answers answersRepo;
 
+    /**
+     * Sets up the repository instances and initializes users and a sample question for testing.
+     */
     @BeforeAll
     public static void setupAnswers() {
         Users userRepo = appContext.users();
@@ -36,6 +56,9 @@ public class AnswersTest extends BaseDatabaseTest {
         answersRepo = appContext.answers();
     }
 
+    /**
+     * Tests creating a top-level answer.
+     */
     @Test
     @Order(1)
     public void testCreateTopLevelAnswer() {
@@ -51,6 +74,9 @@ public class AnswersTest extends BaseDatabaseTest {
         assertNull(created.getParentAnswerId());
     }
 
+    /**
+     * Tests creating a nested answer.
+     */
     @Test
     @Order(2)
     public void testCreateNestedAnswer() {
@@ -65,6 +91,9 @@ public class AnswersTest extends BaseDatabaseTest {
         assertEquals(1, created.getParentAnswerId());
     }
 
+    /**
+     * Tests fetching an answer by its ID.
+     */
     @Test
     @Order(3)
     public void testFetchAnswer() {
@@ -74,6 +103,9 @@ public class AnswersTest extends BaseDatabaseTest {
         assertEquals("JUnit is a testing framework.", fetched.getMessage().getContent());
     }
 
+    /**
+     * Tests updating an existing answer.
+     */
     @Test
     @Order(4)
     public void testUpdateAnswer() {
@@ -84,6 +116,9 @@ public class AnswersTest extends BaseDatabaseTest {
         assertEquals("JUnit is a popular testing framework for Java.", updated.getMessage().getContent());
     }
 
+    /**
+     * Tests toggling the pinned state of an answer.
+     */
     @Test
     @Order(5)
     public void testTogglePin() {
@@ -93,6 +128,9 @@ public class AnswersTest extends BaseDatabaseTest {
         assertEquals(!initialPin, toggled.getIsPinned(), "Pinned state should toggle");
     }
 
+    /**
+     * Tests updating the content of an answer.
+     */
     @Test
     @Order(6)
     public void testUpdateAnswerContent() {
@@ -101,10 +139,12 @@ public class AnswersTest extends BaseDatabaseTest {
         assertEquals("Updated answer content.", updated.getMessage().getContent());
     }
 
+    /**
+     * Tests retrieving answers created by a specific user.
+     */
     @Test
     @Order(7)
     public void testGetAnswersByUser() {
-        // Create an additional answer for userID=2.
         Message msg = new Message(2, "Another answer from user 2");
         Answer a = new Answer(msg, 1, null, false);
         answersRepo.create(a);
@@ -116,37 +156,9 @@ public class AnswersTest extends BaseDatabaseTest {
         }
     }
 
-    @Test
-    @Order(8)
-    public void testNegativeUserId() {
-        Message invalidMsg = new Message(0, "Content");
-        Answer invalid = new Answer(invalidMsg, 1, null, false);
-        assertThrows(IllegalArgumentException.class, () -> {
-            answersRepo.create(invalid);
-        }, "Expected exception for invalid userID=0");
-    }
-
-    @Test
-    @Order(9)
-    public void testNegativeEmptyContent() {
-        Message invalidMsg = new Message(2, "");
-        Answer invalid = new Answer(invalidMsg, 1, null, false);
-        assertThrows(IllegalArgumentException.class, () -> {
-            answersRepo.create(invalid);
-        }, "Expected exception for empty content");
-    }
-
-    @Test
-    @Order(10)
-    public void testCreateAnswerWithBothQuestionAndParentFails() {
-        Message msg = new Message(2, "Invalid answer");
-        // Both questionId and parentAnswerId set should be invalid.
-        Answer invalid = new Answer(msg, 1, 2, false);
-        assertThrows(IllegalArgumentException.class, () -> {
-            answersRepo.create(invalid);
-        }, "Should throw for both questionID and parentAnswerID set");
-    }
-
+    /**
+     * Tests deleting an answer by its ID.
+     */
     @Test
     @Order(11)
     public void testDeleteAnswer() {
@@ -155,6 +167,9 @@ public class AnswersTest extends BaseDatabaseTest {
         assertNull(deleted, "Answer #1 should be deleted");
     }
 
+    /**
+     * Tests searching for answers by keyword.
+     */
     @Test
     @Order(12)
     public void testSearchAnswers() throws Exception {

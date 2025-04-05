@@ -17,19 +17,27 @@ import utils.permissions.Roles;
 import static utils.permissions.RolesUtil.intToRoles;
 import static utils.permissions.RolesUtil.roleName;
 
+/**
+ * Displays a list of all users for modification.
+ * Double-clicking a row sets the target user in AdminUserModifyPage
+ * and navigates to that page.
+ *
+ * @author Mike
+ */
 @Route(MyPages.ADMIN_USER)
 @View(title = "Admin User Page")
-public class AdminUserPage extends BasePage {
 
+public class AdminUserPage extends BasePage {
+    User admin = context.getSession().getActiveUser();
+
+    /**
+     * Constructor using BasePage
+     */
     public AdminUserPage() {
         super();
     }
 
-    /**
-     * Displays a list of all users for modification.
-     * Double-clicking a row sets the target user in AdminUserModifyPage
-     * and navigates to that page.
-     */
+
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
@@ -79,6 +87,7 @@ public class AdminUserPage extends BasePage {
                     User rowUser = row.getItem();
                     try {
                         AdminUserModifyPage.setTargetUser(rowUser);
+                        AdminUserModifyPage.setAdmin(admin);
                         context.router().navigate(MyPages.ADMIN_USER_MODIFY);
                     } catch (Exception ex) {
                         ex.printStackTrace();

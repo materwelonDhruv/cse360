@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.Invite;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -17,6 +18,8 @@ import java.util.List;
 /**
  * InvitationPage class represents the page where an admin can generate an invitation.
  * The page uses UIFactory and DesignGuide for consistent UI creation and styling.
+ *
+ * @author Tyler
  */
 @Route(MyPages.INVITATION)
 @View(title = "Invite Page")
@@ -26,6 +29,10 @@ public class InvitationPage extends BasePage {
         super();
     }
 
+    /**
+     * Creates the layout for the InvitationPage
+     * @return layout
+     */
     @Override
     public Pane createView() {
         // Main vertical layout
@@ -51,7 +58,7 @@ public class InvitationPage extends BasePage {
         Label inviteCodeLabel = UIFactory.createLabel("");
 
         // Create a reusable copy button instance for the invitation code
-        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
+        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText, CopyButtonBuilder::onCopy);
 
         // Button to generate the invitation code
         Button generateBtn = UIFactory.createButton("Generate Invitation Code",
@@ -70,6 +77,18 @@ public class InvitationPage extends BasePage {
         return layout;
     }
 
+    /**
+     * Generates the invitation using each of the role checkboxes and sets up the
+     * copy code button
+     * @param adminCb Checkbox for the admin role
+     * @param studentCb Checkbox for the student role
+     * @param reviewerCb Checkbox for the Reviewer role
+     * @param instructorCb Checkbox for the Instructor role
+     * @param staffCb Checkbox for the Staff role
+     * @param inviteCodeLabel Label displaying the generated invite code
+     * @param copyButton Button to copy the generated invite code to the user's clipboard
+     * @param layout layout of the InvitationPage
+     */
     private void handleGenerateInvitation(CheckBox adminCb, CheckBox studentCb, CheckBox reviewerCb,
                                           CheckBox instructorCb, CheckBox staffCb,
                                           Label inviteCodeLabel, Button copyButton, VBox layout) {

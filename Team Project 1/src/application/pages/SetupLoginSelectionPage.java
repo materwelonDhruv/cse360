@@ -6,18 +6,29 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 /**
- * The SetupLoginSelectionPage class allows users to choose between setting up a
- * new account or logging into an existing account.
- * Provides two buttons for navigation.
+ * Represents the initial account setup selection page.
+ * This page provides users with options to either set up a new account or log in to an existing one.
+ * It features two buttons for navigation: one for account setup and one for login.
+ *
+ * @author Dhruv
  */
 @Route(MyPages.SETUP_LOGIN)
 @View(title = "Account Setup")
 public class SetupLoginSelectionPage extends BasePage {
 
+    /**
+     * Default constructor for SetupLoginSelectionPage.
+     */
     public SetupLoginSelectionPage() {
         super();
     }
 
+    /**
+     * Creates the UI layout for the setup/login selection page.
+     * Includes buttons to navigate to the account setup or login pages.
+     *
+     * @return A VBox containing the UI elements for this page.
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(10);

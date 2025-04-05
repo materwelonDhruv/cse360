@@ -8,14 +8,33 @@ import java.util.List;
 
 /**
  * Responsible for creating or syncing all tables whenever the app starts.
+ * <p>
+ * This class manages the initialization and synchronization of all database tables
+ * by invoking the {@code syncTable()} method of each table.
+ *
+ * <p>
+ * The {@link SchemaManager} ensures that tables are created or modified to match their expected schemas.
+ * It also provides an inspection feature to log table structures and row counts for verification purposes.
+ *
+ * <p><strong>Note:</strong> The {@code UserTable} must be created first due to foreign key dependencies.
+ *
+ * @author Dhruv
+ * @see BaseTable
  */
 public class SchemaManager {
 
     private final List<BaseTable> tables = new ArrayList<>();
 
+    /**
+     * Initializes the {@code SchemaManager} with a predefined list of tables.
+     * <p>
+     * The {@code UserTable} is added first to ensure that foreign key constraints are respected.
+     * Additional tables are added afterward.
+     * </p>
+     */
     public SchemaManager() {
         // Users always need to be created first because of FK constraints
-        tables.add(new UserTable());
+        tables.add(new UsersTable());
         tables.add(new MessagesTable());
 
         // Other tables
@@ -25,8 +44,21 @@ public class SchemaManager {
         tables.add(new AnswersTable());
         tables.add(new PrivateMessageTable());
         tables.add(new ReadMessagesTable());
+        tables.add(new ReviewsTable());
+        tables.add(new ReviewerRequestsTable());
     }
 
+    /**
+     * Synchronizes all tables with the database.
+     * <p>
+     * This method iterates over all registered tables and calls their {@code syncTable()} method.
+     * It ensures that each table is updated to match its expected schema.
+     * </p>
+     *
+     * @param connection The active database connection to use for table synchronization.
+     * @throws SQLException             If the connection is invalid or if a table fails to synchronize.
+     * @throws IllegalArgumentException If the provided connection is null or not valid.
+     */
     public void syncTables(Connection connection) throws SQLException {
         if (connection.isValid(5)) {
             for (BaseTable table : tables) {
@@ -38,6 +70,19 @@ public class SchemaManager {
         }
     }
 
+    /**
+     * Inspects the structure and row count of all tables.
+     * <p>
+     * For each table, this method logs:
+     * <ul>
+     *     <li>Column names, types, and sizes.</li>
+     *     <li>The number of rows present in the table.</li>
+     * </ul>
+     * This method helps verify that tables are correctly synchronized and populated as expected.
+     *
+     * @param connection The active database connection to use for table inspection.
+     * @throws SQLException If a database access error occurs.
+     */
     public void inspectTables(Connection connection) throws SQLException {
         for (BaseTable table : tables) {
             String tableName = table.getTableName();

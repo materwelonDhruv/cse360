@@ -9,15 +9,24 @@ import javafx.scene.layout.VBox;
 /**
  * AdminHomePage represents the main dashboard for admin users.
  * It provides navigation to user management, invitation generation, OTP setup, and logout.
+ *
+ * @author Mike
  */
 @Route(MyPages.ADMIN_HOME)
 @View(title = "Admin Page")
 public class AdminHomePage extends BasePage {
 
+    /**
+     * Constructor using BasePage.
+     */
     public AdminHomePage() {
         super();
     }
 
+    /**
+     * @return layout
+     * Creates layout for Admin Home page, including buttons to traverse to other pages.
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);

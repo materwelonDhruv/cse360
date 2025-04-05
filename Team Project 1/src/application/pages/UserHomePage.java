@@ -22,8 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This page displays a simple welcome message for the user and provides navigation.
- * It shows the user's current role and, if multiple roles exist, a dropdown to select another.
+ * Constructs the UserHomePage and initializes the layout and user interface components.
+ * Handles question creation, display, editing, deletion, and filtering.
+ * Also manages navigation and user session-based behavior.
+ *
+ * @author Atharva
  */
 @Route(MyPages.USER_HOME)
 @View(title = "User Page")
@@ -63,6 +66,9 @@ public class UserHomePage extends BasePage {
     private Stage questionStage;
     private Stage answerStage;
 
+    /**
+     * Constructs the UserHomePage and loads the list of questions from the database.
+     */
     public UserHomePage() {
         super();
         this.questionsRepo = context.questions();
@@ -71,7 +77,11 @@ public class UserHomePage extends BasePage {
         loadQuestions();
     }
 
-    //Updating search results
+    /**
+     * Updates the ListView used for displaying search results.
+     *
+     * @param list The list of questions to display as search results.
+     */
     public static void updateResults(List<Question> list) {
         resultView.getItems().clear();
         for (Question q : list) {
@@ -85,6 +95,12 @@ public class UserHomePage extends BasePage {
 //------------------------------------------------------------------------------------------------------------------------//
 //Question Stage and Methods
 
+    /**
+     * Creates and returns the main user interface view (layout) for the user home page.
+     * Includes buttons for adding/editing/deleting/filtering questions and viewing answers.
+     *
+     * @return The main content pane for the user page.
+     */
     @Override
     public Pane createView() {
         loadQuestions();
@@ -131,6 +147,9 @@ public class UserHomePage extends BasePage {
         // Create Question Display buttons.
         Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
 
+        //Create Trusted Reviewer button
+        Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
+
         //Add button to add a question
         Button addQuestionButton = UIFactory.createButton("Add", e -> e.onAction(a -> ShowQuestionWindow()));
 
@@ -169,15 +188,17 @@ public class UserHomePage extends BasePage {
                 myQuestionsButton.setText("Show Mine Only");
             }
         });
+        Button reviwerProfileButton = UIFactory.createButton("Reviewer Profiles", e -> e.routeToPage(MyPages.REVIEWER_PROFILE, context));
 
         //Creating log out button
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
 
         //Add spacer for better UI
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, logoutButton);
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
+        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -210,40 +231,34 @@ public class UserHomePage extends BasePage {
             }
         });
 
+        // HBox for option buttons
+        HBox optionBar = new HBox(10, questionDisplayButton);
 
-        layout.getChildren().addAll(userLabel, buttonBar, questionListView);
+        // Add the trusted reviewer button only if the user is a student
+        if (userCurrentRole == Roles.STUDENT) {
+            optionBar.getChildren().add(trustedReviewerButton);
+        }
+
+        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
             final Roles[] selectedRole = new Roles[1];
 
-            MenuButton roleMenu = new MenuButton("Select Role");
+            MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
-            for (Roles rol : allRoles) {
-                if (!rol.equals(userCurrentRole)) {
-                    MenuItem roleItem = new MenuItem(rol.toString());
-                    roleItem.setOnAction(e -> {
-                        selectedRole[0] = rol;
-                        roleMenu.setText(rol.toString());
-                    });
-                    roleMenu.getItems().add(roleItem);
-                }
-            }
-
-            Button goButton = UIFactory.createButton("Go", e -> e.onAction(a -> {
-                if (selectedRole[0] != null && RolesUtil.hasRole(selectedRole, Roles.ADMIN)) {
-                    context.router().navigate(MyPages.ADMIN_HOME);
-                } else if (selectedRole[0] != null) {
-                    context.getSession().setCurrentRole(selectedRole[0]);
-                    context.router().navigate(MyPages.USER_HOME);
-                }
-            }));
-            buttonBar.getChildren().addAll(roleMenu, goButton);
+            optionBar.getChildren().addAll(roleMenu);
         }
+        optionBar.getChildren().add(logoutButton);
+
         return layout;
     }
 
-    //Creating a stage for question
+    /**
+     * Initializes the stage and layout used for creating new questions.
+     *
+     * @param userID The ID of the current user creating the question.
+     */
     private void createQuestionStage(int userID) {
         questionStage = new Stage();
         questionStage.initModality(Modality.NONE);
@@ -261,8 +276,9 @@ public class UserHomePage extends BasePage {
         questionStage.setScene(new Scene(questionLayout, 300, 400));
     }
 
-    //Method to load all the questions from the database
-    // And adding it to the question list view
+    /**
+     * Loads and displays questions in the ListView based on current filters.
+     */
     private void loadQuestions() {
         questionListView.getItems().clear();
         List<Question> questionList;
@@ -286,13 +302,19 @@ public class UserHomePage extends BasePage {
                 r = "Replies";
             }
             title += " [" + numAnswers + "] " + r;
-            if (context.questions().hasPinnedAnswer(q.getId())) {title += " ✔";}
+            if (context.questions().hasPinnedAnswer(q.getId())) {
+                title += " ✔";
+            }
             questionListView.getItems().add(new Pair<>(q.getId(), title));
         }
     }
 
 
-    //Method to add a question with the userID
+    /**
+     * Adds a new question to the database and refreshes the question list.
+     *
+     * @param userID The ID of the user creating the question.
+     */
     private void addQuestion(int userID) {
         String title = questionTitleInput.getText();
         String content = questionInput.getText().trim();
@@ -312,6 +334,9 @@ public class UserHomePage extends BasePage {
         loadQuestions();
     }
 
+    /**
+     * Deletes the currently selected question from the database.
+     */
     private void deleteQuestion() {
         Pair<Integer, String> selectedItem = questionListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
@@ -320,6 +345,11 @@ public class UserHomePage extends BasePage {
         }
     }
 
+    /**
+     * Opens a window for editing the selected question's title and content.
+     *
+     * @param questionId The ID of the question to edit.
+     */
     private void editQuestionWindow(int questionId) {
         Stage editorStage = new Stage();
         editorStage.initModality(Modality.APPLICATION_MODAL);
@@ -337,7 +367,8 @@ public class UserHomePage extends BasePage {
         //save button to save the updated content
         Button saveButton = UIFactory.createButton("Save", e -> e.onAction(a -> {
             String newContent = editQuestionField.getText();
-            context.questions().updateQuestionFields(questionId, currentTitle, newContent);
+            String newTitle = editQuestionTitleField.getText();
+            context.questions().updateQuestionFields(questionId, newTitle, newContent);
             loadQuestions(); // Refresh the question list
             editorStage.close();
         }));
@@ -355,7 +386,9 @@ public class UserHomePage extends BasePage {
         editorStage.show();
     }
 
-    //Opening the Question window
+    /**
+     * Displays the window for creating a new question.
+     */
     private void ShowQuestionWindow() {
         questionStage.setTitle("Create Question");
         questionStage.show();
@@ -366,7 +399,13 @@ public class UserHomePage extends BasePage {
 //------------------------------------------------------------------------------------------------------------------------//
 //Answer stage and methods
 
-    //Creating the Answer Stage
+    /**
+     * Initializes and sets up the UI components for the answerStage, which
+     * includes displaying the question, showing a list of answers, and
+     * providing controls to add, edit, delete, or mark answers as a solution.
+     *
+     * @param questionId The ID of the question for which answers are to be managed.
+     */
     private void createAnswerStage(int questionId) {
         answerStage = new Stage();
         answerStage.initModality(Modality.NONE);
@@ -382,7 +421,7 @@ public class UserHomePage extends BasePage {
         assert queContent != null;
         Label questionContent = UIFactory.createLabel("Question: " + queContent.getMessage().getContent(),
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
-        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;-fx"));
+        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;"));
 
         //Adding answer UI
         Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
@@ -453,6 +492,16 @@ public class UserHomePage extends BasePage {
                 }
             }
         });
+        answerListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    final int currentlySelectedAnswerId = selectedItem.getKey();
+                    ReplyList.setAnswer(context.answers().getById(currentlySelectedAnswerId));
+                    context.router().navigate(MyPages.REPLY_LIST);
+                }
+            }
+        });
 
         HBox addUI = new HBox(10, addAnswerButton, answerInput);
         HBox editUI = new HBox(10, answerLabelList, editAnswerButton, deleteAnswerButton, addPMButton);
@@ -466,7 +515,13 @@ public class UserHomePage extends BasePage {
     }
 
 
-    //Method to load all the answer given the question ID
+    /**
+     * Loads all answers associated with the given question ID from the database
+     * and populates the answerListView. If an answer is marked as a solution,
+     * it is displayed with a checkmark and sets the resolution flag.
+     *
+     * @param questionID The ID of the question of whose answers should be loaded.
+     */
     private void loadAnswers(int questionID) {
         answerListView.getItems().clear();
         List<Answer> answerList = context.answers().getRepliesToQuestion(questionID);
@@ -481,7 +536,11 @@ public class UserHomePage extends BasePage {
         }
     }
 
-    //method to add an answer
+    /**
+     * Submits a new answer for the currently selected question. The input
+     * content is validated and added to the system. The answer list is updated
+     * after successful submission.
+     */
     private void addAnswer() {
         if (currentlySelectedQuestionId == -1) return;
         String content = answerInput.getText().trim();
@@ -502,7 +561,11 @@ public class UserHomePage extends BasePage {
         }
     }
 
-    //method to delete answer
+    /**
+     * Deletes the selected answer from the database and removes it from
+     * the ListView. If the deleted answer was marked as a solution, the
+     * resolved status is reset and the questions are reloaded.
+     */
     private void deleteAnswer() {
         Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
@@ -518,7 +581,12 @@ public class UserHomePage extends BasePage {
         loadQuestions();
     }
 
-    //edit answer window to edit an answer
+    /**
+     * Opens a modal window allowing the user to edit the content of an existing answer.
+     * Once edited, the answer is updated in the database and the list is refreshed.
+     *
+     * @param answerId The ID of the answer to be edited.
+     */
     private void editAnswerWindow(int answerId) {
         Stage answerEditStage = new Stage();
         answerEditStage.initModality(Modality.APPLICATION_MODAL);
@@ -550,7 +618,12 @@ public class UserHomePage extends BasePage {
         answerEditStage.showAndWait();
     }
 
-    //Opening the answers window
+    /**
+     * Sets the answerStage title to the question's title, loads all answers related
+     * to the question, and displays the stage.
+     *
+     * @param questionID The ID of the question of whose answers should be displayed.
+     */
     private void showAnswerWindow(int questionID) {
         answerStage.setTitle(context.questions().getById(questionID).getTitle());
         loadAnswers(questionID);

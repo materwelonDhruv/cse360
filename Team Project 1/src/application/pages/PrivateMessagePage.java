@@ -11,20 +11,43 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.permissions.Roles;
 
+/**
+ * Represents the page where users can send a private message in response to a specific question.
+ * This page provides a text field to input the message and a button to send it.
+ * After sending, the message is stored and the user is redirected back to their home page.
+ *
+ * @author Mike
+ */
 @Route(MyPages.PRIVATE_MESSAGE)
 @View(title = "Private Message Page")
 public class PrivateMessagePage extends BasePage {
     private static Question question;
 
+    /**
+     * Default constructor for the PrivateMessagePage.
+     */
     public PrivateMessagePage() {
         super();
     }
 
+    /**
+     * Sets the question that the private message will be in response to.
+     *
+     * @param q The target question.
+     */
     public static void setTargetQuestion(Question q) {
         question = q;
     }
 
+    /**
+     * Creates and returns the UI view for the private message page.
+     * It includes a text field for entering a message, a send button,
+     * and a bottom toolbar with navigation options.
+     *
+     * @return The fully constructed JavaFX Pane for this view.
+     */
     public Pane createView() {
         int MAX_LENGTH = 300;
         //Declare fields
@@ -36,7 +59,15 @@ public class PrivateMessagePage extends BasePage {
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        Roles role = context.getSession().getCurrentRole();
+        Button backButton;
+        if (role == Roles.INSTRUCTOR) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
+        } else if (role == Roles.REVIEWER) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
+        } else {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        }
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
@@ -51,6 +82,7 @@ public class PrivateMessagePage extends BasePage {
             PrivateMessage privateMessage = new PrivateMessage(message, question.getId(), null);
             privateMessage.setMessage(message);
             context.privateMessages().create(privateMessage);
+
         });
         centerItems.getChildren().addAll(privateMessageInput, privateMessageButton);
         view.setCenter(centerItems);

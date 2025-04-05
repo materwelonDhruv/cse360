@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
 /**
  * FirstPage class represents the initial screen for the first user.
  * It prompts the user to set up administrator access and navigate to the admin setup.
+ *
+ * @author Dhruv
  */
 @Route(MyPages.FIRST)
 @View(title = "Welcome")
@@ -18,6 +20,10 @@ public class FirstPage extends BasePage {
         super();
     }
 
+    /**
+     * @return layout
+     * Builds the layout for FirstPage
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);

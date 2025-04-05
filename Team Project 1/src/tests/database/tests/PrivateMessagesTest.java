@@ -14,6 +14,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link PrivateMessages} repository.
+ * <p>
+ * This test class verifies various operations performed on the PrivateMessages repository,
+ * including creation, retrieval, updating, deletion, searching, and fetching messages by user.
+ * </p>
+ *
+ * <p>
+ * It interacts with the {@link Users} and {@link Questions} repositories to ensure messages
+ * are created, related to specific questions, and queried correctly.
+ * </p>
+ *
+ * @author Dhruv
+ * @see PrivateMessages
+ * @see Users
+ * @see Questions
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PrivateMessagesTest extends BaseDatabaseTest {
 
@@ -21,9 +38,13 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
     // Store the dummy question's generated ID for use in PrivateMessage creation.
     private static int dummyQuestionId;
 
+    /**
+     * Sets up the repository instances and initializes users and a dummy question for testing.
+     */
     @BeforeAll
     public static void setupPrivateMessages() {
         Users userRepo = appContext.users();
+
         // Create two users: one as sender (ID=1) and one as receiver (ID=2)
         User sender = new User("pmUser1", "Private", "Sender", "pw1", "pm1@example.com", 0);
         userRepo.create(sender);
@@ -40,6 +61,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         pmRepo = appContext.privateMessages();
     }
 
+    /**
+     * Tests creating a new private message.
+     */
     @Test
     @Order(1)
     public void testCreatePrivateMessage() {
@@ -53,6 +77,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertEquals(dummyQuestionId, created.getQuestionId());
     }
 
+    /**
+     * Tests fetching a private message by its ID.
+     */
     @Test
     @Order(2)
     public void testGetPrivateMessageById() {
@@ -61,6 +88,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertEquals("This is a private message.", fetched.getMessage().getContent());
     }
 
+    /**
+     * Tests updating the content of an existing private message.
+     */
     @Test
     @Order(3)
     public void testUpdatePrivateMessage() {
@@ -70,6 +100,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertEquals("Updated private message content.", updated.getMessage().getContent());
     }
 
+    /**
+     * Tests fetching all private messages from the repository.
+     */
     @Test
     @Order(4)
     public void testGetAllPrivateMessages() {
@@ -77,6 +110,9 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         assertFalse(all.isEmpty(), "Expected at least one private message");
     }
 
+    /**
+     * Tests retrieving private messages associated with a specific user.
+     */
     @Test
     @Order(5)
     public void testGetPrivateMessagesByUser() {
@@ -91,6 +127,11 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * Tests searching for private messages containing a specific keyword.
+     *
+     * @throws Exception if an error occurs during the search operation.
+     */
     @Test
     @Order(6)
     public void testSearchPrivateMessages() throws Exception {
@@ -104,12 +145,14 @@ public class PrivateMessagesTest extends BaseDatabaseTest {
         List<PrivateMessage> results = pmRepo.searchPrivateMessages("search");
         assertTrue(results.size() >= 2, "Expected at least two private messages with 'search'");
         for (PrivateMessage p : results) {
-            System.out.println(p.getMessage().getContent().toLowerCase().contains("search"));
             assertTrue(p.getMessage().getContent().toLowerCase().contains("search"),
                     "Each message must contain 'search'");
         }
     }
 
+    /**
+     * Tests deleting a private message by its ID.
+     */
     @Test
     @Order(7)
     public void testDeletePrivateMessage() {

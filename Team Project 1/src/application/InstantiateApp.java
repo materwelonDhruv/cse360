@@ -8,14 +8,31 @@ import java.sql.SQLException;
 
 /**
  * Main entry point for the JavaFX application.
- * Initializes AppContext with a single Stage and decides first route.
+ * <p>
+ * Initializes the application context and routes to the first page or login setup based on user data.
+ * </p>
+ *
+ * @author Dhruv
  */
 public class InstantiateApp extends Application {
 
+    /**
+     * The main method that launches the JavaFX application.
+     *
+     * @param args Command-line arguments passed to the application.
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Starts the JavaFX application and routes based on user data.
+     * <p>
+     * If no users exist, routes to the first page; otherwise, routes to the login setup.
+     * </p>
+     *
+     * @param primaryStage The primary stage for the application.
+     */
     @Override
     public void start(Stage primaryStage) {
         try {
