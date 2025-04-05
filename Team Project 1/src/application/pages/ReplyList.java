@@ -170,7 +170,8 @@ public class ReplyList extends BasePage {
                 e -> e.onAction(
                         a -> {
                             Answer selectedAnswer = replyTable.getSelectionModel().getSelectedItem();
-                            selectedAnswer.getMessage().setContent("[DELETED]");
+                            selectedAnswer.getMessage().setContent("[DELETED] ");
+                            context.answers().update(selectedAnswer);
                             updateList();
                             replyTable.setItems(replies);
                         }
