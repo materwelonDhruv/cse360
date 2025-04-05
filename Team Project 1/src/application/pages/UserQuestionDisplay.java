@@ -16,11 +16,20 @@ import utils.permissions.RolesUtil;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+/*******
+ * <p> Title: ReviewerProfileWindow class </p>
+ * <p> Description: UserQuestionDisplay page shows the current user's questions
+ * (and reserved space for answers). Double-clicking a question is intended
+ * to load its detail page.</p>
+ * @author Riley
+ * @author Dhruv
+ * @author Mike
+ * @author Atharva
+ * @version 1.00    2025-04-05 Created class
+ */
 
 /**
- * UserQuestionDisplay page shows the current user's questions
- * (and reserved space for answers). Double-clicking a question is intended
- * to load its detail page.
+ *
  */
 @Route(MyPages.USER_QUESTION_DISPLAY)
 @View(title = "User Questions")
@@ -32,6 +41,10 @@ public class UserQuestionDisplay extends BasePage {
         super();
     }
 
+    /**
+     * @return container
+     * Creates the view to display a user's questions, private messages, and a reviewer request tool
+     */
     @Override
     public Pane createView() {
         // Main container with consistent styling from DesignGuide
@@ -221,6 +234,11 @@ public class UserQuestionDisplay extends BasePage {
         return container;
     }
 
+    /**
+     * Sets up review table for displaying answers
+     *
+     * @return null
+     */
     private TableView<Answer> reviewTableSetup() {
         //TODO: write this method and make it work
         return null;
@@ -268,6 +286,10 @@ public class UserQuestionDisplay extends BasePage {
         return sentPrivateMessageTable;
     }
 
+    /**
+     * @return privateMessageTable
+     * Displays a TableView of private messages associated to the user
+     */
     private TableView<PrivateMessage> privateMessageTableSetup() {
         TableView<PrivateMessage> privateMessageTable = new TableView<>();
         ArrayList<PrivateMessage> tempList;
@@ -311,6 +333,10 @@ public class UserQuestionDisplay extends BasePage {
         return privateMessageTable;
     }
 
+    /**
+     * @return questionTable
+     * Sets up a TableView for a user to view their questions
+     */
     private TableView<Question> questionTableSetup() {
         TableView<Question> questionTable = new TableView<>();
         ObservableList<Question> obQuestions = FXCollections.observableArrayList(

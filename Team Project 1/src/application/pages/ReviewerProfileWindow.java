@@ -19,7 +19,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/*******
+ * <p> Title: ReviewerProfileWindow class </p>
+ * <p> Description: Pop-up window displaying a reviewer's profile including their
+ * contact information and reviews</p>
+ * @author Riley
+ * @version 1.00    2025-04-05 Created class
+ */
 public class ReviewerProfileWindow {
+    /**
+     * @param context    used to access data and services
+     * @param userId     ID of user visiting the page used if user wants to add reviewer to their trusted reviewer list
+     * @param reviewerId ID of reviewer on page user is visiting to dynamically change elements to reflect a reviewer's
+     *                   information and allow a user adding them to their trusted reviewer list
+     *                   Pop-up window displaying a reviewer's information, reviews, and a button allowing a visiting user to add the
+     *                   reviewer to their trusted reviewer list
+     */
     public void createReviewerProfileStage(AppContext context, int userId, int reviewerId) {
 
         Stage reviewerProfile = new Stage();

@@ -10,10 +10,15 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-/**
- * SetPassPage represents the page where an admin can generate a one-time password
- * for a selected user.
+/*******
+ * <p> Title: ResetPasswordPage class </p>
+ * <p> Description: SetPassPage represents the page where an admin can generate a one-time password
+ * for a selected user.</p>
+ * @author Riley
+ * @author Dhruv
+ * @version 1.00    2025-02-28 Created class
  */
+
 @Route(MyPages.SET_PASS)
 @View(title = "Set User Password")
 public class SetPassPage extends BasePage {
@@ -26,6 +31,10 @@ public class SetPassPage extends BasePage {
         super();
     }
 
+    /*
+     * Creates the window (view) adding the elements to allow admin user to set a one time password for
+     * a specified user
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
@@ -58,6 +67,9 @@ public class SetPassPage extends BasePage {
         return layout;
     }
 
+    /**
+     * @param passLabel Gets the selected user, then generates a one time password for the admin to give a user
+     */
     private void handleSetOneTimePassword(Label passLabel) {
         if (targetUser == null || targetID == 0) {
             passLabel.setText("Please select a user first.");
