@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
 /**
  * AdminHomePage represents the main dashboard for admin users.
  * It provides navigation to user management, invitation generation, OTP setup, and logout.
+ *
+ * @author Michael Hawes
  */
 @Route(MyPages.ADMIN_HOME)
 @View(title = "Admin Page")

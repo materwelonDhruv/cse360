@@ -18,6 +18,8 @@ import java.util.List;
 
 /**
  * Displays page with all replies of an answer. Supports nested replies and multiple users.
+ *
+ * @author Michael Hawes
  */
 @Route(MyPages.REPLY_LIST)
 @View(title = "Reply List")

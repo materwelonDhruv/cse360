@@ -21,6 +21,8 @@ import static utils.permissions.RolesUtil.roleName;
  * Displays a list of all users for modification.
  * Double-clicking a row sets the target user in AdminUserModifyPage
  * and navigates to that page.
+ *
+ * @author Michael Hawes
  */
 @Route(MyPages.ADMIN_USER)
 @View(title = "Admin User Page")

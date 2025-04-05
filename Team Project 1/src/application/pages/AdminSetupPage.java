@@ -16,6 +16,8 @@ import validators.UsernameValidator;
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
  * This page is used to initialize the system with admin credentials.
+ *
+ * @author Michael Hawes
  */
 @Route(MyPages.ADMIN_SETUP)
 @View(title = "Administrator Setup")
