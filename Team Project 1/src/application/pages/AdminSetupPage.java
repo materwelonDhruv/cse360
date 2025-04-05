@@ -21,10 +21,17 @@ import validators.UsernameValidator;
 @View(title = "Administrator Setup")
 public class AdminSetupPage extends BasePage {
 
+    /**
+     * Constructor using BasePage
+     */
     public AdminSetupPage() {
         super();
     }
 
+    /**
+     * @return layout
+     * Creates layout for Admin Home page, including buttons to traverse to other pages
+     */
     @Override
     public Pane createView() {
         // Create a vertically aligned layout with consistent padding and centering.
@@ -59,6 +66,15 @@ public class AdminSetupPage extends BasePage {
         return layout;
     }
 
+    /**
+     * @param userNameField  TextField for username
+     * @param firstNameField TextField for firstName
+     * @param lastNameField  TextField for lastName
+     * @param passwordField  TextField for password
+     * @param emailField     TextField for email
+     * @param errorLabel     Label for error display
+     *                       private message that handles Javadoc setup of listed elements
+     */
     private void handleSetup(TextField userNameField, TextField firstNameField, TextField lastNameField,
                              TextField passwordField, TextField emailField, Label errorLabel) {
         String userName = userNameField.getText();

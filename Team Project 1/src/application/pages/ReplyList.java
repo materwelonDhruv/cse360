@@ -20,6 +20,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Displays page with all replies of an answer. Supports nested replies and multiple users.
+ */
 @Route(MyPages.REPLY_LIST)
 @View(title = "Reply List")
 public class ReplyList extends BasePage {
@@ -71,6 +74,10 @@ public class ReplyList extends BasePage {
     }
 
 
+    /**
+     * @return ListView of Answer objects, with a CellFactory that automatically displays their body text.
+     * Internal method for the creation of the replyList ListView
+     */
     private ListView<Answer> replyListViewSetup() {
         ListView<Answer> replyList = new ListView<>();
         updateList();
@@ -114,6 +121,11 @@ public class ReplyList extends BasePage {
         return addReplyButton;
     }
 
+    /**
+     * @param replyTable The replyTable set up previously with replyViewSetup.
+     * @param replyInput The textField containing the user input.
+     * @return Button containing the ability to reply to a selected item in the ListView.
+     */
     private Button replyToSelectedButtonSetup(ListView<Answer> replyTable, TextField replyInput) {
         Button addReplyButton = UIFactory.createButton("Add Reply to Selected",
                 e -> e.onAction(
@@ -135,7 +147,9 @@ public class ReplyList extends BasePage {
     }
 
     /**
-     * @return editReplyButton
+     * @param replyTable The replyTable set up previously with replyViewSetup.
+     * @param replyInput The textField containing the user input.
+     * @return Button containing the ability to edit a selected item in the ListView.
      */
     private Button replyEditButtonSetup(ListView<Answer> replyTable, TextField replyInput) {
         Button editReplyButton = UIFactory.createButton("Edit Reply",
@@ -156,6 +170,10 @@ public class ReplyList extends BasePage {
         return editReplyButton;
     }
 
+    /**
+     * @param replyTable The replyTable set up previously with replyViewSetup.
+     * @return Button containing the ability to delete a selected
+     */
     private Button replyDeleteButtonSetup(ListView<Answer> replyTable) {
         Button deleteReplyButton = UIFactory.createButton("Delete Reply",
                 e -> e.onAction(
@@ -193,12 +211,22 @@ public class ReplyList extends BasePage {
         return showTrustedReviewsOnlyButton;
     }
 
+    /**
+     * Internal method for updating the replies ObservableList
+     */
     private void updateList() {
         ObservableList<Answer> tempReplyList = FXCollections.observableArrayList();
         replies = findAnswers(root, tempReplyList);
         rearrangeAnswers(replies);
     }
 
+    /**
+     * @param answer      root answer to search from
+     * @param tempReplies the list that is overwritten and replaced with the result
+     * @return A copy of the ObservableList filled, unsorted, with all answers descended from the root.
+     * Recursively traverses the list, finding all replies to a root answer. It will replace the passed ObservableList
+     * as well as return a copy for code formatting.
+     */
     private ObservableList<Answer> findAnswers(Answer answer, ObservableList<Answer> tempReplies) {
         List<Answer> localReplies = context.answers().getRepliesToAnswer(answer.getId());
         tempReplies.add(answer);
@@ -221,6 +249,10 @@ public class ReplyList extends BasePage {
         return tempReplies;
     }
 
+    /**
+     * @param replies The unsorted ObservableList of Answers
+     *                Rearranges the Answers to properly format the replies to each Answer
+     */
     private void rearrangeAnswers(ObservableList<Answer> replies) {
         resetSpacing();
         for (Answer reply : replies) {
@@ -238,6 +270,9 @@ public class ReplyList extends BasePage {
         }
     }
 
+    /**
+     * Resets the spacing to all Answers in the replies ObservableList
+     */
     private void resetSpacing() {
         for (Answer reply : replies) {
             String fixSpacing = reply.getMessage().getContent().strip();

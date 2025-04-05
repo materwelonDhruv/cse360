@@ -17,19 +17,24 @@ import utils.permissions.Roles;
 import static utils.permissions.RolesUtil.intToRoles;
 import static utils.permissions.RolesUtil.roleName;
 
+/**
+ * Displays a list of all users for modification.
+ * Double-clicking a row sets the target user in AdminUserModifyPage
+ * and navigates to that page.
+ */
 @Route(MyPages.ADMIN_USER)
 @View(title = "Admin User Page")
+
 public class AdminUserPage extends BasePage {
 
+    /**
+     * Constructor using BasePage
+     */
     public AdminUserPage() {
         super();
     }
 
-    /**
-     * Displays a list of all users for modification.
-     * Double-clicking a row sets the target user in AdminUserModifyPage
-     * and navigates to that page.
-     */
+
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
