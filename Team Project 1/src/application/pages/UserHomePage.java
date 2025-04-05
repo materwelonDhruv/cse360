@@ -142,8 +142,8 @@ public class UserHomePage extends BasePage {
                 "Role: " + userCurrentRole, f ->
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
-        //Create Question Display button
-        Button questionDisplayButton = UIFactory.createHomepageButton("Your Homepage", context);
+        // Create Question Display buttons.
+        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
 
         //Create Trusted Reviewer button
         Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
@@ -186,6 +186,7 @@ public class UserHomePage extends BasePage {
                 myQuestionsButton.setText("Show Mine Only");
             }
         });
+        Button reviwerProfileButton = UIFactory.createButton("Reviewer Profiles", e -> e.routeToPage(MyPages.REVIEWER_PROFILE, context));
 
         //Creating log out button
         Button logoutButton = UIFactory.createLogoutButton(context);
@@ -194,6 +195,7 @@ public class UserHomePage extends BasePage {
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
+        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
         HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
 
         //Call the Question stage and Answer stage

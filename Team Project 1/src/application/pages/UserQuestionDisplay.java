@@ -16,12 +16,18 @@ import utils.permissions.RolesUtil;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * UserQuestionDisplay page shows the current user's questions
+/*******
+ * <p> Title: ReviewerProfileWindow class </p>
+ * <p> Description: UserQuestionDisplay page shows the current user's questions
  * (and reserved space for answers). Double-clicking a question is intended
- * to load its detail page.
+ * to load its detail page.</p>
+ * @author Riley
+ * @author Dhruv
+ * @author Mike
+ * @author Atharva
+ * @version 1.00    2025-04-05 Created class
  */
+
 @Route(MyPages.USER_QUESTION_DISPLAY)
 @View(title = "User Questions")
 public class UserQuestionDisplay extends BasePage {
@@ -32,6 +38,10 @@ public class UserQuestionDisplay extends BasePage {
         super();
     }
 
+    /**
+     * @return container
+     * Creates the view to display a user's questions, private messages, and a reviewer request tool
+     */
     @Override
     public Pane createView() {
         // Main container with consistent styling from DesignGuide

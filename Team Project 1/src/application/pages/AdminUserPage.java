@@ -28,6 +28,7 @@ import static utils.permissions.RolesUtil.roleName;
 @View(title = "Admin User Page")
 
 public class AdminUserPage extends BasePage {
+    User admin = context.getSession().getActiveUser();
 
     /**
      * Constructor using BasePage
@@ -86,6 +87,7 @@ public class AdminUserPage extends BasePage {
                     User rowUser = row.getItem();
                     try {
                         AdminUserModifyPage.setTargetUser(rowUser);
+                        AdminUserModifyPage.setAdmin(admin);
                         context.router().navigate(MyPages.ADMIN_USER_MODIFY);
                     } catch (Exception ex) {
                         ex.printStackTrace();

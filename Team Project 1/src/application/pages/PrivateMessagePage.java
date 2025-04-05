@@ -80,6 +80,7 @@ public class PrivateMessagePage extends BasePage {
             PrivateMessage privateMessage = new PrivateMessage(message, question.getId(), null);
             privateMessage.setMessage(message);
             context.privateMessages().create(privateMessage);
+
         });
         centerItems.getChildren().addAll(privateMessageInput, privateMessageButton);
         view.setCenter(centerItems);

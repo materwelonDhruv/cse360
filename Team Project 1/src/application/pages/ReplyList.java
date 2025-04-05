@@ -63,6 +63,20 @@ public class ReplyList extends BasePage {
         Button addReplyToSelected = replyToSelectedButtonSetup(replyList, replyInput);
         topBar.getChildren().addAll(replyInput, addReply, addReplyToSelected, editReply, deleteReply);
         layout.setTop(topBar);
+
+        replyList.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Answer selectedItem = replyList.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && selectedItem.getMessage().getContent().contains("φ")) {
+                    int id = selectedItem.getMessage().getUserId();
+                    if (context.reviews().getReviewersByUserId(id) != null) {
+                        ReviewerProfileWindow reviewerProfileWindow = new ReviewerProfileWindow();
+                        reviewerProfileWindow.createReviewerProfileStage(context, context.getSession().getActiveUser().getId(), id);
+                    }
+                }
+            }
+        });
+
         return layout;
     }
 
@@ -138,6 +152,7 @@ public class ReplyList extends BasePage {
         );
         return addReplyButton;
     }
+
 
     /**
      * @param replyTable The replyTable set up previously with replyViewSetup.
@@ -240,4 +255,7 @@ public class ReplyList extends BasePage {
             reply.getMessage().setContent(fixSpacing);
         }
     }
+
+
 }
+
