@@ -13,6 +13,10 @@ import java.util.ArrayList;
 
 import static utils.permissions.RolesUtil.*;
 
+/**
+ * A page that displays details on a user, allowing creation, updating, and deletion of user roles.
+ * The page also allows for deletion of users, and for modification of an admins own roles.
+ */
 @Route(MyPages.ADMIN_USER_MODIFY)
 @View(title = "Modify User")
 public class AdminUserModifyPage extends BasePage {
