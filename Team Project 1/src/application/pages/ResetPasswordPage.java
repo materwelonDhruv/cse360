@@ -8,13 +8,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import validators.PasswordValidator;
 
-/*******
- * <p> Title: ResetPasswordPage class </p>
- * <p> Description: ResetPasswordPage class represents the page where an admin can reset a user's password.
- *  It validates the new password and provides a back button to return to the admin home.</p>
+/**
+ * <p> ResetPasswordPage class represents the page where an admin can reset a user's password.
+ * It validates the new password and provides a back button to return to the admin home.</p>
+ *
  * @author Riley
- * @author Dhruv
- * @version 1.00    2025-02-28 Created class
  */
 
 @Route(MyPages.RESET_PASSWORD)

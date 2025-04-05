@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
 /**
  * FirstPage class represents the initial screen for the first user.
  * It prompts the user to set up administrator access and navigate to the admin setup.
+ *
+ * @author Dhruv
  */
 @Route(MyPages.FIRST)
 @View(title = "Welcome")

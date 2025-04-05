@@ -16,16 +16,13 @@ import utils.permissions.RolesUtil;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-/*******
- * <p> Title: ReviewerProfileWindow class </p>
- * <p> Description: UserQuestionDisplay page shows the current user's questions
+
+/**
+ * <p> UserQuestionDisplay page shows the current user's questions
  * (and reserved space for answers). Double-clicking a question is intended
  * to load its detail page.</p>
- * @author Riley
- * @author Dhruv
+ *
  * @author Mike
- * @author Atharva
- * @version 1.00    2025-04-05 Created class
  */
 
 @Route(MyPages.USER_QUESTION_DISPLAY)

@@ -24,6 +24,9 @@ import java.util.List;
 /**
  * This page displays a simple welcome message for the user and provides navigation.
  * It shows the user's current role and, if multiple roles exist, a dropdown to select another.
+ *
+ * @author Atharva
+ * @author Mike
  */
 @Route(MyPages.REVIEW_HOME)
 @View(title = "Review Page")

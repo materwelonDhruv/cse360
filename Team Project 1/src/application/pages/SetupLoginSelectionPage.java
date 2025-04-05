@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
  * Represents the initial account setup selection page.
  * This page provides users with options to either set up a new account or log in to an existing one.
  * It features two buttons for navigation: one for account setup and one for login.
+ *
+ * @author Dhruv
  */
 @Route(MyPages.SETUP_LOGIN)
 @View(title = "Account Setup")

@@ -20,6 +20,8 @@ import java.util.List;
  * Students may also rank each of their trusted reviewers and this ranking will be used when ordering
  * the reviews of a question or answer so that the review that is most likely to be useful will
  * appear highest.
+ *
+ * @author Tyler
  */
 @Route(MyPages.TRUSTED_REVIEWER)
 @View(title = "Manage Trusted Reviewers")

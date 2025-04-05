@@ -17,6 +17,8 @@ import java.util.List;
  * This page allows students to search for reviewers that are not on their trusted reviewer list and
  * select as many as they want to add to that list. They may also double-click on a reviewer to view
  * their profile.
+ *
+ * @author Tyler
  */
 @Route(MyPages.ADD_TRUSTED_REVIEWER)
 @View(title = "Add Trusted Reviewers")

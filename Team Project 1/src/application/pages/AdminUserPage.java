@@ -22,7 +22,7 @@ import static utils.permissions.RolesUtil.roleName;
  * Double-clicking a row sets the target user in AdminUserModifyPage
  * and navigates to that page.
  *
- * @author Michael Hawes
+ * @author Mike
  */
 @Route(MyPages.ADMIN_USER)
 @View(title = "Admin User Page")

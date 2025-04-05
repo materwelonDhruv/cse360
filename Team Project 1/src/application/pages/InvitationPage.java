@@ -18,6 +18,8 @@ import java.util.List;
 /**
  * InvitationPage class represents the page where an admin can generate an invitation.
  * The page uses UIFactory and DesignGuide for consistent UI creation and styling.
+ *
+ * @author Tyler
  */
 @Route(MyPages.INVITATION)
 @View(title = "Invite Page")

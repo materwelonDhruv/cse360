@@ -15,6 +15,8 @@ import java.sql.SQLException;
 /**
  * The WelcomeLoginPage class displays a welcome screen for authenticated users.
  * It allows users to navigate to their respective pages based on their role or quit the application.
+ *
+ * @author Atharva
  */
 @Route(MyPages.WELCOME_LOGIN)
 @View(title = "Role Select")

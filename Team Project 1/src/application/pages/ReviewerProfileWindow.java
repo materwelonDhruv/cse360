@@ -19,12 +19,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/*******
- * <p> Title: ReviewerProfileWindow class </p>
- * <p> Description: Pop-up window displaying a reviewer's profile including their
+/**
+ * <p> Pop-up window displaying a reviewer's profile including their
  * contact information and reviews</p>
+ *
  * @author Riley
- * @version 1.00    2025-04-05 Created class
  */
 public class ReviewerProfileWindow {
     /**

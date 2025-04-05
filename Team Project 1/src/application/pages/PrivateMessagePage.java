@@ -17,6 +17,8 @@ import utils.permissions.Roles;
  * Represents the page where users can send a private message in response to a specific question.
  * This page provides a text field to input the message and a button to send it.
  * After sending, the message is stored and the user is redirected back to their home page.
+ *
+ * @author Mike
  */
 @Route(MyPages.PRIVATE_MESSAGE)
 @View(title = "Private Message Page")

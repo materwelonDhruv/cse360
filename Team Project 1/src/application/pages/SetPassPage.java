@@ -11,13 +11,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-/*******
- * <p> Title: ResetPasswordPage class </p>
- * <p> Description: SetPassPage represents the page where an admin can generate a one-time password
+/**
+ * <p> SetPassPage represents the page where an admin can generate a one-time password
  * for a selected user.</p>
+ *
  * @author Riley
- * @author Dhruv
- * @version 1.00    2025-02-28 Created class
  */
 
 @Route(MyPages.SET_PASS)

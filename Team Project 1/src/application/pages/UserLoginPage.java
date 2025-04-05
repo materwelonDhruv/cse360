@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
  * The UserLoginPage class provides a login interface for users to access their
  * accounts. It validates the user's credentials and navigates to the appropriate page
  * upon successful login.
+ *
+ * @author Dhruv
  */
 @Route(MyPages.USER_LOGIN)
 @View(title = "User Login")

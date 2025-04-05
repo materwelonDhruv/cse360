@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 /**
  * Represents the private message conversation page.
  * This page allows users to view and reply to private messages.
+ *
+ * @author Mike
  */
 
 @Route(MyPages.PRIVATE_CONVERSATION)

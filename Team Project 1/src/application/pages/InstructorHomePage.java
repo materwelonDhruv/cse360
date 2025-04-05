@@ -21,6 +21,8 @@ import java.util.List;
 /**
  * The InstructorHomePage class provides an interface for instructors to manage reviewer requests.
  * Instructors can approve or reject pending reviewer requests and navigate to other sections.
+ *
+ * @author Atharva
  */
 @Route(MyPages.INSTRUCTOR_HOME)
 @View(title = "Instructor Page")

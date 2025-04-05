@@ -15,6 +15,8 @@ import validators.UsernameValidator;
 /**
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
+ *
+ * @author Tyler
  */
 @Route(MyPages.SETUP_ACCOUNT)
 @View(title = "Account Setup")
