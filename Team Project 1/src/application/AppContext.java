@@ -11,7 +11,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Centralized application context for database and routing.
+ * Centralized application context for managing the database, routing, and repositories.
+ * <p>
+ * This class is responsible for initializing the database connection, managing the session,
+ * and providing access to various repositories (e.g., {@link Users}, {@link Messages}, etc.).
+ * It also creates a single {@link PageRouter} for navigating between different pages.
+ *
+ * @author Dhruv
+ * @see DatabaseConnection
+ * @see PageRouter
+ * @see Session
  */
 public class AppContext {
     private static AppContext INSTANCE;
@@ -20,7 +29,7 @@ public class AppContext {
 
     private final Session session;
 
-    // Single, shared PageRouter so all pages can navigate.
+    // Single, shared PageRouter for navigation across pages
     private final PageRouter router;
 
     // Repositories:
@@ -43,17 +52,16 @@ public class AppContext {
      * @throws SQLException if DB initialization fails
      */
     private AppContext(Stage primaryStage) throws SQLException {
-        // 1) Initialize DB and schema
+        // Initialize DB and schema
         DatabaseConnection.initialize();
         SchemaManager schemaManager = new SchemaManager();
         this.connection = DatabaseConnection.getConnection();
 
-        // 2) Sync DB schema
+        // Sync DB schema and inspect tables
         schemaManager.syncTables(connection);
-        // 3) Inspect tables
         schemaManager.inspectTables(connection);
 
-        // 4) Build repositories
+        // Build repositories
         this.userRepository = new Users(connection);
         this.messageRepository = new Messages(connection);
         this.inviteRepository = new Invites(connection);
@@ -65,20 +73,19 @@ public class AppContext {
         this.reviewsRepository = new Reviews(connection);
         this.reviewerRequestsRepository = new ReviewerRequests(connection);
 
-        // 5) Create the PageRouter ONCE, passing the main stage
-        if (primaryStage != null) {
-            this.router = new PageRouter(primaryStage);
-        } else {
-            this.router = null;
-        }
+        // Create the PageRouter ONCE, passing the main stage
+        this.router = (primaryStage != null) ? new PageRouter(primaryStage) : null;
 
-        // 6) Create the Session
+        // Create the session
         this.session = new Session();
     }
 
     /**
-     * Global access to AppContext with a single Stage.
-     * If not initialized, create it. Otherwise, return existing.
+     * Returns a singleton instance of AppContext, initialized with a primary stage.
+     *
+     * @param primaryStage The main JavaFX stage.
+     * @return The singleton instance of AppContext.
+     * @throws SQLException If an error occurs during initialization.
      */
     public static synchronized AppContext getInstance(Stage primaryStage) throws SQLException {
         if (INSTANCE == null) {
@@ -88,8 +95,10 @@ public class AppContext {
     }
 
     /**
-     * Global access to AppContext without a primary stage.
-     * If not initialized, create it. Otherwise, return existing.
+     * Returns a singleton instance of AppContext without requiring a primary stage.
+     *
+     * @return The singleton instance of AppContext.
+     * @throws SQLException If an error occurs during initialization.
      */
     public static synchronized AppContext getInstance() throws SQLException {
         if (INSTANCE == null) {
@@ -98,17 +107,20 @@ public class AppContext {
         return INSTANCE;
     }
 
-    // Access to the single PageRouter
+    /**
+     * Returns the single PageRouter for page navigation.
+     *
+     * @return The PageRouter instance.
+     * @throws IllegalStateException if the PageRouter was not initialized.
+     */
     public PageRouter router() {
         if (router == null) {
             throw new IllegalStateException("PageRouter is not available. AppContext was initialized without a primary stage.");
         }
-
         return router;
     }
 
     // Repositories:
-
     public Users users() {
         return userRepository;
     }
@@ -149,16 +161,28 @@ public class AppContext {
         return reviewerRequestsRepository;
     }
 
+    /**
+     * Returns the current database connection.
+     *
+     * @return The database connection.
+     */
     public Connection getConnection() {
         return connection;
     }
 
+    /**
+     * Returns the current session.
+     *
+     * @return The session object.
+     */
     public Session getSession() {
         return session;
     }
 
     /**
      * Closes the database connection if needed.
+     *
+     * @throws SQLException If an error occurs while closing the connection.
      */
     public void closeConnection() throws SQLException {
         DatabaseConnection.closeConnection();

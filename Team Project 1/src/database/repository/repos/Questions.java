@@ -11,6 +11,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Repository class for managing {@link Question} entities in the database.
+ * <p>
+ * This class provides methods for performing CRUD operations on the "Questions" table, including creating,
+ * retrieving, updating, and deleting questions. It extends the {@link Repository} class, which provides
+ * base functionality for database operations.
+ * </p>
+ *
+ * @author Dhruv
+ * @see Repository
+ */
 public class Questions extends Repository<Question> {
     private final Messages messagesRepo;
     private final String baseJoinQuery =
@@ -19,11 +30,28 @@ public class Questions extends Repository<Question> {
                     "FROM Questions q " +
                     "JOIN Messages m ON q.messageID = m.messageID ";
 
+    /**
+     * Constructor for {@code Questions} repository.
+     * Initializes the repository with the provided database connection.
+     *
+     * @param connection The database connection to be used by this repository.
+     * @throws SQLException If an error occurs during the initialization of the repository.
+     */
     public Questions(Connection connection) throws SQLException {
         super(connection);
         this.messagesRepo = new Messages(connection);
     }
 
+    /**
+     * Creates a new question in the "Questions" table.
+     * <p>
+     * Validates the {@link Question} entity before inserting it into the database.
+     * </p>
+     *
+     * @param question The {@link Question} object to be created.
+     * @return The created {@link Question} object, with its ID set.
+     * @throws IllegalArgumentException If the question is invalid.
+     */
     @Override
     public Question create(Question question) throws IllegalArgumentException {
         EntityValidator.validateQuestion(question);
@@ -44,24 +72,43 @@ public class Questions extends Repository<Question> {
         return question;
     }
 
+    /**
+     * Retrieves a question by its ID.
+     *
+     * @param id The ID of the question to be retrieved.
+     * @return The {@link Question} object corresponding to the provided ID, or {@code null} if not found.
+     */
     @Override
     public Question getById(int id) {
         String sql = baseJoinQuery + "WHERE q.questionID = ?";
-
         return queryForObject(sql,
                 pstmt -> pstmt.setInt(1, id),
                 this::build
         );
     }
 
+    /**
+     * Retrieves all questions from the "Questions" table.
+     *
+     * @return A list of all {@link Question} objects in the table.
+     */
     @Override
     public List<Question> getAll() {
         String sql = baseJoinQuery;
-
         return queryForList(sql, pstmt -> {
         }, this::build);
     }
 
+    /**
+     * Builds a {@link Question} object from a {@link ResultSet}.
+     * <p>
+     * This method maps the result set from a SQL query to a {@link Question} object.
+     * </p>
+     *
+     * @param rs The {@link ResultSet} containing the question data.
+     * @return The {@link Question} object created from the result set.
+     * @throws SQLException If an error occurs while extracting data from the result set.
+     */
     @Override
     public Question build(ResultSet rs) throws SQLException {
         Question question = new Question();
@@ -78,6 +125,16 @@ public class Questions extends Repository<Question> {
         return question;
     }
 
+    /**
+     * Updates an existing question in the "Questions" table.
+     * <p>
+     * This method only updates the title of the question and updates the message content in the associated {@link Message}.
+     * </p>
+     *
+     * @param question The {@link Question} object containing the updated information.
+     * @return The updated {@link Question} object if the update was successful, or {@code null} if no rows were affected.
+     * @throws IllegalArgumentException If the question is invalid.
+     */
     @Override
     public Question update(Question question) throws IllegalArgumentException {
         EntityValidator.validateQuestion(question);
@@ -95,6 +152,15 @@ public class Questions extends Repository<Question> {
         return rows > 0 ? question : null;
     }
 
+    /**
+     * Deletes a question from the "Questions" table by its ID.
+     * <p>
+     * The message associated with the question is not deleted explicitly, but it will be removed
+     * automatically if a cascading delete rule is set up in the database schema.
+     * </p>
+     *
+     * @param id The ID of the question to be deleted.
+     */
     @Override
     public void delete(int id) {
         // Only delete from Questions; message row is removed by cascade if set up
@@ -103,16 +169,25 @@ public class Questions extends Repository<Question> {
     }
 
     /**
-     * Returns questions posted by a particular user.
+     * Returns a list of questions posted by a particular user.
+     *
+     * @param userId The ID of the user whose questions are to be retrieved.
+     * @return A list of {@link Question} objects posted by the user.
      */
     public List<Question> getQuestionsByUser(int userId) {
         String sql = baseJoinQuery + "WHERE m.userID = ?";
-
         return queryForList(sql, pstmt -> pstmt.setInt(1, userId), this::build);
     }
 
     /**
-     * Searches questions by fuzzy-matching both title and content.
+     * Searches questions by fuzzy-matching both the title and the content.
+     * <p>
+     * This method retrieves all questions and performs an in-memory fuzzy search using the specified keyword.
+     * </p>
+     *
+     * @param keyword The search keyword to match in the question title and content.
+     * @return A list of {@link Question} objects that match the search keyword.
+     * @throws Exception If an error occurs during the search operation.
      */
     public List<Question> searchQuestions(String keyword) throws Exception {
         // Basic approach: retrieve all, then do fuzzy filter in-memory
@@ -122,6 +197,18 @@ public class Questions extends Repository<Question> {
         );
     }
 
+    /**
+     * Updates the title and content of an existing question.
+     * <p>
+     * This method allows updating the question's title and content. If a field is not provided,
+     * it will not be updated.
+     * </p>
+     *
+     * @param questionId The ID of the question to be updated.
+     * @param newTitle   The new title for the question (can be {@code null} if not updating).
+     * @param newContent The new content for the question (can be {@code null} if not updating).
+     * @return The updated {@link Question} object if the update was successful, or {@code null} if the question was not found.
+     */
     public Question updateQuestionFields(int questionId, String newTitle, String newContent) {
         Question existing = getById(questionId);
         if (existing == null) return null;
@@ -135,9 +222,9 @@ public class Questions extends Repository<Question> {
     }
 
     /**
-     * Returns questions that have not been answered yet.
+     * Returns a list of unanswered questions.
      *
-     * @return List of unanswered questions
+     * @return A list of {@link Question} objects that do not have associated answers.
      */
     public List<Question> getUnansweredQuestions() {
         String sql = baseJoinQuery +
@@ -148,9 +235,12 @@ public class Questions extends Repository<Question> {
     }
 
     /**
-     * Returns a list of questions that don't have a pinned answer while excluding those that have at least one pinned answer.
+     * Returns a list of questions that do not have a pinned answer.
+     * <p>
+     * This method retrieves questions that either do not have any answers or have answers but none are pinned.
+     * </p>
      *
-     * @return List of questions without a pinned answer
+     * @return A list of {@link Question} objects that do not have a pinned answer.
      */
     public List<Question> getQuestionsWithoutPinnedAnswer() {
         String sql = baseJoinQuery +
@@ -161,11 +251,11 @@ public class Questions extends Repository<Question> {
         }, this::build);
     }
 
-
     /**
-     * Returns a true false for whether a question has a pinned answer.
+     * Checks if a question has a pinned answer.
      *
-     * @param questionId The ID of the question to check
+     * @param questionId The ID of the question to check.
+     * @return {@code true} if the question has a pinned answer, {@code false} otherwise.
      */
     public boolean hasPinnedAnswer(int questionId) {
         String sql = "SELECT COUNT(*) FROM Answers WHERE questionID = ? AND isPinned = TRUE";

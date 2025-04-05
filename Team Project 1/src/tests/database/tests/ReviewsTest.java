@@ -13,12 +13,31 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link Reviews} repository.
+ * <p>
+ * This test class verifies various operations performed on the Reviews repository,
+ * including creation, retrieval, updating, deletion, and fetching reviewers sorted by rating.
+ * </p>
+ *
+ * <p>
+ * It interacts with the {@link Users} repository to ensure user relationships are properly established
+ * before conducting review-related tests.
+ * </p>
+ *
+ * @author Dhruv
+ * @see Reviews
+ * @see Users
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReviewsTest extends BaseDatabaseTest {
 
     private static Reviews reviewsRepo;
     private static Users usersRepo;
 
+    /**
+     * Sets up the repository instances and initializes users for testing.
+     */
     @BeforeAll
     public static void setup() {
         usersRepo = appContext.users();
@@ -30,6 +49,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         usersRepo.create(userB);
     }
 
+    /**
+     * Tests creating a new review between two users.
+     */
     @Test
     @Order(1)
     public void testCreateReview() {
@@ -45,6 +67,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         assertEquals(bob.getId(), created.getUser().getId());
     }
 
+    /**
+     * Tests retrieving a review by its composite key.
+     */
     @Test
     @Order(2)
     public void testGetByCompositeKey() {
@@ -56,6 +81,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         assertEquals(3, fetched.getRating());
     }
 
+    /**
+     * Tests updating an existing review's rating.
+     */
     @Test
     @Order(3)
     public void testUpdateReview() {
@@ -70,6 +98,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         assertEquals(5, updated.getRating());
     }
 
+    /**
+     * Tests setting a new rating for an existing review.
+     */
     @Test
     @Order(4)
     public void testSetRating() {
@@ -80,6 +111,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         assertEquals(2, updated.getRating());
     }
 
+    /**
+     * Tests retrieving all reviews from the repository.
+     */
     @Test
     @Order(5)
     public void testGetAllReviews() {
@@ -87,6 +121,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         assertFalse(allReviews.isEmpty(), "Expected at least one review in the DB by now.");
     }
 
+    /**
+     * Tests retrieving reviewers for a user, sorted by rating.
+     */
     @Test
     @Order(6)
     public void testGetReviewersByUserIdSorted() {
@@ -114,6 +151,9 @@ public class ReviewsTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * Tests deleting a review using the composite key.
+     */
     @Test
     @Order(7)
     public void testDeleteReview() {

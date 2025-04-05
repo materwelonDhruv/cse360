@@ -1,7 +1,29 @@
 package validators;
 
+/**
+ * Provides methods for validating name strings according to specified criteria.
+ * <p>
+ * Names must start with a letter and can only contain alphabetic characters.
+ * </p>
+ *
+ * @author Dhruv
+ */
 public class NameValidator {
 
+    /**
+     * Validates the provided name string based on the following criteria:
+     *
+     * <ul>
+     *   <li>Name must not be null or empty.</li>
+     *   <li>Name must start with an alphabetic letter.</li>
+     *   <li>Name can only contain alphabetic characters.</li>
+     * </ul>
+     *
+     * @param input The name string to be validated.
+     * @throws IllegalArgumentException if the name is null, empty,
+     *                                  starts with a non-alphabetic character, or contains invalid characters.
+     * @see IllegalArgumentException
+     */
     public static void validateName(String input) throws IllegalArgumentException {
         if (input == null || input.isEmpty()) {
             throw new IllegalArgumentException("Name is empty");
@@ -34,5 +56,14 @@ public class NameValidator {
         }
     }
 
+    /**
+     * Enumeration representing the different states of name validation processing.
+     *
+     * <ul>
+     *   <li>{@code START} - Initial state before processing.</li>
+     *   <li>{@code VALID} - While the name is valid and matches criteria.</li>
+     *   <li>{@code ERROR} - When an invalid character is encountered.</li>
+     * </ul>
+     */
     private enum State {START, VALID, ERROR}
 }

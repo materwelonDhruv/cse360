@@ -4,8 +4,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import validators.NameValidator;
 
+/**
+ * Unit tests for the {@link NameValidator} class.
+ * <p>
+ * This test class ensures that the {@code validateName} method functions correctly by
+ * verifying valid and invalid name inputs according to defined criteria.
+ * </p>
+ *
+ * @author Dhruv
+ * @see NameValidator
+ */
 public class NameValidatorTest {
 
+    /**
+     * Tests the {@code validateName} method with an empty name string.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     public void testEmptyName() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -13,14 +27,21 @@ public class NameValidatorTest {
         }, "Should throw for empty name");
     }
 
+    /**
+     * Tests the {@code validateName} method with a null name string.
+     * Expects an {@link IllegalArgumentException} to be thrown.
+     */
     @Test
     public void testNullName() {
-
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             NameValidator.validateName(null);
         }, "Should throw for null name");
     }
 
+    /**
+     * Tests the {@code validateName} method with names starting with non-letter characters.
+     * Expects an {@link IllegalArgumentException} to be thrown for each invalid case.
+     */
     @Test
     public void testNameStartsWithNonLetter() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -36,6 +57,10 @@ public class NameValidatorTest {
         }, "Should throw for name starting with a non-letter");
     }
 
+    /**
+     * Tests the {@code validateName} method with names containing invalid characters.
+     * Expects an {@link IllegalArgumentException} to be thrown for each invalid case.
+     */
     @Test
     public void testNameWithInvalidCharacter() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -51,6 +76,10 @@ public class NameValidatorTest {
         }, "Should throw for invalid character in name");
     }
 
+    /**
+     * Tests the {@code validateName} method with valid names.
+     * Ensures no exception is thrown for properly formatted names.
+     */
     @Test
     public void testValidNames() {
         Assertions.assertDoesNotThrow(() -> {

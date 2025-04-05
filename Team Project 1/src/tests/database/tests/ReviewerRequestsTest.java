@@ -13,6 +13,22 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link ReviewerRequests} repository.
+ * <p>
+ * This test class verifies various operations performed on the ReviewerRequests repository,
+ * including creation, retrieval, updating, deletion, and filtering by user or instructor.
+ * </p>
+ *
+ * <p>
+ * It interacts with the {@link Users} repository to ensure user relationships are properly established
+ * before conducting reviewer request-related tests.
+ * </p>
+ *
+ * @author Dhruv
+ * @see ReviewerRequests
+ * @see Users
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReviewerRequestsTest extends BaseDatabaseTest {
 
@@ -20,6 +36,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
     private static Users usersRepo;
     private static int requestId1;
 
+    /**
+     * Sets up the repository instances and initializes users for testing.
+     */
     @BeforeAll
     public static void setup() {
         usersRepo = appContext.users();
@@ -35,6 +54,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         requestId1 = created.getId();
     }
 
+    /**
+     * Tests creating and fetching a reviewer request by ID.
+     */
     @Test
     @Order(1)
     public void testCreateReviewerRequest() {
@@ -43,6 +65,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         assertNull(fetched.getStatus());
     }
 
+    /**
+     * Tests updating an existing reviewer request.
+     */
     @Test
     @Order(2)
     public void testUpdateReviewerRequest() {
@@ -57,6 +82,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         assertEquals(u2.getId(), updated.getInstructor().getId());
     }
 
+    /**
+     * Tests accepting a reviewer request.
+     */
     @Test
     @Order(3)
     public void testAcceptRequest() {
@@ -65,6 +93,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         assertTrue(accepted.getStatus());
     }
 
+    /**
+     * Tests rejecting a reviewer request.
+     */
     @Test
     @Order(4)
     public void testRejectRequest() {
@@ -76,6 +107,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         assertFalse(rejected.getStatus());
     }
 
+    /**
+     * Tests retrieving all reviewer requests.
+     */
     @Test
     @Order(5)
     public void testGetAll() {
@@ -83,6 +117,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         assertFalse(all.isEmpty());
     }
 
+    /**
+     * Tests retrieving reviewer requests by user.
+     */
     @Test
     @Order(6)
     public void testGetRequestsByUser() {
@@ -94,6 +131,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * Tests retrieving reviewer requests by instructor.
+     */
     @Test
     @Order(7)
     public void testGetRequestsByInstructor() {
@@ -105,6 +145,9 @@ public class ReviewerRequestsTest extends BaseDatabaseTest {
         }
     }
 
+    /**
+     * Tests deleting a reviewer request by ID.
+     */
     @Test
     @Order(8)
     public void testDelete() {

@@ -5,7 +5,7 @@ import database.migration.BaseTable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class UserTable extends BaseTable {
+public class UsersTable extends BaseTable {
 
     @Override
     public String getTableName() {
