@@ -46,7 +46,7 @@ public class UserQuestionDisplay extends BasePage {
         TableView<Question> questionTable = questionTableSetup();
         // Create table for Reviewer's reviews
         TableView<Answer> reviewTable = reviewTableSetup();
-        TableView<Question> questionTable = new TableView<>();
+
         ObservableList<Question> obQuestions = FXCollections.observableArrayList(
                 context.questions().getQuestionsByUser(context.getSession().getActiveUser().getId())
         );
