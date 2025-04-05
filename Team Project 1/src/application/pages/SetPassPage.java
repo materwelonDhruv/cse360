@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.OneTimePassword;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,7 +60,7 @@ public class SetPassPage extends BasePage {
         Button setOTPButton = UIFactory.createButton("Set One-Time Password",
                 e -> handleSetOneTimePassword(passLabel));
 
-        Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
+        Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, CopyButtonBuilder::onCopy);
 
         Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
 

@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.Invite;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -51,7 +52,7 @@ public class InvitationPage extends BasePage {
         Label inviteCodeLabel = UIFactory.createLabel("");
 
         // Create a reusable copy button instance for the invitation code
-        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText, UIFactory.CopyButtonBuilder::onCopy);
+        Button copyButton = UIFactory.createCopyButton("Copy Code To Clipboard", inviteCodeLabel::getText, CopyButtonBuilder::onCopy);
 
         // Button to generate the invitation code
         Button generateBtn = UIFactory.createButton("Generate Invitation Code",
