@@ -27,9 +27,6 @@ public final class UIFactory {
      */
     private static final Map<Roles, MyPages> ROLE_PAGE_MAP = new HashMap<>();
 
-    /**
-     * Static block to initialize the role-page mapping immediately when the class is loaded.
-     */
     static {
         ROLE_PAGE_MAP.put(Roles.ADMIN, MyPages.ADMIN_HOME);
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
