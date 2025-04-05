@@ -8,7 +8,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
@@ -38,7 +41,9 @@ public class TrustedReviewerPage extends BasePage {
             if (event.getClickCount() == 2) {
                 HBox selectedReviewer = reviewersListView.getSelectionModel().getSelectedItem();
                 if (selectedReviewer != null) {
-                    //TODO: Open profile of the reviewer
+                    ReviewerProfileWindow reviewerProfileWindow = new ReviewerProfileWindow();
+                    Review r = getReviewFromHBox(selectedReviewer);
+                    reviewerProfileWindow.createReviewerProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
                 }
             }
         });
@@ -140,11 +145,15 @@ public class TrustedReviewerPage extends BasePage {
     // Method to swap the ranking of the given reviewer with another in the student's trusted reviewers list.
     // The reviewer to swap with is found using an offset from the given reviewer's index
     private void swapTrustedReviewerRankings(HBox trustedReviewerHBox1, int offset) {
-        if (!reviewersListView.getItems().contains(trustedReviewerHBox1)) {return;}
+        if (!reviewersListView.getItems().contains(trustedReviewerHBox1)) {
+            return;
+        }
         // Get the two indices of the reviewers to swap
         int index1 = reviewersListView.getItems().indexOf(trustedReviewerHBox1);
         int index2 = index1 + offset;
-        if (index2 >= reviewersListView.getItems().size() || index2 < 0) {return;}
+        if (index2 >= reviewersListView.getItems().size() || index2 < 0) {
+            return;
+        }
 
         // Get second HBox and Reviews
         HBox trustedReviewerHBox2 = reviewersListView.getItems().get(index2);
@@ -179,7 +188,9 @@ public class TrustedReviewerPage extends BasePage {
 
     // Method to remove a reviewer from the student's trusted reviewers list
     private void removeTrustedReviewer(HBox trustedReviewerHBox) {
-        if (!reviewersListView.getItems().contains(trustedReviewerHBox)) {return;}
+        if (!reviewersListView.getItems().contains(trustedReviewerHBox)) {
+            return;
+        }
         // Delete the trusted reviewer from the database
         Review reviewer = getReviewFromHBox(trustedReviewerHBox);
         context.reviews().delete(reviewer.getReviewer().getId(), reviewer.getUser().getId());

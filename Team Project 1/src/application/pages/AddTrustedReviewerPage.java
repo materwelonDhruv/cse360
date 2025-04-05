@@ -74,7 +74,9 @@ public class AddTrustedReviewerPage extends BasePage {
             if (event.getClickCount() == 2) {
                 List<String> selectedReviewer = resultView.getSelectionModel().getSelectedItems();
                 if (selectedReviewer.size() == 1) {
-                    //TODO: Open profile of the reviewer
+                    ReviewerProfileWindow reviewerProfileWindow = new ReviewerProfileWindow();
+                    User u = context.users().getByUsername(selectedReviewer.get(0));
+                    reviewerProfileWindow.createReviewerProfileStage(context, context.getSession().getActiveUser().getId(), u.getId());
                 }
             }
         });
@@ -112,7 +114,9 @@ public class AddTrustedReviewerPage extends BasePage {
             User currentUser = context.getSession().getActiveUser();
             List<User> untrustedReviewers = context.users().getReviewersNotRatedByUser(currentUser.getId());
             resultView.getItems().clear();
-            for (User user : untrustedReviewers) {resultView.getItems().add(user.getUserName());}
+            for (User user : untrustedReviewers) {
+                resultView.getItems().add(user.getUserName());
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
