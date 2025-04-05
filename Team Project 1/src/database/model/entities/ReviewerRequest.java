@@ -33,7 +33,7 @@ public class ReviewerRequest extends BaseEntity {
      *
      * @param requester  The user who is requesting to become a reviewer.
      * @param instructor The user who will approve or reject the request (instructor).
-     * @param status     The current status of the request (approved or pending).
+     * @param status     The current status of the request approved/rejected as a boolean or null if pending.
      */
     public ReviewerRequest(User requester, User instructor, Boolean status) {
         this.requester = requester;
