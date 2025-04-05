@@ -241,7 +241,7 @@ public class ReviewerHomePage extends BasePage {
         assert queContent != null;
         Label questionContent = UIFactory.createLabel("Question: " + queContent.getMessage().getContent(),
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
-        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;-fx"));
+        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;"));
 
         Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
                 a -> addAnswer()));
