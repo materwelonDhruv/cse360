@@ -101,7 +101,8 @@ public class TrustedReviewerPage extends BasePage {
                 }
             }
 
-            // Set ranking of the reviewer to the size of the list view + numNewAdditions if it is a new addition
+            // Set ranking of the reviewer to the total number of trusted reviewers - numNewAdditions
+            // if it is a new addition
             if (trustedReviewer.getRating() == Integer.MAX_VALUE) {
                 trustedReviewer.setRating(trustedReviewers.size() - numNewAdditions);
                 numNewAdditions++;
