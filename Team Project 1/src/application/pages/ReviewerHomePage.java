@@ -2,6 +2,7 @@ package application.pages;
 
 import application.framework.*;
 import database.model.entities.Answer;
+import database.model.entities.Message;
 import database.model.entities.Question;
 import database.model.entities.User;
 import database.repository.repos.Answers;
@@ -242,6 +243,8 @@ public class ReviewerHomePage extends BasePage {
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
         Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;-fx"));
 
+        Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
+                a -> addAnswer()));
 
         //Close answerStage UI
         Button closeButton = UIFactory.createButton("Close", e -> e.onAction(
@@ -281,7 +284,7 @@ public class ReviewerHomePage extends BasePage {
             }
         });
 
-        HBox addUI = new HBox(10, answerInput);
+        HBox addUI = new HBox(10, addAnswerButton, answerInput);
         HBox editUI = new HBox(10, answerLabelList, addPMButton);
 
         //Layout to show every UI
@@ -302,6 +305,31 @@ public class ReviewerHomePage extends BasePage {
             } else {
                 answerListView.getItems().addLast(new Pair<>(a.getId(), a.getMessage().getContent()));
             }
+        }
+    }
+
+    /**
+     * Submits a new answer for the currently selected question. The input
+     * content is validated and added to the system. The answer list is updated
+     * after successful submission.
+     */
+    private void addAnswer() {
+        if (currentlySelectedQuestionId == -1) return;
+        String content = answerInput.getText().trim();
+        if (!content.isEmpty()) {
+            Message message = new Message(context.getSession().getActiveUser().getId(), content);
+            Answer newAnswer = new Answer(message, currentlySelectedQuestionId, null, false);
+
+            Answer createdAnswer = null;
+            try {
+                createdAnswer = context.answers().create(newAnswer);
+                loadQuestions();
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(e);
+            }
+            answerListView.getItems().add(new Pair<>(createdAnswer.getId(), createdAnswer.getMessage().getContent()));
+            answerInput.clear();
+
         }
     }
 
