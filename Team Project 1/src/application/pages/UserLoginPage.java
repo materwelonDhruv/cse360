@@ -33,7 +33,7 @@ public class UserLoginPage extends BasePage {
                 p -> p.maxWidth(250).minChars(8).maxChars(30));
 
         Label errorLabel = UIFactory.createLabel("",
-                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
+                l -> l.style(DesignGuide.ERROR_LABEL));
 
         // Login button using UIFactory
         // Login button using UIFactory

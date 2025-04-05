@@ -39,6 +39,11 @@ public final class DesignGuide {
     public static final String TITLE_LABEL = "-fx-font-size: 16px; -fx-font-weight: bold;";
 
     /**
+     * Style for the error label (font size and color).
+     */
+    public static final String ERROR_LABEL = "-fx-text-fill: red; -fx-font-size: 12px;";
+
+    /**
      * Private constructor to prevent instantiation of the class.
      */
     private DesignGuide() {

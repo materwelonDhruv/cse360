@@ -54,7 +54,7 @@ public class AdminSetupPage extends BasePage {
 
         // Create an error label.
         Label errorLabel = UIFactory.createLabel("",
-                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
+                l -> l.style(DesignGuide.ERROR_LABEL));
 
         // Create Setup and Back buttons.
         // Create Setup button using UIFactory with reduced nesting

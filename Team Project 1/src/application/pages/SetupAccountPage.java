@@ -45,7 +45,7 @@ public class SetupAccountPage extends BasePage {
 
         // Error label.
         Label errorLabel = UIFactory.createLabel("",
-                l -> l.style("-fx-text-fill: red; -fx-font-size: 12px;"));
+                l -> l.style(DesignGuide.ERROR_LABEL));
 
         // Back button navigates to SetupLoginSelectionPage.
         Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
