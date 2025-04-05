@@ -3,6 +3,8 @@ package application.pages;
 import application.framework.*;
 import database.model.entities.Answer;
 import database.model.entities.Message;
+import database.model.entities.Review;
+import database.model.entities.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -14,6 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import utils.permissions.Roles;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Route(MyPages.REPLY_LIST)
@@ -21,6 +25,9 @@ import java.util.List;
 public class ReplyList extends BasePage {
     private static Answer root;
     private ObservableList<Answer> replies;
+
+    // Keeps track of whether only trusted reviews are being shown rather than all reviews
+    private boolean trustedReviewsOnly = false;
 
     /**
      * @param p Sets the root answer to passed parameter
@@ -56,7 +63,9 @@ public class ReplyList extends BasePage {
         Button editReply = replyEditButtonSetup(replyList, replyInput);
         Button deleteReply = replyDeleteButtonSetup(replyList);
         Button addReplyToSelected = replyToSelectedButtonSetup(replyList, replyInput);
+        Button showTrustedReviewsOnly = showTrustedReviewsOnlySetup(replyList);
         topBar.getChildren().addAll(replyInput, addReply, addReplyToSelected, editReply, deleteReply);
+        if (context.getSession().getCurrentRole() == Roles.STUDENT) {topBar.getChildren().add(showTrustedReviewsOnly);}
         layout.setTop(topBar);
         return layout;
     }
@@ -162,20 +171,52 @@ public class ReplyList extends BasePage {
         return deleteReplyButton;
     }
 
+    /**
+     * @param replyTable The ListView object containing all replies
+     * @return showTrustedReviewsOnlyButton
+     * Private method to build the button to switch between showing trusted reviews only and all reviews
+     */
+    private Button showTrustedReviewsOnlySetup(ListView<Answer> replyTable) {
+        Button showTrustedReviewsOnlyButton = UIFactory.createButton("Show Trusted Reviews Only");
+        showTrustedReviewsOnlyButton.setOnAction(
+                a -> {
+                    trustedReviewsOnly = !trustedReviewsOnly;
+                    if (trustedReviewsOnly) {
+                        showTrustedReviewsOnlyButton.setText("Show All Reviews");
+                    } else {
+                        showTrustedReviewsOnlyButton.setText("Show Trusted Reviews Only");
+                    }
+                    updateList();
+                    replyTable.setItems(replies);
+                }
+        );
+        return showTrustedReviewsOnlyButton;
+    }
+
     private void updateList() {
         ObservableList<Answer> tempReplyList = FXCollections.observableArrayList();
-        replies = findAllAnswers(root, tempReplyList);
+        replies = findAnswers(root, tempReplyList);
         rearrangeAnswers(replies);
     }
 
-    private ObservableList<Answer> findAllAnswers(Answer answer, ObservableList<Answer> tempReplies) {
+    private ObservableList<Answer> findAnswers(Answer answer, ObservableList<Answer> tempReplies) {
         List<Answer> localReplies = context.answers().getRepliesToAnswer(answer.getId());
         tempReplies.add(answer);
         if (localReplies == null) {
             return tempReplies;
         }
+        if (trustedReviewsOnly) {
+            try {
+                List<User> untrustedReviewers = context.users().getReviewersNotRatedByUser(context.getSession().getActiveUser().getId());
+                List<Integer> untrustedReviewerIds = new ArrayList<>();
+                for (User untrustedReviewer : untrustedReviewers) {untrustedReviewerIds.add(untrustedReviewer.getId());}
+                localReplies.removeIf(a -> untrustedReviewerIds.contains(a.getMessage().getUserId()));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         for (Answer reply : localReplies) {
-            findAllAnswers(reply, tempReplies);
+            findAnswers(reply, tempReplies);
         }
         return tempReplies;
     }
