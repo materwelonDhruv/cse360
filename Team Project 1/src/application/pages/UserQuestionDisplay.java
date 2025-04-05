@@ -46,6 +46,46 @@ public class UserQuestionDisplay extends BasePage {
         TableView<Question> questionTable = questionTableSetup();
         // Create table for Reviewer's reviews
         TableView<Answer> reviewTable = reviewTableSetup();
+        TableView<Question> questionTable = new TableView<>();
+        ObservableList<Question> obQuestions = FXCollections.observableArrayList(
+                context.questions().getQuestionsByUser(context.getSession().getActiveUser().getId())
+        );
+        questionTable.setItems(obQuestions);
+
+        // Set up double-click on a row to load question details
+        questionTable.setRowFactory(tv -> {
+            TableRow<Question> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Question q = row.getItem();
+                    if (q != null) {
+//                        createAnswerStage(q.getId());
+//                        showAnswerWindow(q.getId());
+                    }
+                }
+            });
+            return row;
+        });
+
+        // Populate columns using CellValueFactory (if needed, otherwise use PropertyValueFactory)
+        TableColumn<Question, String> idCol = new TableColumn<>("QuestionID");
+        idCol.setCellValueFactory(param -> {
+            Question q = param.getValue();
+            int questionInt = q.getId();
+            return new SimpleStringProperty(String.valueOf(questionInt).trim());
+        });
+
+        TableColumn<Question, String> titleCol = new TableColumn<>("Title");
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+        TableColumn<Question, String> timeCol = new TableColumn<>("Time");
+        timeCol.setCellValueFactory(param -> {
+            Question q = param.getValue();
+            Timestamp timestamp = q.getMessage().getCreatedAt();
+            return new SimpleStringProperty(timestamp.toString());
+        });
+
+        questionTable.getColumns().addAll(idCol, titleCol, timeCol);
 
         //Private message table declaration
         TableView<PrivateMessage> privateMessageTable = privateMessageTableSetup();
