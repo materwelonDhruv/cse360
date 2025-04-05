@@ -26,6 +26,10 @@ public class SetupAccountPage extends BasePage {
         super();
     }
 
+    /**
+     * Creates the layout for the SetupAccountPage
+     * @return layout
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(10);
@@ -63,6 +67,16 @@ public class SetupAccountPage extends BasePage {
         return layout;
     }
 
+    /**
+     * Handles the set-up of a new user's account
+     * @param userNameField TextField for the username
+     * @param firstNameField TextField for the first name
+     * @param lastNameField TextField for the last name
+     * @param passwordField TextField for the password
+     * @param emailField TextField for the email
+     * @param inviteCodeField TextField for the invite code
+     * @param errorLabel Label to display any input validation error messages
+     */
     private void handleUserSetup(TextField userNameField, TextField firstNameField, TextField lastNameField,
                                  TextField passwordField, TextField emailField, TextField inviteCodeField,
                                  Label errorLabel) {
