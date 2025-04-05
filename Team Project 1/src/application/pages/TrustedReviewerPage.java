@@ -29,6 +29,10 @@ public class TrustedReviewerPage extends BasePage {
     // ListView to contain the trusted reviewers
     private final ListView<HBox> reviewersListView = new ListView<>();
 
+    /**
+     * Creates the layout for the TrustedReviewerPage
+     * @return layout
+     */
     @Override
     public Pane createView() {
         VBox layout = new VBox(15);
@@ -69,7 +73,9 @@ public class TrustedReviewerPage extends BasePage {
         return layout;
     }
 
-    // Method to load all trusted reviewers in the student's list into the trustedReviewerHBox
+    /**
+     * Loads all trusted reviewers from the student's list into the reviewersListView
+     */
     private void loadTrustedReviewers() {
         reviewersListView.getItems().clear();
         // Get the student's ordered trusted reviewers list from the database
@@ -113,8 +119,12 @@ public class TrustedReviewerPage extends BasePage {
         }
     }
 
-    // Method to create an HBox containing information about the given
-    // reviewer and buttons for ranking and removal from the list
+    /**
+     * Creates an HBox containing information about the given reviewer
+     * and buttons for ranking and removal from the list
+     * @param reviewer The {@link Review} object to make an HBox for
+     * @return The Hbox to be added to the list view
+     */
     private HBox createTrustedReviewerHBox(Review reviewer) {
         // HBox to contain the reviewerNameLabel and buttons
         HBox trustedReviewerHBox = new HBox(20);
@@ -145,8 +155,12 @@ public class TrustedReviewerPage extends BasePage {
         return trustedReviewerHBox;
     }
 
-    // Method to swap the ranking of the given reviewer with another in the student's trusted reviewers list.
-    // The reviewer to swap with is found using an offset from the given reviewer's index
+    /**
+     * Swaps the ranking of the given reviewer with another in the student's trusted reviewers list.
+     * @param trustedReviewerHBox1 The Hbox corresponding to the reviewer to swap
+     * @param offset The amount to be added to the given reviewer's index to find the index of
+     *               the second reviewer to be swapped with
+     */
     private void swapTrustedReviewerRankings(HBox trustedReviewerHBox1, int offset) {
         if (!reviewersListView.getItems().contains(trustedReviewerHBox1)) {
             return;
@@ -189,7 +203,10 @@ public class TrustedReviewerPage extends BasePage {
         reviewersListView.getItems().set(index2, trustedReviewerHBox1);
     }
 
-    // Method to remove a reviewer from the student's trusted reviewers list
+    /**
+     * Removes the given reviewer from the student's trusted reviewers list
+     * @param trustedReviewerHBox The HBox corresponding to the desired reviewer
+     */
     private void removeTrustedReviewer(HBox trustedReviewerHBox) {
         if (!reviewersListView.getItems().contains(trustedReviewerHBox)) {
             return;
@@ -216,6 +233,12 @@ public class TrustedReviewerPage extends BasePage {
     }
 
     // Method to get the Review from the given trustedReviewerHBox using the reviewer's name
+
+    /**
+     * Gets the {@link Review} from the given trusted reviewer using their username
+     * @param trustedReviewerHBox The HBox corresponding to the trusted reviewer
+     * @return The {@link Review} of the given trusted reviewer
+     */
     private Review getReviewFromHBox(HBox trustedReviewerHBox) {
         Label reviewerName = (Label) trustedReviewerHBox.getChildren().getFirst();
         User reviewer = context.users().getByUsername(reviewerName.getText());
