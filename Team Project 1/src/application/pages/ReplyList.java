@@ -18,6 +18,7 @@ import utils.permissions.Roles;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -217,6 +218,7 @@ public class ReplyList extends BasePage {
     private void updateList() {
         ObservableList<Answer> tempReplyList = FXCollections.observableArrayList();
         replies = findAnswers(root, tempReplyList);
+        replies = sendTrustedReviewsToTop(replies);
         rearrangeAnswers(replies);
     }
 
@@ -255,6 +257,19 @@ public class ReplyList extends BasePage {
      */
     private void rearrangeAnswers(ObservableList<Answer> replies) {
         resetSpacing();
+        for (int j = 0; j < replies.size(); j++) {
+            Answer reply = replies.get(j);
+            if (reply != root && reply.getParentAnswerId() != root.getId()) {
+                int parentIndex = replies.indexOf(reply);
+                for (int i = parentIndex - 1; i > 0; i--) {
+                    if (replies.get(i).getId() == reply.getParentAnswerId()) {
+                        parentIndex = i;
+                    }
+                }
+                replies.remove(j);
+                replies.add(parentIndex + 1, reply);
+            }
+        }
         for (Answer reply : replies) {
             int depth = 0;
             Answer tempAnswer = reply;
@@ -268,6 +283,39 @@ public class ReplyList extends BasePage {
             }
             reply.getMessage().setContent(reformat.toString());
         }
+    }
+
+    /**
+     * @param replies The ObservableList of Answers
+     * @return a copy of the ObservableList with trusted reviews sent to the top
+     * Creates a new list of replies that has all the user's
+     * trusted reviewers' reviews at the top, sorted by their rankings.
+     * All other replies are added below trusted reviewer replies.
+     */
+    private ObservableList<Answer> sendTrustedReviewsToTop(ObservableList<Answer> replies) {
+        if (context.getSession().getCurrentRole() != Roles.STUDENT) {return replies;}
+        ObservableList<Answer> newList = FXCollections.observableArrayList();
+        for (Answer reply : replies) {
+            if (reply.getMessage().getContent().contains("φ") && reply.getParentAnswerId() == root.getId()) {
+                List<Review> reviews = context.reviews().getReviewersByUserId(context.getSession().getActiveUser().getId());
+                for (Review review : reviews) {
+                    if (reply.getMessage().getUserId() == review.getReviewer().getId()) {
+                        newList.addFirst(reply);
+                        break;
+                    }
+                }
+            }
+        }
+        newList.sort((a1, a2) -> {
+            int currentUserId = context.getSession().getActiveUser().getId();
+            int rating1 = context.reviews().getByCompositeKey(a1.getMessage().getUserId(), currentUserId).getRating();
+            int rating2 = context.reviews().getByCompositeKey(a2.getMessage().getUserId(), currentUserId).getRating();
+            return Integer.compare(rating1, rating2);
+        });
+        newList.addFirst(root);
+        replies.removeAll(newList);
+        newList.addAll(replies);
+        return newList;
     }
 
     /**
