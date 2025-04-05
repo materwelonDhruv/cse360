@@ -29,6 +29,10 @@ public class AddTrustedReviewerPage extends BasePage {
     private final TextField reviewerNameInput = UIFactory.createTextField("Search Reviewers By Name", f ->
             f.minChars(0).maxChars(30));
 
+    /**
+     * Creates the layout for the AddTrustedReviewerPage
+     * @return layout
+     */
     @Override
     public Pane createView() {
         // Retrieve the active user from session.
@@ -110,7 +114,9 @@ public class AddTrustedReviewerPage extends BasePage {
         return layout;
     }
 
-    // Method to load all untrusted reviewers into the resultView
+    /**
+     * Loads all untrusted reviewers into the resultView
+     */
     private void loadUntrustedReviewers() {
         try {
             User currentUser = context.getSession().getActiveUser();
@@ -124,7 +130,10 @@ public class AddTrustedReviewerPage extends BasePage {
         }
     }
 
-    // Method to update the resultView with the results of the search
+    /**
+     * Updates the resultView with the results of a search
+     * @param list The list containing the search results
+     */
     private void updateResults(List<User> list) {
         resultView.getItems().clear();
         for (User u : list) {
