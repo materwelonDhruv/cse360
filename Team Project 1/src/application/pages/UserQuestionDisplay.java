@@ -181,8 +181,13 @@ public class UserQuestionDisplay extends BasePage {
                 }
             });
         }));
+        User currentUser = context.getSession().getActiveUser();
+        if (RolesUtil.hasRole(currentUser.getRoles(), Roles.REVIEWER)) {
+            toolbar.getChildren().addAll(backButton, logoutButton);
+        } else {
+            toolbar.getChildren().addAll(backButton, requestReviewerButton, logoutButton);
+        }
 
-        toolbar.getChildren().addAll(backButton, requestReviewerButton, logoutButton);
 
         container.getChildren().addAll(splitPane, toolbar);
         return container;

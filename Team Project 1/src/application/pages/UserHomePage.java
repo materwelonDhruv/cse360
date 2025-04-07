@@ -145,7 +145,7 @@ public class UserHomePage extends BasePage {
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
         // Create Question Display buttons.
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
+        Button questionDisplayButton = UIFactory.createHomepageButton("Your Homepage", context);
 
         //Create Trusted Reviewer button
         Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
