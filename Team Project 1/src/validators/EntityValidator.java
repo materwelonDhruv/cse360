@@ -195,4 +195,37 @@ public class EntityValidator {
             }
         }
     }
+
+    /**
+     * Validates a StaffMessage object.
+     *
+     * @param staffMessage The StaffMessage object to validate.
+     * @throws IllegalArgumentException if the staffMessage or its internal fields are invalid.
+     */
+    public static void validateStaffMessage(StaffMessage staffMessage) {
+        if (staffMessage == null) {
+            throw new IllegalArgumentException("StaffMessage cannot be null.");
+        }
+        if (staffMessage.getMessage() == null) {
+            throw new IllegalArgumentException("StaffMessage must contain a valid Message object.");
+        }
+        if (staffMessage.getUser() == null || staffMessage.getUser().getId() <= 0) {
+            throw new IllegalArgumentException("A valid user is required for a staff message.");
+        }
+        if (staffMessage.getStaff() == null || staffMessage.getStaff().getId() <= 0) {
+            throw new IllegalArgumentException("A valid staff member is required for a staff message.");
+        }
+        // staff != user
+        if (staffMessage.getUser().getId() == staffMessage.getStaff().getId()) {
+            throw new IllegalArgumentException("Staff and user cannot be the same person.");
+        }
+
+        // Validate roles
+        if (!RolesUtil.hasRole(staffMessage.getStaff().getRoles(), Roles.STAFF)) {
+            throw new IllegalArgumentException("Staff member must have the STAFF role.");
+        }
+
+        // Reuse existing message validations
+        validateMessage(staffMessage.getMessage());
+    }
 }

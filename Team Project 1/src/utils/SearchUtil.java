@@ -70,6 +70,10 @@ public class SearchUtil {
      * @see org.apache.lucene.queryparser.classic.QueryParser
      */
     public static <T> List<T> fullTextSearch(List<T> items, String keyword, Function<T, String> textExtractor) throws Exception {
+        if (items == null || items.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         Directory directory = new ByteBuffersDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
         IndexWriterConfig config = new IndexWriterConfig(analyzer);

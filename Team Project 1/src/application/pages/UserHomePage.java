@@ -193,6 +193,18 @@ public class UserHomePage extends BasePage {
         //Creating log out button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
+        Button staffChatPopupButton = UIFactory.createButton("Chat With Staff", b ->
+                b.onAction(e -> {
+                    UserStaffChatWindow chatWindow = new UserStaffChatWindow();
+                    chatWindow.createStaffChatStage(context);
+                })
+        );
+
+        // Button to navigate to the announcements page
+        Button announcementsButton = UIFactory.createButton("Announcements", b ->
+                b.routeToPage(MyPages.ANNOUNCEMENTS, context)
+        );
+
         //Add spacer for better UI
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
@@ -232,7 +244,7 @@ public class UserHomePage extends BasePage {
         });
 
         // HBox for option buttons
-        HBox optionBar = new HBox(10, questionDisplayButton);
+        HBox optionBar = new HBox(10, questionDisplayButton, staffChatPopupButton, announcementsButton);
 
         // Add the trusted reviewer button only if the user is a student
         if (userCurrentRole == Roles.STUDENT) {
@@ -340,6 +352,18 @@ public class UserHomePage extends BasePage {
     private void deleteQuestion() {
         Pair<Integer, String> selectedItem = questionListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
+            int questionId = selectedItem.getKey();
+            Question question = context.questions().getById(questionId);
+            User questionAuthor = context.users().getById(question.getMessage().getUserId());
+            boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN});
+            System.out.println(("Staff Check: " + checkIfStaff));
+
+            if (questionAuthor.getId() != context.getSession().getActiveUser().getId() && !checkIfStaff) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "You cannot delete this question.");
+                alert.showAndWait();
+                return;
+            }
+
             context.questions().delete(selectedItem.getKey());// Use Questions class
             questionListView.getItems().remove(selectedItem);
         }

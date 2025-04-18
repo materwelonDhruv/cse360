@@ -35,7 +35,11 @@ public enum MyPages {
     REVIEW_HOME("/reviewHome"),
     REPLY_LIST("/replyList"),
     TRUSTED_REVIEWER("/trustedReviewer"),
-    ADD_TRUSTED_REVIEWER("/addTrustedReviewer");
+    ADD_TRUSTED_REVIEWER("/addTrustedReviewer"),
+    STAFF_HOME("/staffHome"),
+    STAFF_PRIVATE_CHATS("/staffPrivateChats"),
+    REMOVE_REVIEWER("/removeReviewer"),
+    ANNOUNCEMENTS("/announcements");
 
     private final String route;
 
