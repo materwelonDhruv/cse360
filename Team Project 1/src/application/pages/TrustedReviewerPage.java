@@ -1,6 +1,7 @@
 package application.pages;
 
 
+import application.UserProfileWindow;
 import application.framework.*;
 import database.model.entities.Review;
 import database.model.entities.User;
@@ -31,6 +32,7 @@ public class TrustedReviewerPage extends BasePage {
 
     /**
      * Creates the layout for the TrustedReviewerPage
+     *
      * @return layout
      */
     @Override
@@ -47,9 +49,9 @@ public class TrustedReviewerPage extends BasePage {
             if (event.getClickCount() == 2) {
                 HBox selectedReviewer = reviewersListView.getSelectionModel().getSelectedItem();
                 if (selectedReviewer != null) {
-                    ReviewerProfileWindow reviewerProfileWindow = new ReviewerProfileWindow();
+                    UserProfileWindow UserProfileWindow = new UserProfileWindow();
                     Review r = getReviewFromHBox(selectedReviewer);
-                    reviewerProfileWindow.createReviewerProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
+                    application.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
                 }
             }
         });
@@ -122,6 +124,7 @@ public class TrustedReviewerPage extends BasePage {
     /**
      * Creates an HBox containing information about the given reviewer
      * and buttons for ranking and removal from the list
+     *
      * @param reviewer The {@link Review} object to make an HBox for
      * @return The Hbox to be added to the list view
      */
@@ -157,9 +160,10 @@ public class TrustedReviewerPage extends BasePage {
 
     /**
      * Swaps the ranking of the given reviewer with another in the student's trusted reviewers list.
+     *
      * @param trustedReviewerHBox1 The Hbox corresponding to the reviewer to swap
-     * @param offset The amount to be added to the given reviewer's index to find the index of
-     *               the second reviewer to be swapped with
+     * @param offset               The amount to be added to the given reviewer's index to find the index of
+     *                             the second reviewer to be swapped with
      */
     private void swapTrustedReviewerRankings(HBox trustedReviewerHBox1, int offset) {
         if (!reviewersListView.getItems().contains(trustedReviewerHBox1)) {
@@ -205,6 +209,7 @@ public class TrustedReviewerPage extends BasePage {
 
     /**
      * Removes the given reviewer from the student's trusted reviewers list
+     *
      * @param trustedReviewerHBox The HBox corresponding to the desired reviewer
      */
     private void removeTrustedReviewer(HBox trustedReviewerHBox) {
@@ -236,6 +241,7 @@ public class TrustedReviewerPage extends BasePage {
 
     /**
      * Gets the {@link Review} from the given trusted reviewer using their username
+     *
      * @param trustedReviewerHBox The HBox corresponding to the trusted reviewer
      * @return The {@link Review} of the given trusted reviewer
      */

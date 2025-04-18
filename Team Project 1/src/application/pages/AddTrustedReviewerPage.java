@@ -1,5 +1,6 @@
 package application.pages;
 
+import application.UserProfileWindow;
 import application.framework.*;
 import database.model.entities.User;
 import javafx.geometry.Pos;
@@ -31,6 +32,7 @@ public class AddTrustedReviewerPage extends BasePage {
 
     /**
      * Creates the layout for the AddTrustedReviewerPage
+     *
      * @return layout
      */
     @Override
@@ -80,9 +82,9 @@ public class AddTrustedReviewerPage extends BasePage {
             if (event.getClickCount() == 2) {
                 List<String> selectedReviewer = resultView.getSelectionModel().getSelectedItems();
                 if (selectedReviewer.size() == 1) {
-                    ReviewerProfileWindow reviewerProfileWindow = new ReviewerProfileWindow();
+                    UserProfileWindow userProfileWindow = new UserProfileWindow();
                     User u = context.users().getByUsername(selectedReviewer.get(0));
-                    reviewerProfileWindow.createReviewerProfileStage(context, context.getSession().getActiveUser().getId(), u.getId());
+                    UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), u.getId());
                 }
             }
         });
@@ -132,6 +134,7 @@ public class AddTrustedReviewerPage extends BasePage {
 
     /**
      * Updates the resultView with the results of a search
+     *
      * @param list The list containing the search results
      */
     private void updateResults(List<User> list) {

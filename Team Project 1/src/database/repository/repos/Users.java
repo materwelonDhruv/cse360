@@ -4,6 +4,7 @@ import database.model.entities.Review;
 import database.model.entities.User;
 import database.repository.Repository;
 import utils.PasswordUtil;
+import utils.SearchUtil;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
@@ -245,4 +246,23 @@ public class Users extends Repository<User> {
                         && reviewer.getId() != userId)
                 .toList();
     }
+
+    /**
+     * Searches users by fuzzy-matching both the user's username
+     * <p>
+     * This method retrieves all users and performs an in-memory fuzzy search using the specified keyword.
+     * </p>
+     *
+     * @param keyword The search keyword to match the user.
+     * @return A list of {@link User} objects that match the search keyword.
+     * @throws Exception If an error occurs during the search operation.
+     */
+    public List<User> searchUsers(String keyword) throws Exception {
+        // Basic approach: retrieve all, then do fuzzy filter in-memory
+        List<User> all = getAll();
+        return SearchUtil.fullTextSearch(all, keyword,
+                u -> u.getUserName() + " " + u.getFirstName() + " "
+        );
+    }
+
 }
