@@ -1,5 +1,6 @@
-package application;
+package application.pages;
 
+import application.AppContext;
 import application.framework.DesignGuide;
 import application.framework.UIFactory;
 import database.model.entities.Answer;

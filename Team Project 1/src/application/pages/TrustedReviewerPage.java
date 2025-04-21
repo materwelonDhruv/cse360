@@ -1,7 +1,6 @@
 package application.pages;
 
 
-import application.UserProfileWindow;
 import application.framework.*;
 import database.model.entities.Review;
 import database.model.entities.User;
@@ -51,7 +50,7 @@ public class TrustedReviewerPage extends BasePage {
                 if (selectedReviewer != null) {
                     UserProfileWindow UserProfileWindow = new UserProfileWindow();
                     Review r = getReviewFromHBox(selectedReviewer);
-                    application.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
+                    application.pages.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
                 }
             }
         });

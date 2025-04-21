@@ -1,6 +1,5 @@
 package application.pages;
 
-import application.UserProfileWindow;
 import application.framework.*;
 import database.model.entities.User;
 import javafx.geometry.Pos;
