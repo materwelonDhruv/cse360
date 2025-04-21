@@ -91,6 +91,9 @@ public class StaffHomePage extends BasePage {
         List<User> searchList = new ArrayList<User>();
         //Search field allowing staff to search for users
         TextField userSearch = UIFactory.createTextField("Username Search");
+        userSearch.setMaxWidth(300);
+        resultView.setMaxHeight(100);
+        resultView.setMaxWidth(300);
         //When a staff is searching for users, when the content is over three characters, displays fuzzy search of users
         userSearch.setOnKeyReleased(event -> {
             String inputText = userSearch.getText();
@@ -110,7 +113,7 @@ public class StaffHomePage extends BasePage {
             if (event.getClickCount() == 2) {
                 User selectedItem = context.users().getByUsername(resultView.getSelectionModel().getSelectedItem());
                 UserProfileWindow userProfileWindow = new UserProfileWindow();
-                userProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), selectedItem.getId());
+                UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), selectedItem.getId());
             }
         });
 
