@@ -25,21 +25,22 @@ public enum MyPages {
     SETUP_LOGIN("/setupLogin"),
     SETUP_ACCOUNT("/setupAccount"),
     WELCOME_LOGIN("/welcomeLogin"),
-    USER_HOME("/userHome"),
     USER_LOGIN("/userLogin"),
+    STAFF_NAVIGATION("/staffNavigation"),
+    REVIEWER_PROFILE("/reviewerprofile"),
+    REPLY_LIST("/replyList"),
+    USER_HOME("/userHome"),
     USER_QUESTION_DISPLAY("/userQuestionDisplay"),
     PRIVATE_MESSAGE("/privateMessagePage"),
     PRIVATE_CONVERSATION("/privateConversation"),
     INSTRUCTOR_HOME("/instructorHome"),
-    REVIEWER_PROFILE("/reviewerprofile"),
     REVIEW_HOME("/reviewHome"),
-    REPLY_LIST("/replyList"),
     TRUSTED_REVIEWER("/trustedReviewer"),
     ADD_TRUSTED_REVIEWER("/addTrustedReviewer"),
+    ANNOUNCEMENTS("/announcements"),
     STAFF_HOME("/staffHome"),
     STAFF_PRIVATE_CHATS("/staffPrivateChats"),
-    REMOVE_REVIEWER("/removeReviewer"),
-    ANNOUNCEMENTS("/announcements");
+    REMOVE_REVIEWER("/removeReviewer");
 
     private final String route;
 
