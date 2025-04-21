@@ -43,10 +43,14 @@ public class UserHomePage extends BasePage {
     //Answer TextField
     private final TextField answerInput = UIFactory.createTextField("Enter answer", f ->
             f.minWidth(500).maxWidth(1200).minChars(10).maxChars(600));
+    private final TextField searchInput = UIFactory.createTextField("Enter answer", f ->
+            f.minWidth(200).maxWidth(1200).minChars(10).maxChars(48));
     //Question and Answers list to store and
     //interact with each element in the list -- questions and answers
     private final ListView<Pair<Integer, String>> questionListView = new ListView<>();
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
+    private final ListView<Pair<Integer, String>> searchListView = new ListView<>();
+
     private final Questions questionsRepo;
     private final Answers answersRepo;
 
@@ -104,6 +108,7 @@ public class UserHomePage extends BasePage {
     @Override
     public Pane createView() {
         loadQuestions();
+        searchListView.setVisible(false);
         double rowHeight = 26; // Original height for search listview
         resultView.getItems().clear();
         resultView.setPrefHeight(rowHeight);
@@ -161,6 +166,75 @@ public class UserHomePage extends BasePage {
             }
         }));
 
+        searchInput.setOnKeyTyped(event -> {
+            if (searchInput.getText().length() >= 3) {
+                try {
+                    searchListView.setVisible(true);
+                    List<Question> searchedQuestions = questionsRepo.searchQuestions(searchInput.getText());
+                    List<Question> unansweredQuestions = new ArrayList<Question>();
+                    List<Question> answeredQuestions = new ArrayList<Question>();
+                    List<Integer> allUnansweredQuestionIds = new ArrayList<Integer>();
+                    Pair<Integer, String> question;
+                    searchListView.getItems().clear();
+                    for (Question q : context.questions().getUnansweredQuestions()) {
+                        allUnansweredQuestionIds.add(q.getId());
+                    }
+                    for (Question q : searchedQuestions) {
+                        if (allUnansweredQuestionIds.contains(q.getId())) {
+                            unansweredQuestions.add(q);
+                        } else {
+                            answeredQuestions.add(q);
+                        }
+                    }
+                    for (Question q : answeredQuestions) {
+                        question = new Pair<Integer, String>(q.getId(), q.getTitle());
+                        searchListView.getItems().add(question);
+                    }
+                    for (Question q : unansweredQuestions) {
+                        question = new Pair<Integer, String>(q.getId(), q.getTitle());
+                        searchListView.getItems().add(question);
+                    }
+
+                    searchListView.setPrefHeight(searchListView.getItems().size() * 26);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                searchListView.setVisible(false);
+            }
+        });
+
+        //Display only the question
+        searchListView.setCellFactory(lv -> new ListCell<Pair<Integer, String>>() {
+            @Override
+            protected void updateItem(Pair<Integer, String> item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    Question q = context.questions().getById(item.getKey());
+                    if (!context.questions().hasPinnedAnswer(q.getId())) {
+                        setText(item.getValue() + " (Unresolved)");
+                    } else {
+                        setText(item.getValue());
+                    }
+                }
+            }
+        });
+
+        //Go to answer list on double-click
+        searchListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Pair<Integer, String> selectedItem = searchListView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    currentlySelectedQuestionId = selectedItem.getKey();
+                    createAnswerStage(currentlySelectedQuestionId);
+                    showAnswerWindow(currentlySelectedQuestionId);
+                }
+            }
+        });
+
+
         //Delete button to delete a question
         Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
                 (a -> deleteQuestion()));
@@ -210,7 +284,7 @@ public class UserHomePage extends BasePage {
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
         HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
-        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
+        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, searchInput, searchListView);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
