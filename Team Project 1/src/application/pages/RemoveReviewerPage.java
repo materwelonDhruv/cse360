@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The RemoveReviewerPage class provides a user interface for staff users to manage and remove
+ * The RemoveReviewerPage class provides a user interface for staff and instructor users to manage and remove
  * reviewer roles from users. The page displays a list of users who have the reviewer role and
  * provides an option to remove that role.
  * <p>
- * Staff users can use this page to correct role assignments when necessary.
+ * Staff and Instructor users can use this page to correct role assignments (reviewer) when necessary.
  * </p>
  *
  * @author Dhruv
@@ -109,9 +109,8 @@ public class RemoveReviewerPage extends BasePage {
         // Add placeholder text when there are no reviewers
         reviewersTable.setPlaceholder(new Label("No users with reviewer privileges found"));
 
-        // Add back button to return to staff home page
-        Button backButton = UIFactory.createButton("Your Homepage", e ->
-                e.routeToPage(MyPages.STAFF_HOME, context));
+        // Add back button to return to respective role's home page
+        Button backButton = UIFactory.createBackButton(context);
 
         // Add homepage button
         Button homeButton = UIFactory.createHomepageButton("Question Display", context);
