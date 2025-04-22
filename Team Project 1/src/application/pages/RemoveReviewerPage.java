@@ -110,9 +110,8 @@ public class RemoveReviewerPage extends BasePage {
         reviewersTable.setPlaceholder(new Label("No users with reviewer privileges found"));
 
         // Add back button to return to staff home page
-        Button backButton = UIFactory.createButton("Your Homepage", e -> {
-            e.routeToPage(MyPages.STAFF_HOME, context);
-        });
+        Button backButton = UIFactory.createButton("Your Homepage", e ->
+                e.routeToPage(MyPages.STAFF_HOME, context));
 
         // Add homepage button
         Button homeButton = UIFactory.createHomepageButton("Question Display", context);
