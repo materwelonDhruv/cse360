@@ -7,6 +7,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
+import javafx.scene.control.MenuButton;
+
 
 /**
  * The StaffHomePage class provides the main landing page for staff members.
@@ -14,8 +18,6 @@ import javafx.scene.layout.VBox;
  * This page displays basic navigation controls and a button that opens
  * the staff private chat interface.
  * </p>
- *
- * @author Dhruv
  */
 @Route(MyPages.STAFF_HOME)
 @View(title = "Staff Home Page")
@@ -37,8 +39,9 @@ public class StaffHomePage extends BasePage {
      */
     @Override
     public Pane createView() {
-        VBox layout = new VBox(15);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        VBox layout = new VBox(20);
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.CENTER);
 
         // Retrieve the active user (staff) from session.
         User staffUser = context.getSession().getActiveUser();
@@ -48,8 +51,8 @@ public class StaffHomePage extends BasePage {
         }
 
         // Greeting label
-        Label greeting = UIFactory.createLabel("Hello, " + staffUser.getFirstName() + " (Staff)!");
-        greeting.getStyleClass().add("heading");
+        Label titleLabel = UIFactory.createLabel("Hello, " + staffUser.getFirstName() + " (Staff)!");
+        titleLabel.getStyleClass().add("heading");
 
         // Button to navigate to the staff private chats page
         Button privateChatsButton = UIFactory.createButton("Open Private Chats", b ->
@@ -65,17 +68,24 @@ public class StaffHomePage extends BasePage {
                 b.routeToPage(MyPages.ANNOUNCEMENTS, context)
         );
 
-        // Add base buttons
+        // Button to logout
         Button logoutButton = UIFactory.createLogoutButton(context);
-        Button homepageButton = UIFactory.createHomepageButton("Main Page", context);
 
-        HBox topBar = new HBox(10, privateChatsButton,
+        // Question display button
+        Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
+
+        //role menu to select and switch between the role
+        MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
+
+        HBox topBar = new HBox(10, logoutButton, roleMenu);
+        topBar.setAlignment(Pos.CENTER);
+
+        layout.getChildren().addAll(titleLabel,
                 manageReviewerButton,
+                privateChatsButton,
+                questionDisplayButton,
                 announcementsButton,
-                logoutButton,
-                homepageButton
-        );
-        layout.getChildren().addAll(greeting, topBar);
+                topBar);
 
         return layout;
     }
