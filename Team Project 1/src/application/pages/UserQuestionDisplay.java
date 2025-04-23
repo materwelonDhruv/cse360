@@ -1,7 +1,10 @@
 package application.pages;
 
 import application.framework.*;
-import database.model.entities.*;
+import database.model.entities.PrivateMessage;
+import database.model.entities.Question;
+import database.model.entities.ReviewerRequest;
+import database.model.entities.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,19 +54,31 @@ public class UserQuestionDisplay extends BasePage {
 
         // Create table for user's questions
         TableView<Question> questionTable = questionTableSetup();
-        // Create table for Reviewer's reviews
-        TableView<Answer> reviewTable = reviewTableSetup();
+        questionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox questionTableVBox = new VBox(10);
+        Label questionLabel = new Label("Your Questions");
+        questionLabel.setStyle("-fx-font-weight: bold;");
+        questionTableVBox.getChildren().addAll(questionLabel, questionTable);
 
         //Private message table declaration
         TableView<PrivateMessage> privateMessageTable = privateMessageTableSetup();
+        privateMessageTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox privateMessageVBox = new VBox(10);
+        Label privateMessageLabel = new Label("Received PrivateMessages");
+        privateMessageLabel.setStyle("-fx-font-weight: bold;");
+        privateMessageVBox.getChildren().addAll(privateMessageLabel, privateMessageTable);
 
         //Set up SentPMTable
         TableView<PrivateMessage> sentPrivateMessageTable = sentPrivateMessageTableSetup();
-
+        sentPrivateMessageTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox sentPrivateMessageVBox = new VBox(10);
+        Label sentPrivateMessageLabel = new Label("Sent PrivateMessages");
+        sentPrivateMessageLabel.setStyle("-fx-font-weight: bold;");
+        sentPrivateMessageVBox.getChildren().addAll(sentPrivateMessageLabel, sentPrivateMessageTable);
         // Add tables to the split pane
         SplitPane sp = new SplitPane();
-        sp.getItems().addAll(privateMessageTable, sentPrivateMessageTable);
-        splitPane.getItems().addAll(questionTable, sp);
+        sp.getItems().addAll(privateMessageVBox, sentPrivateMessageVBox);
+        splitPane.getItems().addAll(questionTableVBox, sp);
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
@@ -192,12 +207,7 @@ public class UserQuestionDisplay extends BasePage {
         container.getChildren().addAll(splitPane, toolbar);
         return container;
     }
-
-    private TableView<Answer> reviewTableSetup() {
-        //TODO: write this method and make it work
-        return null;
-    }
-
+    
     private TableView<PrivateMessage> sentPrivateMessageTableSetup() {
         TableView<PrivateMessage> sentPrivateMessageTable = new TableView<>();
         ObservableList<PrivateMessage> obSPMs = FXCollections.observableArrayList();
