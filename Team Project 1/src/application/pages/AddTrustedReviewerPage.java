@@ -146,7 +146,7 @@ public class AddTrustedReviewerPage extends BasePage {
                 reviewerList.sort((u1, u2) -> {
                         int rating1 = context.reviews().calculateAggregatedRating(u1);
                         int rating2 = context.reviews().calculateAggregatedRating(u2);
-                        return Integer.compare(rating1, rating2);
+                        return Integer.compare(rating2, rating1);
                 });
             }
             resultView.getItems().clear();
