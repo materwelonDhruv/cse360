@@ -1,6 +1,7 @@
 package utils;
 
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 
 /**
  * This utility class provides general-purpose helper methods for various functionalities such as
@@ -39,5 +40,18 @@ public class Helpers {
             sb.append(chars.charAt(random.nextInt(chars.length())));
         }
         return sb.toString();
+    }
+
+    /**
+     * Method converts provided {@link Timestamp} to a human-readable string format:
+     * "h:mm a d MMM, yyyy"
+     *
+     * @param timestamp The {@link Timestamp} to be converted.
+     * @return A formatted string representing the timestamp, including an AM/PM marker.
+     */
+    public static String formatTimestamp(Timestamp timestamp) {
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("h:mm a d MMM, yyyy");
+        return sdf.format(timestamp);
     }
 }
