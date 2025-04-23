@@ -164,4 +164,38 @@ public class ReviewsTest extends BaseDatabaseTest {
         Review shouldBeGone = reviewsRepo.getByCompositeKey(alice.getId(), bob.getId());
         assertNull(shouldBeGone, "Review should have been deleted.");
     }
+
+    /**
+     * Tests {@link Reviews#calculateAggregatedRating(User)} with smoothing and
+     * minimum-list requirement. Logs the computed rating.
+     */
+    @Test
+    @Order(8)
+    public void testCalculateAggregatedRatingWithSmoothing() {
+        // Create a fresh reviewer
+        User frank = new User("frank111", "Frank", "Furter", "pw6", "frank@example.com",
+                RolesUtil.rolesToInt(new Roles[]{Roles.REVIEWER}));
+        usersRepo.create(frank);
+
+        // Existing users as list-owners
+        User charlie = usersRepo.getByUsername("charlie789");
+        User dave = usersRepo.getByUsername("dave012");
+        User eve = usersRepo.getByUsername("eve345");
+
+        // Ensure no stale entries for Frank
+        reviewsRepo.delete(frank.getId(), charlie.getId());
+        reviewsRepo.delete(frank.getId(), dave.getId());
+        reviewsRepo.delete(frank.getId(), eve.getId());
+
+        // Each of charlie, dave, eve lists Frank
+        reviewsRepo.create(new Review(frank, charlie, 1));  // top of a list of size 1 → w=0×r=1
+        reviewsRepo.create(new Review(frank, dave, 2));  // second in list of size 2 → w=0.5×r=0.5
+        reviewsRepo.create(new Review(frank, eve, 3));  // third in list of size 2 (invalid) → ignored
+
+        int rating = reviewsRepo.calculateAggregatedRating(frank);
+        System.out.println("Smoothed rating for Frank: " + rating);
+
+        // Based on math, we expect ~4 after smoothing and mapping
+        assertEquals(4, rating, "Expected smoothed, thresholded rating of 5 for Frank");
+    }
 }

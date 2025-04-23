@@ -5,7 +5,7 @@ import database.model.BaseEntity;
 /**
  * Represents a review given by a user to a reviewer.
  * <p>
- * This class stores the reviewer, the user being reviewed, and the rating given by the user.
+ * This class stores the reviewer, the user being reviewed, and the position in their list given by the user.
  * </p>
  *
  * @author Dhruv
@@ -28,7 +28,7 @@ public class Review extends BaseEntity {
      *
      * @param reviewer The user who is reviewing the other user.
      * @param user     The user being reviewed.
-     * @param rating   The rating given by the reviewer.
+     * @param rating   The position given by the reviewer.
      */
     public Review(User reviewer, User user, int rating) {
         this.reviewer = reviewer;
@@ -39,7 +39,7 @@ public class Review extends BaseEntity {
     /**
      * Gets the reviewer who gave the rating.
      *
-     * @return The user who gave the review.
+     * @return The user who got the review.
      */
     public User getReviewer() {
         return reviewer;
@@ -48,7 +48,7 @@ public class Review extends BaseEntity {
     /**
      * Sets the reviewer who gave the rating.
      *
-     * @param reviewer The user who is giving the review.
+     * @param reviewer The user who is receiving the review.
      */
     public void setReviewer(User reviewer) {
         this.reviewer = reviewer;
@@ -57,7 +57,7 @@ public class Review extends BaseEntity {
     /**
      * Gets the user being reviewed.
      *
-     * @return The user who is being reviewed.
+     * @return The user who gave the review.
      */
     public User getUser() {
         return user;
@@ -66,7 +66,7 @@ public class Review extends BaseEntity {
     /**
      * Sets the user being reviewed.
      *
-     * @param user The user who is being reviewed.
+     * @param user The user giving the review.
      */
     public void setUser(User user) {
         this.user = user;
@@ -75,7 +75,7 @@ public class Review extends BaseEntity {
     /**
      * Gets the rating given to the user.
      *
-     * @return The rating for the user.
+     * @return The position for the user.
      */
     public int getRating() {
         return rating;
@@ -84,7 +84,7 @@ public class Review extends BaseEntity {
     /**
      * Sets the rating given to the user.
      *
-     * @param rating The rating to be set for the user.
+     * @param rating The position to be set for the user.
      */
     public void setRating(int rating) {
         this.rating = rating;
