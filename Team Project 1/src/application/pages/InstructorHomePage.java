@@ -128,8 +128,13 @@ public class InstructorHomePage extends BasePage {
         // RoleMenu to change role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
+        Button privateMessageButton = new Button("Private Messages");
+        privateMessageButton.setOnAction(e -> {
+            context.router().navigate(MyPages.USER_QUESTION_DISPLAY);
+        });
+
         // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton);
+        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton, privateMessageButton);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPadding(new Insets(10, 0, 0, 0));
 
