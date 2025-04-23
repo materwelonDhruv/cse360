@@ -3,6 +3,9 @@ package application.framework;
 import javafx.stage.Stage;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -46,22 +49,27 @@ public class PageRouter {
     /**
      * Automatically registers pages annotated with {@link Route} from the "application.pages" package.
      * <p>
-     * This method uses the Reflections library to scan the package for classes with the {@link Route} annotation,
+     * This method uses the Reflections library to scan the package (and subpackages) for classes with the {@link Route} annotation,
      * mapping them to the corresponding {@link MyPages} enum value.
      * </p>
      */
     private void autoRegister() {
-        // 1) Use Reflections to scan package "application.pages" for annotated classes
-        Reflections reflections = new Reflections("application.pages", Scanners.TypesAnnotated);
-        // 2) Find all classes with @Route
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(application.framework.Route.class);
+        String basePackage = "application.pages";
+        // Configuration that scans the package and all its subpackages
+        ConfigurationBuilder config = new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forPackage(basePackage))
+                .setScanners(Scanners.TypesAnnotated)
+                .filterInputsBy(new FilterBuilder().includePackage(basePackage));
+        Reflections reflections = new Reflections(config);
 
+        // find and register every @Route on a BasePage subclass
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Route.class);
         for (Class<?> cls : annotated) {
-            if (application.framework.BasePage.class.isAssignableFrom(cls)) {
+            if (BasePage.class.isAssignableFrom(cls)) {
                 @SuppressWarnings("unchecked")
-                Class<? extends application.framework.BasePage> pageClass = (Class<? extends application.framework.BasePage>) cls;
-                application.framework.Route routeAnnotation = pageClass.getAnnotation(application.framework.Route.class);
-                application.framework.MyPages pageEnum = routeAnnotation.value();
+                Class<? extends BasePage> pageClass = (Class<? extends BasePage>) cls;
+                Route ann = pageClass.getAnnotation(Route.class);
+                MyPages pageEnum = ann.value();
                 routeMap.put(pageEnum, pageClass);
                 System.out.println("Registered route " + pageEnum + " -> " + pageClass.getName());
             }

@@ -1,4 +1,4 @@
-package application.pages;
+package application.pages.admin;
 
 import application.framework.*;
 import database.model.entities.Announcement;
@@ -165,7 +165,9 @@ public class AnnouncementsPage extends BasePage {
      */
     private void editAnnouncementWindow(int announcementId) {
         Announcement announcement = context.announcements().getById(announcementId);
-        if (announcement.getMessage().getUserId() != context.getSession().getActiveUser().getId()) {return;}
+        if (announcement.getMessage().getUserId() != context.getSession().getActiveUser().getId()) {
+            return;
+        }
         Stage editorStage = new Stage();
         editorStage.initModality(Modality.APPLICATION_MODAL);
 
@@ -214,7 +216,9 @@ public class AnnouncementsPage extends BasePage {
         if (selectedItem != null) {
             Announcement a = context.announcements().getById(selectedItem.getKey());
             // Return if not the owner of the announcement
-            if (a.getMessage().getUserId() != context.getSession().getActiveUser().getId()) {return;}
+            if (a.getMessage().getUserId() != context.getSession().getActiveUser().getId()) {
+                return;
+            }
             context.announcements().delete(selectedItem.getKey());
             announcementView.getItems().remove(selectedItem);
         }
