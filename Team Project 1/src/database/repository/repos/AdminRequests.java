@@ -161,6 +161,20 @@ public class AdminRequests extends Repository<AdminRequest> {
     }
 
     /**
+     * Retrieves all {@link AdminRequest}s matching the given state.
+     *
+     * @param state the {@link RequestState} to filter by
+     * @return a list of AdminRequest objects matching the state
+     */
+    public List<AdminRequest> filterFetch(RequestState state) {
+        String sql =
+                "SELECT requestId, requesterID, targetID, type, state, reason, context " +
+                        "FROM AdminRequests " +
+                        "WHERE state = ?";
+        return queryForList(sql, pstmt -> pstmt.setInt(1, state.ordinal()), this::build);
+    }
+
+    /**
      * Updates only the {@link RequestState} of the specified AdminRequest.
      *
      * @param requestId the primary key of the request to update

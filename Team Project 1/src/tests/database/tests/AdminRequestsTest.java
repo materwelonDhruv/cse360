@@ -107,13 +107,22 @@ public class AdminRequestsTest extends BaseDatabaseTest {
 
     @Test
     @Order(3)
+    public void testFilterFetchByState() {
+        List<AdminRequest> pending = arRepo.filterFetch(RequestState.Pending);
+        assertTrue(pending.stream().anyMatch(r -> r.getId() == delReqId));
+        assertTrue(pending.stream().anyMatch(r -> r.getId() == updReqId));
+        assertTrue(pending.stream().anyMatch(r -> r.getId() == passReqId));
+    }
+
+    @Test
+    @Order(4)
     public void testFilterFetchByActionAndState() {
         List<AdminRequest> deletes = arRepo.filterFetch(AdminActions.DeleteUser, RequestState.Pending);
         assertTrue(deletes.stream().anyMatch(r -> r.getId() == delReqId));
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     public void testFilterFetchByActionStateRequester() {
         List<AdminRequest> requesterUpdates =
                 arRepo.filterFetch(AdminActions.UpdateRole, RequestState.Pending, instructorId);
@@ -122,7 +131,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void testSetState() {
         AdminRequest accepted = arRepo.setState(delReqId, RequestState.Accepted);
         assertNotNull(accepted);
@@ -133,7 +142,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testUpdateWholeRequest() throws SQLException {
         AdminRequest upd = arRepo.getById(updReqId);
         upd.setReason("Promote to reviewer – verified");
@@ -145,7 +154,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     public void testValidatorEdgeCase_ContextRequiredForUpdateRole() {
         AdminRequest bad = new AdminRequest(
                 usersRepo.getById(instructorId),
@@ -159,14 +168,14 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testDelete() throws SQLException {
         arRepo.delete(passReqId);
         assertNull(arRepo.getById(passReqId));
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void testSetStateNonExistent() {
         AdminRequest none = arRepo.setState(999999, RequestState.Accepted);
         assertNull(none);
