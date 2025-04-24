@@ -8,16 +8,15 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
  * Handles page navigation in the application.
  * <p>
- * This class is responsible for scanning pages annotated with {@link Route} in the "application.pages" package,
- * mapping them to the corresponding {@link MyPages} enum, and handling the navigation between pages.
+ * This class is responsible for scanning pages annotated with {@link Route} in the
+ * "application.pages" package, mapping them to the corresponding {@link MyPages} enum,
+ * and maintaining a history stack for back navigation.
  * </p>
  *
  * @author Dhruv
@@ -27,19 +26,21 @@ import java.util.logging.Logger;
 public class PageRouter {
 
     private static final Logger logger = Logger.getLogger(PageRouter.class.getName());
+
     private final Stage primaryStage;
-    private final Map<application.framework.MyPages, Class<? extends application.framework.BasePage>> routeMap = new HashMap<>();
-    private MyPages previousPage = null;
+    private final Map<MyPages, Class<? extends BasePage>> routeMap = new HashMap<>();
+
+    // Stack of previously visited pages; top is the most recent
+    private final Deque<MyPages> history = new ArrayDeque<>();
+
+    // The currently displayed page
     private MyPages currentPage = null;
 
     /**
-     * Constructs a {@code PageRouter} with the given primary stage.
-     * <p>
-     * This constructor initializes the primary stage and automatically registers all pages annotated with
-     * {@link Route} in the "application.pages" package.
-     * </p>
+     * Constructs a {@code PageRouter} with the given primary stage,
+     * and immediately registers all @Route-annotated pages.
      *
-     * @param primaryStage The primary stage of the application.
+     * @param primaryStage the primary JavaFX Stage
      */
     public PageRouter(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -47,11 +48,8 @@ public class PageRouter {
     }
 
     /**
-     * Automatically registers pages annotated with {@link Route} from the "application.pages" package.
-     * <p>
-     * This method uses the Reflections library to scan the package (and subpackages) for classes with the {@link Route} annotation,
-     * mapping them to the corresponding {@link MyPages} enum value.
-     * </p>
+     * Scans "application.pages" (and subpackages) for classes annotated with {@link Route},
+     * and populates the routeMap.
      */
     private void autoRegister() {
         String basePackage = "application.pages";
@@ -77,45 +75,57 @@ public class PageRouter {
     }
 
     /**
-     * Navigates to the specified page route.
+     * Navigates to the specified page.
      * <p>
-     * This method creates an instance of the page, initializes it with the primary stage, and shows the page.
-     * It also updates the current and previous pages for navigation history.
+     * Always pushes the current page onto the history stack (if non-null and different)
+     * before switching to the new page. Does not itself handle popping history.
      * </p>
      *
-     * @param page The {@link MyPages} enum value representing the page to navigate to.
+     * @param page the {@link MyPages} enum value to navigate to
      */
-    public void navigate(application.framework.MyPages page) {
+    public void navigate(MyPages page) {
+        if (page == null) {
+            logger.warning("Cannot navigate to null page");
+            return;
+        }
+
+        if (currentPage != null && !currentPage.equals(page)) {
+            history.push(currentPage);
+        }
+
         Class<? extends BasePage> pageClass = routeMap.get(page);
         if (pageClass == null) {
             logger.warning("No route found for: " + page);
             return;
         }
+
         try {
             Constructor<? extends BasePage> ctor = pageClass.getDeclaredConstructor();
-            BasePage pageInstance = ctor.newInstance();
-            pageInstance.init(primaryStage);
-            previousPage = currentPage;
+            BasePage instance = ctor.newInstance();
+            instance.init(primaryStage);
             currentPage = page;
-            pageInstance.show();
+            instance.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Returns the previously visited page.
+     * Returns and removes the last page from the history stack.
+     * <p>
+     * This is used by the back-button logic. If there is no history, returns null.
+     * </p>
      *
-     * @return The {@link MyPages} enum value representing the previous page, or {@code null} if no previous page exists.
+     * @return the previous {@link MyPages} enum value, or null if none
      */
     public MyPages getPreviousPage() {
-        return previousPage;
+        return history.isEmpty() ? null : history.pop();
     }
 
     /**
      * Returns the currently displayed page.
      *
-     * @return The {@link MyPages} enum value representing the current page.
+     * @return the current {@link MyPages} enum value
      */
     public MyPages getCurrentPage() {
         return currentPage;
