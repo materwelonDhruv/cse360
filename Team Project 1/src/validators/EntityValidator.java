@@ -3,12 +3,13 @@ package validators;
 import database.model.entities.*;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
+import utils.requests.AdminActions;
 
 /**
  * Provides validation methods for various entities within the system.
  * <p>
  * This class includes validation mechanisms for entities such as Question, Answer, PrivateMessage,
- * Message, Review, and ReviewerRequest. It ensures required fields are present and valid according
+ * Message, Review, and ReviewerRequest, etc. It ensures required fields are present and valid according
  * to specified criteria.
  * </p>
  *
@@ -227,5 +228,50 @@ public class EntityValidator {
 
         // Reuse existing message validations
         validateMessage(staffMessage.getMessage());
+    }
+
+    /**
+     * Validates an {@link AdminRequest} object.
+     * <p>
+     * Ensures that requester and target are non-null with valid IDs,
+     * that type and state enums are set,
+     * that reason is non-empty,
+     * and if the action is {@link AdminActions#UpdateRole}, that a non-null context (role ID) is provided.
+     * </p>
+     *
+     * @param req the AdminRequest to validate
+     * @throws IllegalArgumentException if any required field is missing or invalid
+     */
+    public static void validateAdminRequest(AdminRequest req) {
+        if (req == null) {
+            throw new IllegalArgumentException("AdminRequest cannot be null.");
+        }
+        if (req.getRequester() == null || req.getRequester().getId() <= 0) {
+            throw new IllegalArgumentException("A valid requester is required.");
+        }
+        if (req.getTarget() == null || req.getTarget().getId() <= 0) {
+            throw new IllegalArgumentException("A valid target user is required.");
+        }
+        if (req.getType() == null) {
+            throw new IllegalArgumentException("Admin action type must be specified.");
+        }
+        if (req.getState() == null) {
+            throw new IllegalArgumentException("Request state must be specified.");
+        }
+        if (req.getReason() == null || req.getReason().trim().isEmpty()) {
+            throw new IllegalArgumentException("Reason cannot be empty.");
+        }
+        // If action is UpdateRole, context (new rolesInt) must be present
+        if (req.getType() == AdminActions.UpdateRole
+                && req.getContext() == null) {
+            throw new IllegalArgumentException("Context (rolesInt) is required for UpdateRole requests.");
+        }
+
+        // If requester is not a user with the Instructor role, throw an exception
+        if (req.getRequester() != null && req.getRequester().getId() > 0) {
+            if (!RolesUtil.hasRole(req.getRequester().getRoles(), Roles.INSTRUCTOR)) {
+                throw new IllegalArgumentException("Requester must have the INSTRUCTOR role.");
+            }
+        }
     }
 }
