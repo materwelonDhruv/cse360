@@ -210,23 +210,30 @@ public class UserHomePage extends BasePage {
             }
         });
 
-        //Display only the question
+        //Display only the question title or reviewer's username
         searchListView.setCellFactory(lv -> new ListCell<Pair<Integer, String>>() {
             @Override
             protected void updateItem(Pair<Integer, String> item, boolean empty) {
+                //List to hold a list of all reviewers id's to cross-check
                 List<Integer> reviewerIds = new ArrayList<Integer>();
+                //List to hold a list of all question id's to differentiate between users and questions
                 List<Integer> questionIds = new ArrayList<Integer>();
+                //List to hold a list of all reviewer usernames to accurately assign reviewer or question appended text
+                List<String> reviewerUserNames = new ArrayList<String>();
                 for (User u : context.users().getAllReviewers()) {
                     reviewerIds.add(u.getId());
+                    reviewerUserNames.add(u.getUserName());
                 }
                 for (Question q : context.questions().getAll()) {
                     questionIds.add(q.getId());
                 }
+
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    if (reviewerIds.contains(item.getKey())) {
+                    //checks if selected item is a reviewer or a question and appends appropriate text
+                    if (reviewerUserNames.contains(item.getValue()) || reviewerIds.contains(item.getKey()) && !questionIds.contains(item.getKey())) {
                         setText(item.getValue() + "(Reviewer)");
                     } else if (questionIds.contains(item.getKey())) {
                         Question q = context.questions().getById(item.getKey());
@@ -245,10 +252,23 @@ public class UserHomePage extends BasePage {
         searchListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Pair<Integer, String> selectedItem = searchListView.getSelectionModel().getSelectedItem();
+                List<Integer> reviewerIds = new ArrayList<Integer>();
+                List<Integer> questionIds = new ArrayList<Integer>();
+                for (User u : context.users().getAllReviewers()) {
+                    reviewerIds.add(u.getId());
+                }
+                for (Question q : context.questions().getAll()) {
+                    questionIds.add(q.getId());
+                }
                 if (selectedItem != null) {
-                    currentlySelectedQuestionId = selectedItem.getKey();
-                    createAnswerStage(currentlySelectedQuestionId);
-                    showAnswerWindow(currentlySelectedQuestionId);
+                    if (reviewerIds.contains(selectedItem.getKey())) { //If item is a reviewer, open their profile
+                        UserProfileWindow userProfileWindow = new UserProfileWindow();
+                        UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), selectedItem.getKey());
+                    } else if (questionIds.contains(selectedItem.getKey())) { //if item is a question, open answer stage
+                        currentlySelectedQuestionId = selectedItem.getKey();
+                        createAnswerStage(currentlySelectedQuestionId);
+                        showAnswerWindow(currentlySelectedQuestionId);
+                    }
                 }
             }
         });
