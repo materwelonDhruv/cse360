@@ -279,6 +279,11 @@ public class UserHomePage extends BasePage {
                 b.routeToPage(MyPages.ANNOUNCEMENTS, context)
         );
 
+        // Button to navigate to StaffNavigationPage
+        Button staffNavigationButton = UIFactory.createButton("Navigate To Other Pages", b ->
+                b.routeToPage(MyPages.STAFF_NAVIGATION, context)
+        );
+
         //Add spacer for better UI
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
@@ -323,6 +328,8 @@ public class UserHomePage extends BasePage {
         // Add the trusted reviewer button only if the user is a student
         if (userCurrentRole == Roles.STUDENT) {
             optionBar.getChildren().add(trustedReviewerButton);
+        } else if (userCurrentRole == Roles.STAFF) { // Add staff navigation button only for staff
+            optionBar.getChildren().add(staffNavigationButton);
         }
 
         layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
