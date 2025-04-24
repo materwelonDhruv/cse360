@@ -32,6 +32,8 @@ public class PageRouter {
 
     // Stack of previously visited pages; top is the most recent
     private final Deque<MyPages> history = new ArrayDeque<>();
+    // When true, skip pushing currentPage on the next navigate() call
+    private boolean skipHistoryPush = false;
 
     // The currently displayed page
     private MyPages currentPage = null;
@@ -89,16 +91,10 @@ public class PageRouter {
             return;
         }
 
-        if (currentPage != null && !currentPage.equals(page)) {
-            logger.info("Adding page to history: " + currentPage + " (navigating to " + page + ")");
-            logger.fine("Current history stack before update: " + history);
+        if (!skipHistoryPush && currentPage != null && !currentPage.equals(page)) {
             history.push(currentPage);
-            logger.fine("Updated history stack: " + history);
-        } else if (currentPage == null) {
-            logger.info("Not updating history: currentPage is null");
-        } else {
-            logger.info("Not updating history: navigating to same page (" + page + ")");
         }
+        skipHistoryPush = false;
 
         Class<? extends BasePage> pageClass = routeMap.get(page);
         if (pageClass == null) {
@@ -126,7 +122,9 @@ public class PageRouter {
      * @return the previous {@link MyPages} enum value, or null if none
      */
     public MyPages getPreviousPage() {
-        return history.isEmpty() ? null : history.pop();
+        if (history.isEmpty()) return null;
+        skipHistoryPush = true;
+        return history.pop();
     }
 
     /**
