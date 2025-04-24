@@ -117,10 +117,15 @@ public class InstructorHomePage extends BasePage {
 
         //Button to go the question_display page
         Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
+
         // Add a refresh button
         Button refreshButton = UIFactory.createButton("Refresh Requests", e -> {
             refreshRequestsTable();
         });
+
+        //Button to navigate to remove reviewers role
+        Button manageReviewerButton = UIFactory.createButton("Manage Reviewer Roles", b ->
+                b.routeToPage(MyPages.REMOVE_REVIEWER, context));
 
         // Add logout button
         Button logoutButton = UIFactory.createLogoutButton(context);
@@ -134,7 +139,8 @@ public class InstructorHomePage extends BasePage {
         });
 
         // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton, privateMessageButton);
+        HBox buttonContainer = new HBox(10, refreshButton, questionDisplayButton, privateMessageButton,
+                manageReviewerButton, roleMenu, logoutButton);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPadding(new Insets(10, 0, 0, 0));
 

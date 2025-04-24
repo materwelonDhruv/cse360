@@ -112,11 +112,9 @@ public class RemoveReviewerPage extends BasePage {
         // Add back button to return to respective role's home page
         Button backButton = UIFactory.createBackButton(context);
 
-        // Add homepage button
-        Button homeButton = UIFactory.createHomepageButton("Question Display", context);
 
         // Button container
-        HBox buttonContainer = new HBox(10, backButton, homeButton);
+        HBox buttonContainer = new HBox(10, backButton);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPadding(new Insets(10, 0, 0, 0));
 
