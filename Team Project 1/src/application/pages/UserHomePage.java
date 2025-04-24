@@ -174,6 +174,7 @@ public class UserHomePage extends BasePage {
                     List<Question> unansweredQuestions = new ArrayList<Question>();
                     List<Question> answeredQuestions = new ArrayList<Question>();
                     List<Integer> allUnansweredQuestionIds = new ArrayList<Integer>();
+                    List<User> reviewerList = context.users().getAllReviewers();
                     Pair<Integer, String> question;
                     searchListView.getItems().clear();
                     for (Question q : context.questions().getUnansweredQuestions()) {
@@ -194,6 +195,11 @@ public class UserHomePage extends BasePage {
                         question = new Pair<Integer, String>(q.getId(), q.getTitle());
                         searchListView.getItems().add(question);
                     }
+                    for (User u : reviewerList) {
+                        question = new Pair<Integer, String>(u.getId(), u.getUserName());
+                        searchListView.getItems().add(question);
+                    }
+
 
                     searchListView.setPrefHeight(searchListView.getItems().size() * 26);
                 } catch (Exception e) {
@@ -208,15 +214,28 @@ public class UserHomePage extends BasePage {
         searchListView.setCellFactory(lv -> new ListCell<Pair<Integer, String>>() {
             @Override
             protected void updateItem(Pair<Integer, String> item, boolean empty) {
+                List<Integer> reviewerIds = new ArrayList<Integer>();
+                List<Integer> questionIds = new ArrayList<Integer>();
+                for (User u : context.users().getAllReviewers()) {
+                    reviewerIds.add(u.getId());
+                }
+                for (Question q : context.questions().getAll()) {
+                    questionIds.add(q.getId());
+                }
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    Question q = context.questions().getById(item.getKey());
-                    if (!context.questions().hasPinnedAnswer(q.getId())) {
-                        setText(item.getValue() + " (Unresolved)");
-                    } else {
-                        setText(item.getValue());
+                    if (reviewerIds.contains(item.getKey())) {
+                        setText(item.getValue() + "(Reviewer)");
+                    } else if (questionIds.contains(item.getKey())) {
+                        Question q = context.questions().getById(item.getKey());
+                        if (!context.questions().hasPinnedAnswer(q.getId())) {
+                            setText(item.getValue() + " (Unresolved)");
+                        } else {
+                            setText(item.getValue());
+                        }
+
                     }
                 }
             }
