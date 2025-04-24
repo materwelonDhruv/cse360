@@ -2,16 +2,13 @@ package application.pages;
 
 import application.framework.*;
 import database.model.entities.User;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.geometry.Insets;
-import javafx.scene.control.MenuButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,8 +68,8 @@ public class StaffHomePage extends BasePage {
         }
 
         // Greeting label
-        Label titleLabel = UIFactory.createLabel("Hello, " + staffUser.getFirstName() + " (Staff)!");
-        titleLabel.getStyleClass().add("heading");
+        Label greeting = UIFactory.createLabel("Hello, " + staffUser.getFirstName() + " (Staff)!");
+        greeting.getStyleClass().add("heading");
 
         // Button to navigate to the staff private chats page
         Button privateChatsButton = UIFactory.createButton("Open Private Chats", b ->
@@ -128,18 +125,9 @@ public class StaffHomePage extends BasePage {
         //role menu to select and switch between the role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
-        HBox topBar = new HBox(10, logoutButton, roleMenu);
+        HBox topBar = new HBox(10, logoutButton, roleMenu, manageReviewerButton, privateChatsButton, questionDisplayButton, announcementsButton);
         topBar.setAlignment(Pos.CENTER);
 
-        layout.getChildren().addAll(titleLabel,
-                manageReviewerButton,
-                privateChatsButton,
-                questionDisplayButton,
-                announcementsButton,
-                topBar);
-                logoutButton,
-                homepageButton
-        );
         layout.getChildren().addAll(greeting, topBar, userSearch, resultView);
 
         return layout;
