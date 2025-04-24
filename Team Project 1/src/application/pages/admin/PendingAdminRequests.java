@@ -36,6 +36,7 @@ public class PendingAdminRequests extends BasePage {
             Button rejectButton = setupRejectButton();
             buttonVBox.getChildren().addAll(acceptButton, rejectButton);
         }
+        
         return tempView;
     }
 
