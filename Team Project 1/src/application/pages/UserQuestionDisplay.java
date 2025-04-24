@@ -207,7 +207,7 @@ public class UserQuestionDisplay extends BasePage {
         container.getChildren().addAll(splitPane, toolbar);
         return container;
     }
-    
+
     private TableView<PrivateMessage> sentPrivateMessageTableSetup() {
         TableView<PrivateMessage> sentPrivateMessageTable = new TableView<>();
         ObservableList<PrivateMessage> obSPMs = FXCollections.observableArrayList();
