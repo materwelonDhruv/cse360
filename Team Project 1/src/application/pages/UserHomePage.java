@@ -43,7 +43,7 @@ public class UserHomePage extends BasePage {
     //Answer TextField
     private final TextField answerInput = UIFactory.createTextField("Enter answer", f ->
             f.minWidth(500).maxWidth(1200).minChars(10).maxChars(600));
-    private final TextField searchInput = UIFactory.createTextField("Enter answer", f ->
+    private final TextField searchInput = UIFactory.createTextField("Search", f ->
             f.minWidth(200).maxWidth(1200).minChars(10).maxChars(48));
     //Question and Answers list to store and
     //interact with each element in the list -- questions and answers
@@ -283,7 +283,7 @@ public class UserHomePage extends BasePage {
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
+        //HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
         HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, searchInput, searchListView);
 
         //Call the Question stage and Answer stage

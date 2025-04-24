@@ -47,6 +47,7 @@ public class ReviewerHomePage extends BasePage {
     //interact with each element in the list -- questions and answers
     private final ListView<Pair<Integer, String>> questionListView = new ListView<>();
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
+
     private final Questions questionsRepo;
     private final Answers answersRepo;
     //keeping track of whether only the user's questions are being shown
@@ -148,7 +149,7 @@ public class ReviewerHomePage extends BasePage {
         //Region spacer = new Region();
         //spacer.setPrefWidth(250);
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, unresolvedQuestionsButton, logoutButton);
+        HBox buttonBar = new HBox(10, questionDisplayButton, unresolvedQuestionsButton, logoutButton);
 
         //Go to answer list on double-click
         questionListView.setOnMouseClicked(event -> {
