@@ -90,7 +90,14 @@ public class PageRouter {
         }
 
         if (currentPage != null && !currentPage.equals(page)) {
+            logger.info("Adding page to history: " + currentPage + " (navigating to " + page + ")");
+            logger.fine("Current history stack before update: " + history);
             history.push(currentPage);
+            logger.fine("Updated history stack: " + history);
+        } else if (currentPage == null) {
+            logger.info("Not updating history: currentPage is null");
+        } else {
+            logger.info("Not updating history: navigating to same page (" + page + ")");
         }
 
         Class<? extends BasePage> pageClass = routeMap.get(page);
