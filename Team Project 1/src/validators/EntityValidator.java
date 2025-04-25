@@ -269,7 +269,7 @@ public class EntityValidator {
 
         // If requester is not a user with the Instructor role, throw an exception
         if (req.getRequester() != null && req.getRequester().getId() > 0) {
-            if (!RolesUtil.hasRole(req.getRequester().getRoles(), Roles.INSTRUCTOR)) {
+            if (!RolesUtil.hasAnyRole(RolesUtil.intToRoles(req.getRequester().getRoles()), new Roles[]{Roles.INSTRUCTOR, Roles.ADMIN})) {
                 throw new IllegalArgumentException("Requester must have the INSTRUCTOR role.");
             }
         }
