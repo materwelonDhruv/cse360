@@ -115,7 +115,8 @@ public class AdminRequest extends BaseEntity {
         return context;
     }
 
-    public void setContext(Integer context) {
+    public AdminRequest setContext(Integer context) {
         this.context = context;
+        return this;
     }
 }
