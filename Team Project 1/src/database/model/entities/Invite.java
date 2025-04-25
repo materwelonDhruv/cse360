@@ -57,8 +57,9 @@ public class Invite extends BaseEntity {
      *
      * @param code The new invite code.
      */
-    public void setCode(String code) {
+    public Invite setCode(String code) {
         this.code = code;
+        return this;
     }
 
     /**
@@ -75,8 +76,9 @@ public class Invite extends BaseEntity {
      *
      * @param userId The new user ID of the invite creator.
      */
-    public void setUserId(Integer userId) {
+    public Invite setUserId(Integer userId) {
         this.userId = userId;
+        return this;
     }
 
     /**
@@ -93,8 +95,9 @@ public class Invite extends BaseEntity {
      *
      * @param roles The new roles (bit field) to be associated with the invite.
      */
-    public void setRoles(int roles) {
+    public Invite setRoles(int roles) {
         this.roles = roles;
+        return this;
     }
 
     /**
@@ -111,7 +114,8 @@ public class Invite extends BaseEntity {
      *
      * @param createdAt The new creation timestamp (in seconds).
      */
-    public void setCreatedAt(long createdAt) {
+    public Invite setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 }

@@ -48,8 +48,9 @@ public class Question extends BaseEntity {
      *
      * @param message The new message for the question.
      */
-    public void setMessage(Message message) {
+    public Question setMessage(Message message) {
         this.message = message;
+        return this;
     }
 
     /**
@@ -66,7 +67,8 @@ public class Question extends BaseEntity {
      *
      * @param title The new title for the question.
      */
-    public void setTitle(String title) {
+    public Question setTitle(String title) {
         this.title = title;
+        return this;
     }
 }

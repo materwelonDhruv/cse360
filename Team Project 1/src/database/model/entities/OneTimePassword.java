@@ -56,8 +56,9 @@ public class OneTimePassword extends BaseEntity {
      *
      * @param creatorId The new creator ID to be set.
      */
-    public void setCreatorId(int creatorId) {
+    public OneTimePassword setCreatorId(int creatorId) {
         this.creatorId = creatorId;
+        return this;
     }
 
     /**
@@ -74,8 +75,9 @@ public class OneTimePassword extends BaseEntity {
      *
      * @param targetId The new target ID to be set.
      */
-    public void setTargetId(int targetId) {
+    public OneTimePassword setTargetId(int targetId) {
         this.targetId = targetId;
+        return this;
     }
 
     /**
@@ -92,8 +94,9 @@ public class OneTimePassword extends BaseEntity {
      *
      * @param used The new status of the OTP's usage.
      */
-    public void setUsed(boolean used) {
+    public OneTimePassword setUsed(boolean used) {
         isUsed = used;
+        return this;
     }
 
     /**
@@ -110,8 +113,9 @@ public class OneTimePassword extends BaseEntity {
      *
      * @param otpValue The new OTP value to be set.
      */
-    public void setOtpValue(String otpValue) {
+    public OneTimePassword setOtpValue(String otpValue) {
         this.otpValue = otpValue;
+        return this;
     }
 
     /**
@@ -124,5 +128,6 @@ public class OneTimePassword extends BaseEntity {
      */
     public String getPlainOtp() {
         return plainOtp;
+
     }
 }

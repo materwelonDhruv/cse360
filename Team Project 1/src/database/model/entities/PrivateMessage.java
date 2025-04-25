@@ -51,8 +51,9 @@ public class PrivateMessage extends BaseEntity {
      *
      * @param message The new message to be set.
      */
-    public void setMessage(Message message) {
+    public PrivateMessage setMessage(Message message) {
         this.message = message;
+        return this;
     }
 
     /**
@@ -69,8 +70,9 @@ public class PrivateMessage extends BaseEntity {
      *
      * @param questionId The new question ID to be set.
      */
-    public void setQuestionId(Integer questionId) {
+    public PrivateMessage setQuestionId(Integer questionId) {
         this.questionId = questionId;
+        return this;
     }
 
     /**
@@ -96,7 +98,8 @@ public class PrivateMessage extends BaseEntity {
      *
      * @param parentPrivateMessageId The new parent private message ID to be set.
      */
-    public void setParentPrivateMessageId(Integer parentPrivateMessageId) {
+    public PrivateMessage setParentPrivateMessageId(Integer parentPrivateMessageId) {
         this.parentPrivateMessageId = parentPrivateMessageId;
+        return this;
     }
 }

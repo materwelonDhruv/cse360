@@ -50,8 +50,9 @@ public class Review extends BaseEntity {
      *
      * @param reviewer The user who is receiving the review.
      */
-    public void setReviewer(User reviewer) {
+    public Review setReviewer(User reviewer) {
         this.reviewer = reviewer;
+        return this;
     }
 
     /**
@@ -68,8 +69,9 @@ public class Review extends BaseEntity {
      *
      * @param user The user giving the review.
      */
-    public void setUser(User user) {
+    public Review setUser(User user) {
         this.user = user;
+        return this;
     }
 
     /**
@@ -86,7 +88,8 @@ public class Review extends BaseEntity {
      *
      * @param rating The position to be set for the user.
      */
-    public void setRating(int rating) {
+    public Review setRating(int rating) {
         this.rating = rating;
+        return this;
     }
 }
