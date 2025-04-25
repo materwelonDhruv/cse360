@@ -15,6 +15,7 @@ import utils.requests.RequestState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static utils.permissions.RolesUtil.*;
 
@@ -30,6 +31,8 @@ import static utils.permissions.RolesUtil.*;
 @Route(MyPages.ADMIN_USER_MODIFY)
 @View(title = "Modify User")
 public class AdminUserModifyPage extends BasePage {
+    // TextField for the reason the request is being made.
+    private final TextField reasonField = UIFactory.createTextField("Reason For Request");
     private static User admin;
     // The target user that is to be modified.
     private static User targetUser;
@@ -185,17 +188,8 @@ public class AdminUserModifyPage extends BasePage {
 
         // Request OTP Button.
         Button requestOTPBtn = UIFactory.createButton("Request One Time Password",
-                e -> e.onAction(a -> {
-                    AdminRequest request = new AdminRequest(
-                        context.getSession().getActiveUser(),
-                        targetUser,
-                        AdminActions.RequestPassword,
-                        RequestState.Pending,
-                        "",
-                        null
-                    );
-                    sendAdminRequest(request);
-                }));
+                e -> e.onAction(a -> sendAdminRequest(AdminActions.RequestPassword, null))
+        );
 
         // Delete button.
         Button deleteBtn = UIFactory.createButton("Delete",
@@ -249,15 +243,7 @@ public class AdminUserModifyPage extends BasePage {
                         new Alert(Alert.AlertType.ERROR, "You cannot remove an admin!").show();
                     }
                 } else {
-                    AdminRequest request = new AdminRequest(
-                            context.getSession().getActiveUser(),
-                            targetUser,
-                            AdminActions.DeleteUser,
-                            RequestState.Pending,
-                            "",
-                            null
-                    );
-                    sendAdminRequest(request);
+                    sendAdminRequest(AdminActions.DeleteUser, null);
                 }
             }
         });
@@ -276,15 +262,7 @@ public class AdminUserModifyPage extends BasePage {
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 if (!hasRole(targetUser.getRoles(), Roles.ADMIN)) {
-                    AdminRequest request = new AdminRequest(
-                            context.getSession().getActiveUser(),
-                            targetUser,
-                            AdminActions.UpdateRole,
-                            RequestState.Pending,
-                            "",
-                            roleInt
-                    );
-                    sendAdminRequest(request);
+                    sendAdminRequest(AdminActions.UpdateRole, roleInt);
                 } else {
                     new Alert(Alert.AlertType.ERROR, "You cannot remove an admin!").show();
                 }
@@ -293,16 +271,33 @@ public class AdminUserModifyPage extends BasePage {
     }
 
     /**
-     *  Updates the given request if it is being reopened.
-     *  Otherwise, a new request is created. The user is then
-     *  sent back to the pending admin request page to view
-     *  the request.
-     * @param request The request to be updated/created.
+     *  If a request is being reopened, that request is updated
+     *  with the given action and roleInt. Otherwise, a new
+     *  request is created.
+     * @param action The action of the request.
+     * @param roleInt The roleInt of the request.
      */
-    private void sendAdminRequest(AdminRequest request) {
-        if (existingRequest != null) {
-            context.adminRequests().update(request);
+    private void sendAdminRequest(AdminActions action, Integer roleInt) {
+        String reason;
+        if (!Objects.equals(reasonField.getText(), "")) {
+            reason = reasonField.getText();
         } else {
+            reason = "None";
+        }
+        if (existingRequest != null) {
+            existingRequest.setReason(reason);
+            existingRequest.setContext(roleInt);
+            existingRequest.setState(RequestState.Pending);
+            context.adminRequests().update(existingRequest);
+        } else {
+            AdminRequest request = new AdminRequest(
+                    context.getSession().getActiveUser(),
+                    targetUser,
+                    action,
+                    RequestState.Pending,
+                    reason,
+                    roleInt
+            );
             context.adminRequests().create(request);
         }
         context.router().navigate(MyPages.ADMIN_PENDING);
