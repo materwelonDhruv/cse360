@@ -103,12 +103,17 @@ public class PendingAdminRequests extends BasePage {
 
     private void sendOTP(AdminRequest m) {
         // Generate one-time password using current active user's ID as the issuer.
-        OneTimePassword newPass = new OneTimePassword(m.getId(), m.getTarget().getId());
+        OneTimePassword newPass = new OneTimePassword(m.getRequester().getId(), m.getTarget().getId());
         context.oneTimePasswords().create(newPass);
         System.out.println("New password: " + newPass.getPlainOtp());
-        Message otpMessage = new Message(m.getId(), newPass.getPlainOtp());
+        Message otpMessage = new Message(m.getRequester().getId(), newPass.getPlainOtp());
+        User requester = m.getRequester();
+        requester.setRoles(RolesUtil.addRole(requester.getRoles(), Roles.STAFF));
+        context.users().update(requester);
         StaffMessage sm = new StaffMessage(otpMessage, context.getSession().getActiveUser(), m.getRequester());
         context.staffMessages().create(sm);
+        requester.setRoles(RolesUtil.removeRole(requester.getRoles(), Roles.STAFF));
+        context.users().update(requester);
     }
 
     private void updateListView(ListView<HBox> listView) {
