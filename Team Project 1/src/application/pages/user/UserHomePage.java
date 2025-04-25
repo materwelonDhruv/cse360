@@ -1,6 +1,8 @@
-package application.pages;
+package application.pages.user;
 
 import application.framework.*;
+import application.pages.PrivateMessagePage;
+import application.pages.ReplyList;
 import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Question;
@@ -11,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -38,7 +39,7 @@ public class UserHomePage extends BasePage {
     private static final ListView<String> resultView = new ListView<>();
     //Question and Question title TextFields
     private final TextField questionTitleInput = UIFactory.createTextField("Enter the title", f ->
-            f.minWidth(200).maxWidth(600).minChars(5).maxChars(10));
+            f.minWidth(200).maxWidth(600).minChars(5).maxChars(100));
     private final TextField questionInput = UIFactory.createTextField("Enter question", f ->
             f.minWidth(200).maxWidth(600).minChars(10).maxChars(MAX_LENGTH));
     //Answer TextField

@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.pages.user.UserProfileWindow;
 import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Review;
@@ -82,7 +83,7 @@ public class ReplyList extends BasePage {
                     int id = selectedItem.getMessage().getUserId();
                     if (context.reviews().getReviewersByUserId(id) != null) {
                         UserProfileWindow UserProfileWindow = new UserProfileWindow();
-                        application.pages.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), id);
+                        application.pages.user.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), id);
                     }
                 }
             }
