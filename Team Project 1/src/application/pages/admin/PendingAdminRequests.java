@@ -1,19 +1,19 @@
 package application.pages.admin;
 
 import application.framework.*;
-import database.model.entities.Message;
-import database.model.entities.OneTimePassword;
-import database.model.entities.User;
+import database.model.entities.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -27,16 +27,23 @@ public class PendingAdminRequests extends BasePage {
     private ArrayList<Message> adminRequests;
 
     public Pane createView() {
-        VBox layout = new VBox(10);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        BorderPane view = new BorderPane();
+        view.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
         Label title = new Label("Pending Admin Requests");
         ListView<HBox> pendingAdminRequests = setupPendingRequests();
-        layout.getChildren().addAll(title, pendingAdminRequests);
-        return layout;
+        VBox titleVBox = new VBox(10);
+        titleVBox.getChildren().addAll(title, pendingAdminRequests);
+        view.setCenter(titleVBox);
+        // Bottom toolbar with Back and Logout buttons using UIFactory
+        HBox toolbar = new HBox(10);
+        Button backButton = UIFactory.createHomepageButton("Homepage", context, e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        toolbar.getChildren().addAll(backButton, logoutButton);
+        view.setBottom(toolbar);
+        return view;
     }
 
     private ListView<HBox> setupPendingRequests() {
-        //TODO: un-messageify
         ListView<HBox> tempView = new ListView<>();
         HBox row = new HBox(10);
         Label title = new Label("...");
@@ -44,11 +51,16 @@ public class PendingAdminRequests extends BasePage {
         Label infoLabel = new Label("...");
         Label targetUsername = new Label("...");
         TextArea description = new TextArea("...");
-        ArrayList<Message> pendingRequests = setupPendingRequestsArrayList();
-        for (Message m : pendingRequests) {
-            title.setText(m.getContent());
-            requesterName.setText(m.getContent());
-            switch (m.getContent()) {
+        ArrayList<AdminRequest> pendingRequests = new ArrayList<>();
+        try {
+            pendingRequests = setupPendingRequestsArrayList();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (AdminRequest m : pendingRequests) {
+            title.setText(m.toString());
+            requesterName.setText(m.getRequester().getUserName());
+            switch (m.getReason()) {
                 case "delete":
                     infoLabel.setText("Delete");
                     break;
@@ -59,6 +71,7 @@ public class PendingAdminRequests extends BasePage {
                     infoLabel.setText("Password");
                     break;
                 default:
+                    infoLabel.setText("Unknown");
                     break;
             }
 
@@ -71,25 +84,23 @@ public class PendingAdminRequests extends BasePage {
                 buttonVBox.setAlignment(Pos.CENTER_RIGHT);
             }
 
-            targetUsername.setText(m.getContent());
-            description.setText(m.getContent());
+            targetUsername.setText(m.getTarget().getUserName());
         }
         return tempView;
     }
 
-    private Button setupAcceptButton(Message m) {
-        //TODO: un-messageify
+    private Button setupAcceptButton(AdminRequest m) {
         Button acceptButton = new Button("Accept");
         acceptButton.setOnAction(event -> {
-            switch (m.getContent()) {
+            switch (m.getReason()) {
                 case "delete":
-                    context.users().delete(m.getId());
+                    context.users().delete(m.getTarget().getId());
                     break;
                 case "change role":
-                    context.users().getById(0).setRoles(m.getId());
+                    context.users().getById(m.getTarget().getId()).setRoles(m.getContext());
                     break;
                 case "password":
-                    sendOTP();
+                    sendOTP(m);
                     break;
                 default:
                     break;
@@ -98,23 +109,23 @@ public class PendingAdminRequests extends BasePage {
         return acceptButton;
     }
 
-    private Button setupRejectButton() {
+    private Button setupRejectButton(AdminRequest m) {
         Button rejectButton = new Button("Reject");
         return rejectButton;
     }
 
-    private ArrayList<Message> setupPendingRequestsArrayList() {
-        ArrayList<Message> pendingRequests = null;
+    private ArrayList<AdminRequest> setupPendingRequestsArrayList() throws SQLException {
+        ArrayList<AdminRequest> pendingRequests = (ArrayList<AdminRequest>) context.adminRequests().getAll();
         return pendingRequests;
     }
 
-    private void sendOTP(Message m) {
+    private void sendOTP(AdminRequest m) {
         // Generate one-time password using current active user's ID as the issuer.
-        //TODO change this to make the issuer the sender of the request
-        OneTimePassword newPass = new OneTimePassword(context.getSession().getActiveUser().getId(), m.getId());
+        OneTimePassword newPass = new OneTimePassword(m.getId(), m.getTarget().getId());
         context.oneTimePasswords().create(newPass);
         System.out.println("New password: " + newPass.getPlainOtp());
-        Message otpMessage = new Message(user.getId(), "");
-        context.privateMessages().create();
+        Message otpMessage = new Message(m.getId(), newPass.getPlainOtp());
+        StaffMessage sm = new StaffMessage(otpMessage, context.getSession().getActiveUser(), m.getRequester());
+        context.staffMessages().create(sm);
     }
 }
