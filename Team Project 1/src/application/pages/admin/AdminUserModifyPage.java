@@ -167,10 +167,16 @@ public class AdminUserModifyPage extends BasePage {
             roleBox.getChildren().remove(adminCb);
         }
 
-        // TextField for the reason the request is being made.
-        TextField reasonField = UIFactory.createTextField("Reason For Request");
+        // Show existingRequest's reason and selected roles
         if (existingRequest != null) {
             reasonField.setText(existingRequest.getReason());
+
+            if (existingRequest.getType() == AdminActions.UpdateRole) {
+                instructorCb.setSelected(hasRole(existingRequest.getContext(), Roles.INSTRUCTOR));
+                studentCb.setSelected(hasRole(existingRequest.getContext(), Roles.STUDENT));
+                reviewerCb.setSelected(hasRole(existingRequest.getContext(), Roles.REVIEWER));
+                staffCb.setSelected(hasRole(existingRequest.getContext(), Roles.STAFF));
+            }
         }
 
         // Change roles button.
