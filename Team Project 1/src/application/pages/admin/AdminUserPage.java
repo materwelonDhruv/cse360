@@ -45,14 +45,7 @@ public class AdminUserPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Header label
-        Button backButton;
-        if (role == Roles.INSTRUCTOR) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.ADMIN) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
-        } else {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        }
+        Button backButton = UIFactory.createBackButton(context);
         var header = UIFactory.createLabel("Choose a User to Modify");
 
         // Create TableView to display users
