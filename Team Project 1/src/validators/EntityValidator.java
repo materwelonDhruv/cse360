@@ -273,5 +273,7 @@ public class EntityValidator {
                 throw new IllegalArgumentException("Requester must have the INSTRUCTOR role.");
             }
         }
+
+        validateLength(req.getReason(), 5, 500, "AdminRequest reason must be between 10 and 2000 characters.");
     }
 }

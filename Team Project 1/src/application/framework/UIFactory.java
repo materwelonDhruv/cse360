@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -270,7 +271,36 @@ public final class UIFactory {
     }
 
     /**
-     * Opens a modal input dialog with a single text field.
+     * Opens a modal input dialog with a single text field with validation.
+     *
+     * @param title       dialog window title
+     * @param placeholder placeholder text for the field
+     * @param defaultText optional pre‑fill text (may be null)
+     * @param validator   validator
+     * @param errorMsg    error message to show when validation fails
+     * @param configs     additional customisations for the {@link InputDialogBuilder}
+     * @return an {@link Optional} containing the user input when OK was pressed, otherwise empty
+     */
+    @SafeVarargs
+    public static Optional<String> showTextInput(String title,
+                                                 String placeholder,
+                                                 String defaultText,
+                                                 Predicate<String> validator,
+                                                 String errorMsg,
+                                                 Consumer<InputDialogBuilder>... configs) {
+        InputDialogBuilder builder = new InputDialogBuilder()
+                .setTitle(title)
+                .setPlaceholder(placeholder)
+                .attachValidator(validator, errorMsg);
+        if (defaultText != null) builder.setDefaultText(defaultText);
+        for (Consumer<InputDialogBuilder> cfg : configs) cfg.accept(builder);
+        return builder.showAndWaitValidated();
+    }
+
+    /**
+     * Opens a modal input dialog with a single text field with validation.
+     * <p>
+     * Don't use this method and set validator via configs. Use {@link #showTextInput(String, String, String, Predicate, String, Consumer[])} instead.
      *
      * @param title       dialog window title
      * @param placeholder placeholder text for the field
@@ -284,11 +314,10 @@ public final class UIFactory {
                                                  String defaultText,
                                                  Consumer<InputDialogBuilder>... configs) {
         InputDialogBuilder builder = new InputDialogBuilder()
-                .title(title)
-                .placeholder(placeholder);
-        if (defaultText != null) builder.defaultText(defaultText);
+                .setTitle(title)
+                .setPlaceholder(placeholder);
+        if (defaultText != null) builder.setDefaultText(defaultText);
         for (Consumer<InputDialogBuilder> cfg : configs) cfg.accept(builder);
-        Dialog<String> dlg = builder.build();
-        return dlg.showAndWait();
+        return builder.showAndWait();
     }
 }
