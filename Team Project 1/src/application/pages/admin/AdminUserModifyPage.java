@@ -16,7 +16,6 @@ import utils.requests.RequestState;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;
-import java.util.Objects;
 
 import static utils.permissions.RolesUtil.*;
 
@@ -27,7 +26,8 @@ import static utils.permissions.RolesUtil.*;
  * not allowed to make instantaneous changes like an admin could. Instead, they select the changes
  * they want, then an AdminRequest is created according to the changes they selected.
  *
- * @author Mike, Tyler
+ * @author Mike
+ * @author Tyler
  */
 @Route(MyPages.ADMIN_USER_MODIFY)
 @View(title = "Modify User")
