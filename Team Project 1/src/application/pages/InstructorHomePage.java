@@ -130,25 +130,21 @@ public class InstructorHomePage extends BasePage {
         // Add logout button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
-        // Add solved admin requests button
-        Button solvedRequestsButton = new Button("Solved Admin Requests");
-        solvedRequestsButton.setOnAction(e -> {
-            context.router().navigate(MyPages.ADMIN_SOLVED);
-        });
 
-        // Add pending admin requests button
-        Button pendingRequestsButton = new Button("Pending Admin Requests");
-        pendingRequestsButton.setOnAction(e -> {
-            context.router().navigate(MyPages.ADMIN_PENDING);
-        });
+        //menu button to operate requests to admin
+        MenuButton requests_for_admin = new MenuButton("Admin Requests");
+        MenuItem solved_requests = new MenuItem("Solved Requests");
+        solved_requests.setOnAction(e -> context.router().navigate(MyPages.ADMIN_SOLVED));
 
-        // Add admin request creation button
-        Button createRequestsButton = new Button("Create an Admin Request");
-        createRequestsButton.setOnAction(e -> {
-            context.router().navigate(MyPages.ADMIN_USER);
-        });
-        VBox adminRequestsContainer = new VBox(5);
-        adminRequestsContainer.getChildren().addAll(solvedRequestsButton, pendingRequestsButton, createRequestsButton);
+        MenuItem pending_requests = new MenuItem("Pending Requests");
+        pending_requests.setOnAction(e -> context.router().navigate(MyPages.ADMIN_PENDING));
+
+        MenuItem create_requests = new MenuItem("Create Request");
+        create_requests.setOnAction(e -> context.router().navigate(MyPages.ADMIN_USER));
+
+        requests_for_admin.getItems().addAll(create_requests, pending_requests, solved_requests);
+
+
         // RoleMenu to change role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
@@ -157,18 +153,24 @@ public class InstructorHomePage extends BasePage {
             context.router().navigate(MyPages.USER_QUESTION_DISPLAY);
         });
 
-        // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, questionDisplayButton, privateMessageButton,
-                manageReviewerButton, roleMenu, logoutButton, adminRequestsContainer);
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.setPadding(new Insets(10, 0, 0, 0));
+        // Button container for bottom of the page
+        HBox buttonContainerBelow = new HBox(10, requests_for_admin, roleMenu, logoutButton);
+        buttonContainerBelow.setAlignment(Pos.CENTER);
+        buttonContainerBelow.setPadding(new Insets(10, 0, 0, 0));
+
+        //Button container for top of the page
+        HBox buttonContainerAbove = new HBox(10, questionDisplayButton, privateMessageButton, manageReviewerButton);
+        buttonContainerAbove.setAlignment(Pos.CENTER);
+        buttonContainerAbove.setPadding(new Insets(10, 0, 0, 0));
 
         // Add everything to the layout
         layout.getChildren().addAll(
                 welcomeLabel,
+                buttonContainerAbove,
                 requestsLabel,
                 requestTable,
-                buttonContainer);
+                refreshButton,
+                buttonContainerBelow);
 
         return layout;
     }
