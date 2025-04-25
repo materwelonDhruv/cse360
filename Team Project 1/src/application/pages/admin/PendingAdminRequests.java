@@ -40,7 +40,6 @@ public class PendingAdminRequests extends BasePage {
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
         Button backButton = UIFactory.createBackButton(context);
-        UIFactory
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
@@ -57,57 +56,13 @@ public class PendingAdminRequests extends BasePage {
         }
         System.out.println(pendingRequests.size());
         for (AdminRequest a : pendingRequests) {
-            HBox row = new HBox(10);
-            Label title = new Label("...");
-            Label requesterName = new Label("Requester: " + a.getRequester().getUserName());
-            Label infoLabel = new Label("...");
-            Label targetUsername = new Label("Target: " + a.getTarget().getUserName());
-
-            title.setText(a.getReason());
-            row.getChildren().addAll(title, requesterName, infoLabel, targetUsername);
-            switch (a.getType()) {
-                case AdminActions.DeleteUser:
-                    infoLabel.setText("Delete");
-                    break;
-                case AdminActions.UpdateRole:
-                    infoLabel.setText("Change Role");
-                    Label newRoleLabel = new Label();
-                    Roles[] newRole = RolesUtil.intToRoles(a.getContext());
-                    String roles = "";
-                    for (Roles r : newRole) {
-                        int targetRoles = a.getTarget().getRoles();
-                        if (RolesUtil.hasRole(targetRoles, RolesUtil.intToRoles(a.getContext())[0])) {
-                            roles += "remove ";
-                        } else {
-                            roles += "add ";
-                        }
-                        roles += r.toString() + " ";
-                    }
-                    newRoleLabel.setText(roles);
-                    newRoleLabel.setAlignment(Pos.CENTER_RIGHT);
-                    row.getChildren().add(newRoleLabel);
-                    break;
-                case AdminActions.RequestPassword:
-                    infoLabel.setText("Password");
-                    break;
-                default:
-                    infoLabel.setText("Null");
-                    break;
-            }
-            if (currentRole == Roles.ADMIN) {
-                VBox buttonVBox = new VBox(10);
-                Button acceptButton = setupAcceptButton(a);
-                Button rejectButton = setupRejectButton(a);
-                buttonVBox.getChildren().addAll(acceptButton, rejectButton);
-                row.getChildren().add(buttonVBox);
-                buttonVBox.setAlignment(Pos.CENTER_RIGHT);
-            }
+            HBox row = buildRequestRow(a, tempView);
             tempView.getItems().add(row);
         }
         return tempView;
     }
 
-    private Button setupAcceptButton(AdminRequest m) {
+    private Button setupAcceptButton(AdminRequest m, ListView<HBox> listView) {
         Button acceptButton = new Button("Accept");
         acceptButton.setOnAction(event -> {
             switch (m.getType()) {
@@ -138,6 +93,7 @@ public class PendingAdminRequests extends BasePage {
 
                     target.setRoles(updatedRoles);
                     context.users().update(target);
+                    m.setState(RequestState.Accepted);
                     break;
                 case AdminActions.RequestPassword:
                     sendOTP(m);
@@ -145,15 +101,19 @@ public class PendingAdminRequests extends BasePage {
                 default:
                     break;
             }
+            m.setState(RequestState.Accepted);
+            context.adminRequests().update(m);
+            updateListView(listView);
         });
         return acceptButton;
     }
 
-    private Button setupRejectButton(AdminRequest m) {
+    private Button setupRejectButton(AdminRequest m, ListView<HBox> listView) {
         Button rejectButton = new Button("Reject");
         rejectButton.setOnAction(event -> {
             m.setState(RequestState.Denied);
             context.adminRequests().update(m);
+            updateListView(listView);
         });
         return rejectButton;
     }
@@ -172,5 +132,67 @@ public class PendingAdminRequests extends BasePage {
         Message otpMessage = new Message(m.getId(), newPass.getPlainOtp());
         StaffMessage sm = new StaffMessage(otpMessage, context.getSession().getActiveUser(), m.getRequester());
         context.staffMessages().create(sm);
+    }
+
+    private void updateListView(ListView<HBox> listView) {
+        listView.getItems().clear();
+        try {
+            ArrayList<AdminRequest> updatedRequests = setupPendingRequestsArrayList();
+            for (AdminRequest a : updatedRequests) {
+                HBox row = buildRequestRow(a, listView);  // extracted for reuse
+                listView.getItems().add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private HBox buildRequestRow(AdminRequest a, ListView<HBox> listView) {
+        HBox row = new HBox(10);
+        Label title = new Label("...");
+        Label requesterName = new Label("Requester: " + a.getRequester().getUserName());
+        Label infoLabel = new Label("...");
+        Label targetUsername = new Label("Target: " + a.getTarget().getUserName());
+
+        title.setText(a.getReason());
+        row.getChildren().addAll(title, requesterName, infoLabel, targetUsername);
+        switch (a.getType()) {
+            case AdminActions.DeleteUser:
+                infoLabel.setText("Delete");
+                break;
+            case AdminActions.UpdateRole:
+                infoLabel.setText("Change Role");
+                Label newRoleLabel = new Label();
+                Roles[] newRole = RolesUtil.intToRoles(a.getContext());
+                String roles = "";
+                for (Roles r : newRole) {
+                    int targetRoles = a.getTarget().getRoles();
+                    if (RolesUtil.hasRole(targetRoles, RolesUtil.intToRoles(a.getContext())[0])) {
+                        roles += "remove ";
+                    } else {
+                        roles += "add ";
+                    }
+                    roles += r.toString() + " ";
+                }
+                newRoleLabel.setText(roles);
+                newRoleLabel.setAlignment(Pos.CENTER_RIGHT);
+                row.getChildren().add(newRoleLabel);
+                break;
+            case AdminActions.RequestPassword:
+                infoLabel.setText("Password");
+                break;
+            default:
+                infoLabel.setText("Null");
+                break;
+        }
+        if (currentRole == Roles.ADMIN) {
+            VBox buttonVBox = new VBox(10);
+            Button acceptButton = setupAcceptButton(a, listView);
+            Button rejectButton = setupRejectButton(a, listView);
+            buttonVBox.getChildren().addAll(acceptButton, rejectButton);
+            row.getChildren().add(buttonVBox);
+            buttonVBox.setAlignment(Pos.CENTER_RIGHT);
+        }
+        return row;
     }
 }
