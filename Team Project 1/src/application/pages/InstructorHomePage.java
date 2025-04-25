@@ -123,6 +123,10 @@ public class InstructorHomePage extends BasePage {
             refreshRequestsTable();
         });
 
+        //Button to navigate to remove reviewers role
+        Button manageReviewerButton = UIFactory.createButton("Manage Reviewer Roles", b ->
+                b.routeToPage(MyPages.REMOVE_REVIEWER, context));
+
         // Add logout button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
