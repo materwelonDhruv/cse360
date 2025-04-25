@@ -40,7 +40,7 @@ public class ResetPasswordPage extends BasePage {
                 e -> e.onAction(a -> handleResetPassword(newPassField, a))
         );
 
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(resetPassLabel, newPassField, resetPasswordButton, backButton);
         return layout;

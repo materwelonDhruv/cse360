@@ -31,6 +31,7 @@ public class InvitationPage extends BasePage {
 
     /**
      * Creates the layout for the InvitationPage
+     *
      * @return layout
      */
     @Override
@@ -70,7 +71,7 @@ public class InvitationPage extends BasePage {
         );
 
         // Back button navigates to Admin Home
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         // Assemble layout
         layout.getChildren().addAll(titleLabel, instructions, roleBox, generateBtn, inviteCodeLabel, backButton);
@@ -80,14 +81,15 @@ public class InvitationPage extends BasePage {
     /**
      * Generates the invitation using each of the role checkboxes and sets up the
      * copy code button
-     * @param adminCb Checkbox for the admin role
-     * @param studentCb Checkbox for the student role
-     * @param reviewerCb Checkbox for the Reviewer role
-     * @param instructorCb Checkbox for the Instructor role
-     * @param staffCb Checkbox for the Staff role
+     *
+     * @param adminCb         Checkbox for the admin role
+     * @param studentCb       Checkbox for the student role
+     * @param reviewerCb      Checkbox for the Reviewer role
+     * @param instructorCb    Checkbox for the Instructor role
+     * @param staffCb         Checkbox for the Staff role
      * @param inviteCodeLabel Label displaying the generated invite code
-     * @param copyButton Button to copy the generated invite code to the user's clipboard
-     * @param layout layout of the InvitationPage
+     * @param copyButton      Button to copy the generated invite code to the user's clipboard
+     * @param layout          layout of the InvitationPage
      */
     private void handleGenerateInvitation(CheckBox adminCb, CheckBox studentCb, CheckBox reviewerCb,
                                           CheckBox instructorCb, CheckBox staffCb,

@@ -56,8 +56,8 @@ public class ReplyList extends BasePage {
         HBox bottomBar = new HBox(10);
         HBox topBar = new HBox(10);
         //Setup bottom toolbar
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
+        Button logoutButton = UIFactory.createLogoutButton(context);
         bottomBar.getChildren().addAll(backButton, logoutButton);
         layout.setBottom(bottomBar);
         //Setup ListView of replies

@@ -145,7 +145,7 @@ public class ReviewerHomePage extends BasePage {
         });
 
         //Creating log out button
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
 
         //Add spacer for better UI
         //Region spacer = new Region();

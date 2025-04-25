@@ -78,8 +78,8 @@ public class PrivateMessageConvoPage extends BasePage {
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
+        Button logoutButton = UIFactory.createLogoutButton(context);
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
 

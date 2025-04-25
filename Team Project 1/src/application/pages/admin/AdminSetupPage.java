@@ -62,7 +62,7 @@ public class AdminSetupPage extends BasePage {
                 e -> e.onAction(a -> handleSetup(userNameField, firstNameField, lastNameField, passwordField, emailField, errorLabel))
         );
 
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton, errorLabel, backButton);
         return layout;
