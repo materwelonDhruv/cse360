@@ -117,14 +117,10 @@ public class AdminUserModifyPage extends BasePage {
                                 }
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(removeRole(roleInt, Roles.ADMIN));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.ADMIN);
                                 }
                             } else {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(addRole(roleInt, Roles.ADMIN));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.ADMIN);
                                 }
                             }
                             break;
@@ -132,14 +128,10 @@ public class AdminUserModifyPage extends BasePage {
                             if (!cb.isSelected()) {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(removeRole(roleInt, Roles.INSTRUCTOR));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.INSTRUCTOR);
                                 }
                             } else {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(addRole(roleInt, Roles.INSTRUCTOR));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.INSTRUCTOR);
                                 }
                             }
                             break;
@@ -147,14 +139,10 @@ public class AdminUserModifyPage extends BasePage {
                             if (!cb.isSelected()) {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(removeRole(roleInt, Roles.STUDENT));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.STUDENT);
                                 }
                             } else {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(addRole(roleInt, Roles.STUDENT));
-                                } else {
-                                    createAdminRoleRequest(roleInt, Roles.STUDENT);
                                 }
                             }
                             break;
@@ -162,14 +150,10 @@ public class AdminUserModifyPage extends BasePage {
                             if (!cb.isSelected()) {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(removeRole(roleInt, Roles.REVIEWER));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.REVIEWER);
                                 }
                             } else {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(addRole(roleInt, Roles.REVIEWER));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.REVIEWER);
                                 }
                             }
                             break;
@@ -177,14 +161,10 @@ public class AdminUserModifyPage extends BasePage {
                             if (!cb.isSelected()) {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(removeRole(roleInt, Roles.STAFF));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.STAFF);
                                 }
                             } else {
                                 if (role == Roles.ADMIN) {
                                     targetUser.setRoles(addRole(roleInt, Roles.STAFF));
-                                } else if (role == Roles.INSTRUCTOR) {
-                                    createAdminRoleRequest(roleInt, Roles.STAFF);
                                 }
                             }
                             break;
@@ -262,25 +242,6 @@ public class AdminUserModifyPage extends BasePage {
         }
 
         return layout;
-    }
-
-    private void createAdminRoleRequest(int roleInt, Roles roles) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Are you sure?");
-        alert.setContentText("Would you like to send an admin role change request?");
-        Optional<ButtonType> result = alert.showAndWait();
-        result.ifPresent(buttonType -> {
-            if (buttonType == ButtonType.OK) {
-                AdminRequest adminRequest = new AdminRequest()
-                        .setRequester(context.getSession().getActiveUser())
-                        .setContext(roles.getBit())
-                        .setState(RequestState.Pending)
-                        .setTarget(targetUser)
-                        .setReason("reason")
-                        .setType(AdminActions.UpdateRole);
-                context.adminRequests().create(adminRequest);
-            }
-        });
     }
 
     /**
