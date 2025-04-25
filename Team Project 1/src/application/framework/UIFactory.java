@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -172,15 +173,14 @@ public final class UIFactory {
      * @param alertType The type of the alert.
      * @param title     The title of the alert.
      * @param content   The content text of the alert.
-     * @return An {@link Optional} containing the {@link ButtonType} that was clicked, or empty if closed without selection.
      */
-    public static Optional<ButtonType> showAlert(Alert.AlertType alertType, String title, String content) {
+    public static void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new AlertBuilder(alertType)
                 .title(title)
                 .header(null)
                 .content(content)
                 .build();
-        return alert.showAndWait();
+        alert.showAndWait();
     }
 
     /**
@@ -267,5 +267,56 @@ public final class UIFactory {
                 context.router().navigate(MyPages.USER_HOME);
             }
         }));
+    }
+
+    /**
+     * Opens a modal input dialog with a single text field with validation.
+     *
+     * @param title       dialog window title
+     * @param placeholder placeholder text for the field
+     * @param defaultText optional pre‑fill text (may be null)
+     * @param validator   validator
+     * @param errorMsg    error message to show when validation fails
+     * @param configs     additional customisations for the {@link InputDialogBuilder}
+     * @return an {@link Optional} containing the user input when OK was pressed, otherwise empty
+     */
+    @SafeVarargs
+    public static Optional<String> showTextInput(String title,
+                                                 String placeholder,
+                                                 String defaultText,
+                                                 Predicate<String> validator,
+                                                 String errorMsg,
+                                                 Consumer<InputDialogBuilder>... configs) {
+        InputDialogBuilder builder = new InputDialogBuilder()
+                .setTitle(title)
+                .setPlaceholder(placeholder)
+                .attachValidator(validator, errorMsg);
+        if (defaultText != null) builder.setDefaultText(defaultText);
+        for (Consumer<InputDialogBuilder> cfg : configs) cfg.accept(builder);
+        return builder.showAndWaitValidated();
+    }
+
+    /**
+     * Opens a modal input dialog with a single text field with validation.
+     * <p>
+     * Don't use this method and set validator via configs. Use {@link #showTextInput(String, String, String, Predicate, String, Consumer[])} instead.
+     *
+     * @param title       dialog window title
+     * @param placeholder placeholder text for the field
+     * @param defaultText optional pre‑fill text (may be null)
+     * @param configs     additional customisations for the {@link InputDialogBuilder}
+     * @return an {@link Optional} containing the user input when OK was pressed, otherwise empty
+     */
+    @SafeVarargs
+    public static Optional<String> showTextInput(String title,
+                                                 String placeholder,
+                                                 String defaultText,
+                                                 Consumer<InputDialogBuilder>... configs) {
+        InputDialogBuilder builder = new InputDialogBuilder()
+                .setTitle(title)
+                .setPlaceholder(placeholder);
+        if (defaultText != null) builder.setDefaultText(defaultText);
+        for (Consumer<InputDialogBuilder> cfg : configs) cfg.accept(builder);
+        return builder.showAndWait();
     }
 }

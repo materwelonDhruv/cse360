@@ -44,6 +44,21 @@ public final class DesignGuide {
     public static final String ERROR_LABEL = "-fx-text-fill: red; -fx-font-size: 12px;";
 
     /**
+     * Bold style for text.
+     */
+    public static final String BOLD_TEXT = "-fx-font-weight: bold;";
+
+    /**
+     * Italic style for text.
+     */
+    public static final String ITALIC_TEXT = "-fx-font-style: italic;";
+
+    /**
+     * Invalid input style (red border).
+     */
+    public static final String INVALID_INPUT = "-fx-border-color: red; -fx-border-width: 1.5px;";
+
+    /**
      * Private constructor to prevent instantiation of the class.
      */
     private DesignGuide() {

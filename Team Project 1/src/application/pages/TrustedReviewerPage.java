@@ -64,7 +64,7 @@ public class TrustedReviewerPage extends BasePage {
         Button addReviewersButton = UIFactory.createButton("Add Reviewers", e -> e.routeToPage(MyPages.ADD_TRUSTED_REVIEWER, context));
 
         // Navigation buttons using UIFactory; navigation via the shared router.
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         // HBox for option buttons
         HBox optionBar = new HBox(15, addReviewersButton, backButton);

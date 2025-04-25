@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import utils.Helpers;
 import utils.permissions.Roles;
 
 import java.util.List;
@@ -110,7 +111,7 @@ public class AnnouncementsPage extends BasePage {
      */
     private VBox createAnnouncementVBox(Announcement announcement) {
         // Label for the announcement's title
-        Label titleLabel = new Label(announcement.getTitle() + " | " + announcement.getMessage().getCreatedAt().toString());
+        Label titleLabel = new Label(announcement.getTitle() + " | " + Helpers.formatTimestamp(announcement.getMessage().getCreatedAt()));
         titleLabel.setStyle("-fx-font-weight: bold");
 
         // Label for the announcement's content

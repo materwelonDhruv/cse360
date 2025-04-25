@@ -41,8 +41,9 @@ public class Announcement extends BaseEntity {
     /**
      * Sets the underlying {@link Message} entity for this announcement.
      */
-    public void setMessage(Message message) {
+    public Announcement setMessage(Message message) {
         this.message = message;
+        return this;
     }
 
     /**
@@ -55,7 +56,8 @@ public class Announcement extends BaseEntity {
     /**
      * Sets the title of the announcement.
      */
-    public void setTitle(String title) {
+    public Announcement setTitle(String title) {
         this.title = title;
+        return this;
     }
 }

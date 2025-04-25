@@ -475,7 +475,7 @@ public class UserHomePage extends BasePage {
             int questionId = selectedItem.getKey();
             Question question = context.questions().getById(questionId);
             User questionAuthor = context.users().getById(question.getMessage().getUserId());
-            boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN});
+            boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN, Roles.INSTRUCTOR});
             System.out.println(("Staff Check: " + checkIfStaff));
 
             if (questionAuthor.getId() != context.getSession().getActiveUser().getId() && !checkIfStaff) {
@@ -713,8 +713,18 @@ public class UserHomePage extends BasePage {
     private void deleteAnswer() {
         Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            boolean isPinned = context.answers().getById(selectedItem.getKey()).getIsPinned();
-            context.answers().delete(selectedItem.getKey()); // Use the Answers instance to delete
+            int answerId = selectedItem.getKey();
+            Answer answer = context.answers().getById(answerId);
+            boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN, Roles.INSTRUCTOR});
+            boolean isPinned = answer.getIsPinned();
+            User answerAuthor = context.users().getById(answer.getMessage().getUserId());
+            if (answerAuthor.getId() != context.getSession().getActiveUser().getId() && !checkIfStaff) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "You cannot delete this answer.");
+                alert.showAndWait();
+                return;
+            } else {
+                context.answers().delete(answerId); // Use the Answers instance to delete
+            }
             //if answer is pinned, loadQuestions to update questionViewList
             if (isPinned) {
                 currentlySelectedQuestionResolved = false;

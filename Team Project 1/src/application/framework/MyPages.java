@@ -40,7 +40,9 @@ public enum MyPages {
     ANNOUNCEMENTS("/announcements"),
     STAFF_HOME("/staffHome"),
     STAFF_PRIVATE_CHATS("/staffPrivateChats"),
-    REMOVE_REVIEWER("/removeReviewer");
+    REMOVE_REVIEWER("/removeReviewer"),
+    ADMIN_PENDING("/adminPending"),
+    ADMIN_SOLVED("/adminSolved");
 
     private final String route;
 

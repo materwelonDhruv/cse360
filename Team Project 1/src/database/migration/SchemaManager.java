@@ -48,6 +48,7 @@ public class SchemaManager {
         tables.add(new ReviewerRequestsTable());
         tables.add(new StaffMessagesTable());
         tables.add(new AnnouncementsTable());
+        tables.add(new AdminRequestsTable());
     }
 
     /**
