@@ -46,12 +46,17 @@ public class UserProfileWindow {
         Stage userProfile = new Stage();
         userProfile.initModality(Modality.NONE);
         VBox layout = new VBox(15);
-        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+
+        User user = context.users().getById(userId);
+        User targetUser = context.users().getById(targetId);
 
         //Labels for displaying information about the reviewer
         Label email = new Label();
         email.setText("");
-        email.setText(context.users().getById(targetId).getEmail());
+        email.setText(targetUser.getEmail());
+
+        //Label for displaying a reviewer's rating
+        Label reviewerRatingLabel = new Label("Rating : ");
 
         //Labels for displaying a reviewer or student's page
         Label reviewsLabel = new Label("My Reviews");
@@ -60,7 +65,7 @@ public class UserProfileWindow {
         //Fields to allow users to see reviewers reviews or students questions
         ListView<String> displayTable = new ListView<>();
         //Populates table with reviewer's reviews
-        if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.REVIEWER)) {
+        if (RolesUtil.hasRole(targetUser.getRoles(), Roles.REVIEWER)) {
             displayTable.getItems().clear();
             ObservableList<String> reviews = FXCollections.observableArrayList();
             for (Answer a : context.answers().getAnswersByUser(targetId)) {
@@ -72,7 +77,7 @@ public class UserProfileWindow {
             }
         }
         //Populates table with student's questions
-        else if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.STUDENT)) {
+        else if (RolesUtil.hasRole(targetUser.getRoles(), Roles.STUDENT)) {
             displayTable.getItems().clear();
             for (Question q : context.questions().getQuestionsByUser(targetId)) {
                 String qTitle = q.getTitle();
@@ -80,12 +85,9 @@ public class UserProfileWindow {
             }
         }
 
-        User user = context.users().getById(userId);
-        User reviewer = context.users().getById(targetId);
         Button addTrustedButton = UIFactory.createButton("Add as trusted reviewer");
         Button removeReviewerButton = UIFactory.createButton("Remove reviewer");
         removeReviewerButton.setOnAction(e -> {
-            User targetUser = context.users().getById(targetId);
             int roleInt = targetUser.getRoles();
             targetUser.setRoles(removeRole(roleInt, Roles.REVIEWER));
             context.users().update(targetUser);
@@ -106,37 +108,38 @@ public class UserProfileWindow {
             throw new RuntimeException(ex);
         }
         addTrustedButton.setOnAction(e -> {
-            context.reviews().setRating(reviewer, user, Integer.MAX_VALUE);
+            context.reviews().setRating(targetUser, user, Integer.MAX_VALUE);
             addTrustedButton.setDisable(true);
         });
 
         //Sets users appropriate role
-        if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.ADMIN)) {
-            title.setText(context.users().getById(targetId).getFirstName() + " | " + "Admin");
+        if (RolesUtil.hasRole(targetUser.getRoles(), Roles.ADMIN)) {
+            title.setText(targetUser.getFirstName() + " | " + "Admin");
             layout.getChildren().addAll(title, email);
-        } else if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.REVIEWER)) {
-            title.setText(context.users().getById(targetId).getFirstName() + " | " + "Reviewer");
-            layout.getChildren().addAll(title, email, addTrustedButton, reviewsLabel, displayTable);
-        } else if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.STUDENT)) {
-            title.setText(context.users().getById(targetId).getFirstName() + " | " + "Student");
+        } else if (RolesUtil.hasRole(targetUser.getRoles(), Roles.REVIEWER)) {
+            title.setText(targetUser.getFirstName() + " | " + "Reviewer");
+            reviewerRatingLabel.setText("Rating: " + context.reviews().calculateAggregatedRating(targetUser) + "/10");
+            layout.getChildren().addAll(title, email, reviewerRatingLabel, addTrustedButton, reviewsLabel, displayTable);
+        } else if (RolesUtil.hasRole(targetUser.getRoles(), Roles.STUDENT)) {
+            title.setText(targetUser.getFirstName() + " | " + "Student");
             layout.getChildren().addAll(title, email, questionsLabel, displayTable);
-        } else if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.STAFF)) {
-            title.setText(context.users().getById(targetId).getFirstName() + " | " + "Staff");
+        } else if (RolesUtil.hasRole(targetUser.getRoles(), Roles.STAFF)) {
+            title.setText(targetUser.getFirstName() + " | " + "Staff");
             layout.getChildren().addAll(title, email);
-        } else if (RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.INSTRUCTOR)) {
-            title.setText(context.users().getById(targetId).getFirstName() + " | " + "Instructor");
+        } else if (RolesUtil.hasRole(targetUser.getRoles(), Roles.INSTRUCTOR)) {
+            title.setText(targetUser.getFirstName() + " | " + "Instructor");
             layout.getChildren().addAll(title, email);
         } else {
-            title.setText(context.users().getById(targetId).getFirstName() + " | " + "User");
+            title.setText(targetUser.getFirstName() + " | " + "User");
             layout.getChildren().addAll(title, email);
         }
-        if (RolesUtil.hasRole(context.users().getById(userId).getRoles(), Roles.STAFF) && RolesUtil.hasRole(context.users().getById(targetId).getRoles(), Roles.REVIEWER)) {
+        if (RolesUtil.hasRole(context.users().getById(userId).getRoles(), Roles.STAFF) && RolesUtil.hasRole(targetUser.getRoles(), Roles.REVIEWER)) {
             layout.getChildren().add(removeReviewerButton);
         }
 
         Scene scene = new Scene(layout, 400, 300);
         userProfile.setScene(scene);
-        userProfile.setTitle(context.users().getById(targetId).getFirstName() + "'s Profile");
+        userProfile.setTitle(targetUser.getFirstName() + "'s Profile");
 
         userProfile.show();
 
