@@ -48,7 +48,7 @@ public class NavMenuBuilder {
         }
 
         // If user only has one role, disable menu
-        if (menuButton.getItems().size() <= 1) {
+        if (allRoles.length <= 1) {
             menuButton.setDisable(true);
         }
     }

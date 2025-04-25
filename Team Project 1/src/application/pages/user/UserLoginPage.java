@@ -76,6 +76,7 @@ public class UserLoginPage extends BasePage {
 
         // Valid login: set active user and navigate
         context.getSession().setActiveUser(user);
+        context.getSession().setCurrentRole(RolesUtil.intToRoles(user.getRoles())[0]);
         Roles[] roles = RolesUtil.intToRoles(user.getRoles());
         if (roles.length == 1) {
             context.router().navigate(UIFactory.getPageForRole(roles[0]));
