@@ -56,7 +56,7 @@ public class SetPassPage extends BasePage {
         Label passLabel = UIFactory.createLabel("");
 
         Button setOTPButton = UIFactory.createButton("Set One-Time Password",
-                e -> handleSetOneTimePassword(passLabel));
+                e -> e.onAction(a -> handleSetOneTimePassword(passLabel)));
 
         Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, CopyButtonBuilder::onCopy);
 
