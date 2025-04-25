@@ -4,13 +4,12 @@ import application.framework.*;
 import database.model.entities.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The StaffHomePage class provides the main landing page for staff members.
@@ -82,7 +81,7 @@ public class StaffHomePage extends BasePage {
         HBox topBar = new HBox(10, logoutButton, roleMenu);
         topBar.setAlignment(Pos.CENTER);
 
-        layout.getChildren().addAll(titleLabel,
+        layout.getChildren().addAll(greeting,
                 manageReviewerButton,
                 privateChatsButton,
                 questionDisplayButton,
