@@ -57,9 +57,9 @@ public class AdminUserModifyPage extends BasePage {
     /**
      * Sets the existingRequest. May be called before navigating
      * to the page if a request is being reopened.
-     * @param existingRequest The request to be reopened.
+     * @param request The request to be reopened.
      */
-    public static void setExistingRequest(AdminRequest existingRequest) {existingRequest = existingRequest;}
+    public static void setExistingRequest(AdminRequest request) {existingRequest = request;}
 
     @Override
     public Pane createView() {
