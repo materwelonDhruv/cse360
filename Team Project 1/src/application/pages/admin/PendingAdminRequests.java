@@ -6,10 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 import utils.requests.AdminActions;
@@ -70,28 +67,8 @@ public class PendingAdminRequests extends BasePage {
                     context.users().delete(m.getTarget().getId());
                     break;
                 case AdminActions.UpdateRole:
-                    Roles[] currentRoles = RolesUtil.intToRoles(m.getTarget().getRoles());
                     User target = m.getTarget();
-                    Roles targetRole = RolesUtil.intToRoles(m.getContext())[0];
-
-                    boolean hasTargetRole = false;
-                    for (Roles r : currentRoles) {
-                        if (r == targetRole) {
-                            hasTargetRole = true;
-                            break;
-                        }
-                    }
-
-                    int updatedRoles;
-                    if (!hasTargetRole) {
-                        // User doesn't have the role, so we add it
-                        updatedRoles = RolesUtil.addRole(target.getRoles(), targetRole);
-                    } else {
-                        // User already has the role, so we remove it
-                        updatedRoles = RolesUtil.removeRole(target.getRoles(), targetRole);
-                    }
-
-                    target.setRoles(updatedRoles);
+                    target.setRoles(m.getContext());
                     context.users().update(target);
                     m.setState(RequestState.Accepted);
                     break;
@@ -150,6 +127,8 @@ public class PendingAdminRequests extends BasePage {
     private HBox buildRequestRow(AdminRequest a, ListView<HBox> listView) {
         HBox row = new HBox(10);
         Label title = new Label("...");
+        title.setPrefWidth(150);
+        title.setWrapText(true);
         Label requesterName = new Label("Requester: " + a.getRequester().getUserName());
         Label infoLabel = new Label("...");
         Label targetUsername = new Label("Target: " + a.getTarget().getUserName());
@@ -163,19 +142,28 @@ public class PendingAdminRequests extends BasePage {
             case AdminActions.UpdateRole:
                 infoLabel.setText("Change Role");
                 Label newRoleLabel = new Label();
-                Roles[] newRole = RolesUtil.intToRoles(a.getContext());
-                String roles = "";
-                for (Roles r : newRole) {
-                    int targetRoles = a.getTarget().getRoles();
-                    if (RolesUtil.hasRole(targetRoles, RolesUtil.intToRoles(a.getContext())[0])) {
-                        roles += "remove ";
-                    } else {
-                        roles += "add ";
+
+                Roles[] currentRoles = RolesUtil.intToRoles(a.getTarget().getRoles());
+                Roles[] requestedRoles = RolesUtil.intToRoles(a.getContext());
+
+                StringBuilder roles = new StringBuilder();
+
+                // Detect removed roles
+                for (Roles r : currentRoles) {
+                    if (!RolesUtil.hasRole(a.getContext(), r)) {
+                        roles.append("remove ").append(r).append(" ");
                     }
-                    roles += r.toString() + " ";
                 }
-                newRoleLabel.setText(roles);
-                newRoleLabel.setAlignment(Pos.CENTER_RIGHT);
+                // Detect added roles
+                for (Roles r : requestedRoles) {
+                    if (!RolesUtil.hasRole(a.getTarget().getRoles(), r)) {
+                        roles.append("add ").append(r).append(" ");
+                    }
+                }
+                newRoleLabel.setWrapText(true);
+                newRoleLabel.setPrefWidth(150);
+                VBox.setVgrow(newRoleLabel, Priority.ALWAYS);
+                newRoleLabel.setText(roles.toString().trim() + "\n");
                 row.getChildren().add(newRoleLabel);
                 break;
             case AdminActions.RequestPassword:
