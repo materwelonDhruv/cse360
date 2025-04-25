@@ -109,6 +109,7 @@ public class AdminSetupPage extends BasePage {
         context.users().create(adminUser);
         // Set active user in session.
         context.getSession().setActiveUser(adminUser);
+        context.getSession().setCurrentRole(Roles.ADMIN);
         // Navigate to Admin Home Page
         context.router().navigate(MyPages.ADMIN_HOME);
     }

@@ -121,8 +121,9 @@ public class SetupAccountPage extends BasePage {
                 User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
                 context.getSession().setActiveUser(context.users().create(user)); // Create user and set as active.
                 Roles[] roles = RolesUtil.intToRoles(user.getRoles());
-                if (roles.length == 1) {
+                if (roles.length <= 1) {
                     context.router().navigate(UIFactory.getPageForRole(roles[0]));
+                    context.getSession().setCurrentRole(roles[0]);
                 } else {
                     context.router().navigate(MyPages.WELCOME_LOGIN);
                 }
