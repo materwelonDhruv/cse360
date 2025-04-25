@@ -32,8 +32,6 @@ import static utils.permissions.RolesUtil.*;
 @Route(MyPages.ADMIN_USER_MODIFY)
 @View(title = "Modify User")
 public class AdminUserModifyPage extends BasePage {
-    // TextField for the reason the request is being made.
-    private final TextField reasonField = UIFactory.createTextField("Reason For Request");
     private static User admin;
     // The target user that is to be modified.
     private static User targetUser;
@@ -192,8 +190,6 @@ public class AdminUserModifyPage extends BasePage {
 
         // Show existingRequest's reason and selected roles
         if (existingRequest != null) {
-            reasonField.setText(existingRequest.getReason());
-
             if (existingRequest.getType() == AdminActions.UpdateRole) {
                 instructorCb.setSelected(hasRole(existingRequest.getContext(), Roles.INSTRUCTOR));
                 studentCb.setSelected(hasRole(existingRequest.getContext(), Roles.STUDENT));
@@ -229,7 +225,7 @@ public class AdminUserModifyPage extends BasePage {
         Button backBtn = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(nameLabel, roleBox);
-        if (currentRole != Roles.ADMIN) {layout.getChildren().addAll(reasonField, changeRolesBtn, requestOTPBtn);}
+        if (currentRole != Roles.ADMIN) {layout.getChildren().addAll(changeRolesBtn, requestOTPBtn);}
         layout.getChildren().addAll(deleteBtn, backBtn);
 
         // Remove unnecessary elements if a request is being reopened.
@@ -307,14 +303,16 @@ public class AdminUserModifyPage extends BasePage {
      * @param roleInt The roleInt of the request.
      */
     private void sendAdminRequest(AdminActions action, Integer roleInt) {
-        String reason;
-        if (!Objects.equals(reasonField.getText(), "")) {
-            reason = reasonField.getText();
-        } else {
-            reason = "None";
-        }
+        Optional<String> result = UIFactory.showTextInput(
+                "Reason",
+                "Enter reason for request",
+                existingRequest != null ? existingRequest.getReason() : null,
+                s -> (!s.isBlank() && s.length() >= 10 && s.length() <= 500),   // predicate
+                "Reason must be 10-500 characters"           // message on error
+        );
+
         if (existingRequest != null) {
-            existingRequest.setReason(reason);
+            existingRequest.setReason(result.isPresent() ? result.get() : "No Reason Given");
             existingRequest.setContext(roleInt);
             existingRequest.setState(RequestState.Pending);
             context.adminRequests().update(existingRequest);
@@ -324,7 +322,7 @@ public class AdminUserModifyPage extends BasePage {
                     targetUser,
                     action,
                     RequestState.Pending,
-                    reason,
+                    result.get(),
                     roleInt
             );
             context.adminRequests().create(request);

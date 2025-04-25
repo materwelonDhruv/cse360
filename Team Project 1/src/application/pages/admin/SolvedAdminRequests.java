@@ -48,7 +48,6 @@ public class SolvedAdminRequests extends BasePage {
      */
     @Override
     public Pane createView() {
-        context.adminRequests().setState(3, RequestState.Accepted);
         VBox layout = new VBox(15);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
