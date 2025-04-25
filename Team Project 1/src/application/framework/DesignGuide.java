@@ -14,12 +14,12 @@ public final class DesignGuide {
     /**
      * Default width for the application windows.
      */
-    public static final int DEFAULT_WIDTH = 800;
+    public static final int DEFAULT_WIDTH = 1250;
 
     /**
      * Default height for the application windows.
      */
-    public static final int DEFAULT_HEIGHT = 400;
+    public static final int DEFAULT_HEIGHT = 600;
 
     // Style constants
 
