@@ -1,10 +1,12 @@
 package application.framework.builders;
 
+import application.framework.DesignGuide;
 import application.framework.UIFactory;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -19,7 +21,9 @@ import java.util.function.Predicate;
  */
 public class InputDialogBuilder {
     private final Dialog<String> dialog = new Dialog<>();
-    private final TextField inputField = new TextField();
+    private final TextArea inputArea = new TextArea();
+    private final Button okBtn;
+
     /**
      * functional validator; null means "no validation"
      */
@@ -28,26 +32,34 @@ public class InputDialogBuilder {
 
     public InputDialogBuilder() {
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        okBtn = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+
+        dialog.getDialogPane().setPrefWidth(300);
 
         GridPane pane = new GridPane();
         pane.setHgap(10);
         pane.setVgap(10);
-        pane.setPadding(new Insets(20, 150, 10, 10));
-        pane.add(new Label("Input:"), 0, 0);
-        pane.add(inputField, 1, 0);
+        pane.setPadding(new Insets(20, 20, 10, 20));
+
+        ColumnConstraints cc = new ColumnConstraints();
+        cc.setHgrow(Priority.ALWAYS);
+        cc.setFillWidth(true);
+        pane.getColumnConstraints().add(cc);
+
+        Label lbl = new Label("Input");
+        lbl.setStyle(DesignGuide.BOLD_TEXT);
+        pane.add(lbl, 0, 0);
+
+        inputArea.setWrapText(true);
+        inputArea.setPrefRowCount(5);
+        inputArea.setMaxWidth(Double.MAX_VALUE);
+        pane.add(inputArea, 0, 1);
+        GridPane.setHgrow(inputArea, Priority.ALWAYS);
+        GridPane.setVgrow(inputArea, Priority.ALWAYS);
+
         dialog.getDialogPane().setContent(pane);
 
-        // disable OK until validation passes (if validator set)
-        Button okBtn = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        if (validator != null) {
-            okBtn.disableProperty().bind(
-                    Bindings.createBooleanBinding(
-                            () -> !validator.test(inputField.getText()),
-                            inputField.textProperty())
-            );
-        }
-
-        dialog.setResultConverter(btn -> btn == ButtonType.OK ? inputField.getText() : null);
+        dialog.setResultConverter(bt -> bt == ButtonType.OK ? inputArea.getText() : null);
     }
 
     /**
@@ -70,7 +82,7 @@ public class InputDialogBuilder {
      * Placeholder text shown when the field is empty.
      */
     public InputDialogBuilder setPlaceholder(String p) {
-        inputField.setPromptText(p);
+        inputArea.setPromptText(p);
         return this;
     }
 
@@ -78,15 +90,7 @@ public class InputDialogBuilder {
      * Pre‑fills the text field.
      */
     public InputDialogBuilder setDefaultText(String txt) {
-        inputField.setText(txt);
-        return this;
-    }
-
-    /**
-     * Max width of the text field.
-     */
-    public InputDialogBuilder setFieldWidth(double w) {
-        inputField.setMaxWidth(w);
+        inputArea.setText(txt);
         return this;
     }
 
@@ -98,6 +102,25 @@ public class InputDialogBuilder {
     public InputDialogBuilder attachValidator(Predicate<String> v, String errMessage) {
         this.validator = v;
         this.validatorMessage = errMessage == null ? "Invalid input" : errMessage;
+
+        // initial disable state
+        okBtn.setDisable(!validator.test(inputArea.getText()));
+
+        // listen for text changes and enable/disable OK button
+        inputArea.textProperty().addListener((obs, old, val) -> {
+            okBtn.setDisable(!validator.test(val));
+        });
+
+        inputArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!validator.test(newValue)) {
+                inputArea.setStyle(DesignGuide.INVALID_INPUT);
+                inputArea.setTooltip(new Tooltip(validatorMessage));
+            } else {
+                inputArea.setStyle("");
+                inputArea.setTooltip(null);
+            }
+        });
+
         return this;
     }
 
@@ -129,8 +152,8 @@ public class InputDialogBuilder {
     }
 
     // Allow additional customisations via lambdas
-    public InputDialogBuilder with(Consumer<TextField> cfg) {
-        cfg.accept(inputField);
+    public InputDialogBuilder with(Consumer<TextArea> cfg) {
+        cfg.accept(inputArea);
         return this;
     }
 }
