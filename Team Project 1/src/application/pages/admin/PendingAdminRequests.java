@@ -114,6 +114,7 @@ public class PendingAdminRequests extends BasePage {
         context.staffMessages().create(sm);
         requester.setRoles(RolesUtil.removeRole(requester.getRoles(), Roles.STAFF));
         context.users().update(requester);
+        m.setContext(newPass.getId());
     }
 
     private void updateListView(ListView<HBox> listView) {

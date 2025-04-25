@@ -1,7 +1,9 @@
 package application.pages.admin;
 
 import application.framework.*;
+import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.AdminRequest;
+import database.model.entities.OneTimePassword;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -22,6 +24,7 @@ import utils.requests.RequestState;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  *  Displays the list of all closed/solved admin requests and allows Instructors
@@ -122,6 +125,7 @@ public class SolvedAdminRequests extends BasePage {
         Label targetNameLabel = new Label(request.getTarget().getUserName());
         Label actionTypeNameLabel = new Label(request.getType().name());
         Label statusNameLabel = new Label(request.getState().name());
+
         HBox topLabels = new HBox(10,
                 requesterLabel,
                 requesterNameLabel,
@@ -132,6 +136,15 @@ public class SolvedAdminRequests extends BasePage {
                 statusLabel,
                 statusNameLabel
         );
+
+        // Add copy button for the One Time Password if the user is the requester
+        if (request.getType() == AdminActions.RequestPassword && request.getRequester().getId() == context.getSession().getActiveUser().getId()) {
+            Button copyOTPButton = UIFactory.createCopyButton("Copy One Time Password",
+                    () -> context.oneTimePasswords().getById(request.getContext()).getPlainOtp(),
+                    CopyButtonBuilder::onCopy);
+            topLabels.getChildren().add(copyOTPButton);
+        }
+
         Label reasonLabel = new Label("Reason:");
         reasonLabel.setStyle("-fx-font-weight: bold");
         Label reasonNameLabel = new Label(request.getReason());
