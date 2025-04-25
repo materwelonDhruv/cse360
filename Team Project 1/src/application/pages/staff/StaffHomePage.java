@@ -1,4 +1,4 @@
-package application.pages;
+package application.pages.staff;
 
 import application.framework.*;
 import database.model.entities.User;
