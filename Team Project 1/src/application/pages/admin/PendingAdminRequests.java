@@ -39,14 +39,8 @@ public class PendingAdminRequests extends BasePage {
         view.setCenter(titleVBox);
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createHomepageButton("Back", context);
-        if (role == Roles.INSTRUCTOR) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.ADMIN) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
-        } else {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        }
+        Button backButton = UIFactory.createBackButton(context);
+        UIFactory
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
@@ -121,7 +115,29 @@ public class PendingAdminRequests extends BasePage {
                     context.users().delete(m.getTarget().getId());
                     break;
                 case AdminActions.UpdateRole:
-                    context.users().getById(m.getTarget().getId()).setRoles(m.getContext());
+                    Roles[] currentRoles = RolesUtil.intToRoles(m.getTarget().getRoles());
+                    User target = m.getTarget();
+                    Roles targetRole = RolesUtil.intToRoles(m.getContext())[0];
+
+                    boolean hasTargetRole = false;
+                    for (Roles r : currentRoles) {
+                        if (r == targetRole) {
+                            hasTargetRole = true;
+                            break;
+                        }
+                    }
+
+                    int updatedRoles;
+                    if (!hasTargetRole) {
+                        // User doesn't have the role, so we add it
+                        updatedRoles = RolesUtil.addRole(target.getRoles(), targetRole);
+                    } else {
+                        // User already has the role, so we remove it
+                        updatedRoles = RolesUtil.removeRole(target.getRoles(), targetRole);
+                    }
+
+                    target.setRoles(updatedRoles);
+                    context.users().update(target);
                     break;
                 case AdminActions.RequestPassword:
                     sendOTP(m);
