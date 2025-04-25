@@ -19,8 +19,10 @@ import utils.permissions.RolesUtil;
 import java.util.List;
 
 /**
- * The InstructorHomePage class provides an interface for instructors to manage reviewer requests.
- * Instructors can approve or reject pending reviewer requests and navigate to other sections.
+ * The InstructorHomePage class provides an interface for instructors to manage
+ * reviewer requests.
+ * Instructors can approve or reject pending reviewer requests and navigate to
+ * other sections.
  *
  * @author Atharva
  */
@@ -35,7 +37,8 @@ public class InstructorHomePage extends BasePage {
      * The page includes:
      * - A welcome message for instructors.
      * - A table displaying pending reviewer requests.
-     * - Buttons to approve/reject requests, refresh, logout, change roles, and navigate to the question display.
+     * - Buttons to approve/reject requests, refresh, logout, change roles, and
+     * navigate to the question display.
      *
      * @return A Pane containing the instructor's dashboard.
      */
@@ -58,13 +61,12 @@ public class InstructorHomePage extends BasePage {
         // Set up the table columns
         TableColumn<ReviewerRequest, String> requesterCol = new TableColumn<>("Requester");
         requesterCol.setPrefWidth(150);
-        requesterCol.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getRequester().getUserName()));
+        requesterCol
+                .setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getRequester().getUserName()));
 
         TableColumn<ReviewerRequest, String> dateCol = new TableColumn<>("Request Date");
         dateCol.setPrefWidth(200);
-        dateCol.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getCreatedAt().toString()));
+        dateCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCreatedAt().toString()));
 
         TableColumn<ReviewerRequest, Void> actionsCol = new TableColumn<>("Actions");
         actionsCol.setPrefWidth(200);
@@ -74,14 +76,12 @@ public class InstructorHomePage extends BasePage {
             {
                 buttonBox.setAlignment(Pos.CENTER);
 
-                Button approveButton = UIFactory.createButton("Approve", e -> e.onAction(a ->
-                {
+                Button approveButton = UIFactory.createButton("Approve", e -> e.onAction(a -> {
                     ReviewerRequest request = getTableView().getItems().get(getIndex());
                     handleRequestAction(request, true);
                 }));
 
-                Button rejectButton = UIFactory.createButton("Reject", e -> e.onAction(a ->
-                {
+                Button rejectButton = UIFactory.createButton("Reject", e -> e.onAction(a -> {
                     ReviewerRequest request = getTableView().getItems().get(getIndex());
                     handleRequestAction(request, false);
                 }));
@@ -115,8 +115,9 @@ public class InstructorHomePage extends BasePage {
         // Add placeholder text when there are no requests
         requestTable.setPlaceholder(new Label("No pending reviewer requests"));
 
-        //Button to go the question_display page
+        // Button to go the question_display page
         Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
+
         // Add a refresh button
         Button refreshButton = UIFactory.createButton("Refresh Requests", e -> {
             refreshRequestsTable();
@@ -125,19 +126,19 @@ public class InstructorHomePage extends BasePage {
         // Add logout button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
-        //Add solved admin requests button
+        // Add solved admin requests button
         Button solvedRequestsButton = new Button("Solved Admin Requests");
         solvedRequestsButton.setOnAction(e -> {
             context.router().navigate(MyPages.ADMIN_SOLVED);
         });
 
-        //Add pending admin requests button
+        // Add pending admin requests button
         Button pendingRequestsButton = new Button("Pending Admin Requests");
         pendingRequestsButton.setOnAction(e -> {
             context.router().navigate(MyPages.ADMIN_PENDING);
         });
 
-        //Add admin request creation button
+        // Add admin request creation button
         Button createRequestsButton = new Button("Create an Admin Request");
         createRequestsButton.setOnAction(e -> {
             context.router().navigate(MyPages.ADMIN_USER);
@@ -153,7 +154,8 @@ public class InstructorHomePage extends BasePage {
         });
 
         // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton, privateMessageButton, adminRequestsContainer);
+        HBox buttonContainer = new HBox(10, refreshButton, questionDisplayButton, privateMessageButton,
+                manageReviewerButton, roleMenu, logoutButton, adminRequestsContainer);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPadding(new Insets(10, 0, 0, 0));
 
@@ -162,8 +164,7 @@ public class InstructorHomePage extends BasePage {
                 welcomeLabel,
                 requestsLabel,
                 requestTable,
-                buttonContainer
-        );
+                buttonContainer);
 
         return layout;
     }
@@ -202,7 +203,8 @@ public class InstructorHomePage extends BasePage {
 
                 if (updatedRequest != null) {
                     UIFactory.showAlert(Alert.AlertType.INFORMATION, "Request Rejected",
-                            "You have rejected the reviewer request from " + request.getRequester().getUserName() + ".");
+                            "You have rejected the reviewer request from " + request.getRequester().getUserName()
+                                    + ".");
                 }
             }
 

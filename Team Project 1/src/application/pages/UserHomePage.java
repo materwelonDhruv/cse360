@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -92,7 +93,7 @@ public class UserHomePage extends BasePage {
             resultView.getItems().add(q.getTitle());
         }
         int height = list.size();
-        resultView.setPrefHeight(height * 26); //Gives 26 height for every element to cleanly display
+        resultView.setPrefHeight(Math.min(height * 26, 150)); //Gives 26 height for every element to cleanly display
     }
 
 //--------------------------------------------------------------------------------------------------------------------------//
@@ -108,10 +109,9 @@ public class UserHomePage extends BasePage {
     @Override
     public Pane createView() {
         loadQuestions();
-        searchListView.setVisible(false);
-        double rowHeight = 26; // Original height for search listview
+        searchListView.setPrefHeight(150);// Original height for search listview
+        questionListView.setPrefHeight(150);
         resultView.getItems().clear();
-        resultView.setPrefHeight(rowHeight);
         VBox layout = new VBox(10);
 
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
@@ -153,7 +153,8 @@ public class UserHomePage extends BasePage {
         Button questionDisplayButton = UIFactory.createHomepageButton("Your Homepage", context);
 
         //Create Trusted Reviewer button
-        Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
+        MenuItem trustedReviewersItem = new MenuItem("Manage Trusted Reviewers");
+        trustedReviewersItem.setOnAction(e -> context.router().navigate(MyPages.TRUSTED_REVIEWER));
 
         //Add button to add a question
         Button addQuestionButton = UIFactory.createButton("Add", e -> e.onAction(a -> ShowQuestionWindow()));
@@ -165,8 +166,7 @@ public class UserHomePage extends BasePage {
                 editQuestionWindow(selectedQuestion.getKey());
             }
         }));
-
-        searchInput.setOnKeyTyped(event -> {
+        searchInput.setOnKeyReleased(event -> {
             if (searchInput.getText().length() >= 3) {
                 try {
                     searchListView.setVisible(true);
@@ -306,29 +306,31 @@ public class UserHomePage extends BasePage {
         //Creating log out button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
-        Button staffChatPopupButton = UIFactory.createButton("Chat With Staff", b ->
-                b.onAction(e -> {
-                    UserStaffChatWindow chatWindow = new UserStaffChatWindow();
-                    chatWindow.createStaffChatStage(context);
-                })
-        );
+        Button dotMenuButton = new Button("⋮");
+        dotMenuButton.setStyle("-fx-font-size: 15px; -fx-cursor: hand;");
 
-        // Button to navigate to the announcements page
-        Button announcementsButton = UIFactory.createButton("Announcements", b ->
-                b.routeToPage(MyPages.ANNOUNCEMENTS, context)
-        );
+// Create the menu
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem announcementsItem = new MenuItem("Announcements");
+        announcementsItem.setOnAction(e -> context.router().navigate(MyPages.ANNOUNCEMENTS));
+
+        MenuItem staffChatItem = new MenuItem("Chat With Staff");
+        staffChatItem.setOnAction(e -> {
+            UserStaffChatWindow chatWindow = new UserStaffChatWindow();
+            chatWindow.createStaffChatStage(context);
+        });
+
 
         // Button to navigate to StaffNavigationPage
         Button staffNavigationButton = UIFactory.createButton("Navigate To Other Pages", b ->
                 b.routeToPage(MyPages.STAFF_NAVIGATION, context)
         );
 
-        //Add spacer for better UI
-        //Region spacer = new Region();
-        //spacer.setPrefWidth(250);
+
         //Button Bar above ListView for horizontal orientation
-        //HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
-        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, searchInput, searchListView);
+        HBox questionListBar = new HBox(10, addQuestionButton, editQuestionButton, deleteQuestionButton,
+                unresolvedQuestionsButton, myQuestionsButton, searchInput, dotMenuButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -361,24 +363,29 @@ public class UserHomePage extends BasePage {
             }
         });
 
+        //menu bar for options
+        contextMenu.getItems().addAll(announcementsItem, staffChatItem);
+        dotMenuButton.setOnMouseClicked(e -> contextMenu.show(dotMenuButton, e.getScreenX(), e.getScreenY()));
+
         // HBox for option buttons
-        HBox optionBar = new HBox(10, questionDisplayButton, staffChatPopupButton, announcementsButton);
+        HBox optionBar = new HBox(10, questionDisplayButton);
 
         // Add the trusted reviewer button only if the user is a student
         if (userCurrentRole == Roles.STUDENT) {
-            optionBar.getChildren().add(trustedReviewerButton);
+            contextMenu.getItems().add(trustedReviewersItem);
         } else if (userCurrentRole == Roles.STAFF) { // Add staff navigation button only for staff
             optionBar.getChildren().add(staffNavigationButton);
+            questionListBar.getChildren().remove(dotMenuButton);
+        } else {
+            questionListBar.getChildren().remove(dotMenuButton);
         }
 
-        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
+
+        layout.getChildren().addAll(userLabel, questionListBar, searchListView, questionListView, optionBar);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
-            final Roles[] selectedRole = new Roles[1];
-
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
-
             optionBar.getChildren().addAll(roleMenu);
         }
         optionBar.getChildren().add(logoutButton);
