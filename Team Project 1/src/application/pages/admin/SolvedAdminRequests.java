@@ -12,97 +12,138 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
+import application.framework.BasePage;
+import application.framework.MyPages;
+import application.framework.Route;
+import application.framework.View;
+import database.model.entities.AdminRequest;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import application.framework.*;
+import javafx.scene.layout.VBox;
+import javafx.util.Pair;
+import utils.permissions.Roles;
 import utils.requests.AdminActions;
 import utils.requests.RequestState;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
+/**
+ *  Displays the list of all closed/solved admin requests and allows Instructors
+ *  to reopen a closed admin request and update its description.
+ *
+ * @author Tyler
+ */
 @Route(MyPages.ADMIN_SOLVED)
 @View(title = "Solved Admin Requests")
 public class SolvedAdminRequests extends BasePage {
-    private final Roles role = context.getSession().getCurrentRole();
+    // ListView containing all solved admin requests
+    private final ListView<Pair<Integer,VBox>> requestView = new ListView<>();
 
+    /**
+     * Creates the layout for the SolvedAdminRequests Page.
+     * @return A Pane containing the layout of the page.
+     */
+    @Override
     public Pane createView() {
-        BorderPane view = new BorderPane();
-        view.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
-        Label title = new Label("Solved Admin Requests");
-        ListView<HBox> solvedAdminRequests = setupSolvedRequests();
-        VBox titleVBox = new VBox(10);
-        titleVBox.getChildren().addAll(title, solvedAdminRequests);
-        view.setCenter(titleVBox);
-        // Bottom toolbar with Back and Logout buttons using UIFactory
-        HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createHomepageButton("Back", context);
-        if (role == Roles.INSTRUCTOR) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.ADMIN) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
-        } else {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        }
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
-        toolbar.getChildren().addAll(backButton, logoutButton);
-        view.setBottom(toolbar);
-        return view;
-    }
+        context.adminRequests().setState(3, RequestState.Accepted);
+        VBox layout = new VBox(15);
+        layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
-    private ListView<HBox> setupSolvedRequests() {
-        ListView<HBox> tempView = new ListView<>();
-        ArrayList<AdminRequest> pendingRequests = new ArrayList<>();
-        try {
-            pendingRequests = setupSolvedRequestsArrayList();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println(pendingRequests.size());
-        for (AdminRequest a : pendingRequests) {
-            HBox row = new HBox(10);
-            Label title = new Label("...");
-            Label requesterName = new Label("Requester: " + a.getRequester().getUserName());
-            Label infoLabel = new Label("...");
-            Label targetUsername = new Label("Target: " + a.getTarget().getUserName());
+        Label titleLabel = UIFactory.createLabel("Solved Admin Requests");
 
-            title.setText(a.getReason());
-            row.getChildren().addAll(title, requesterName, infoLabel, targetUsername);
-            switch (a.getType()) {
-                case AdminActions.DeleteUser:
-                    infoLabel.setText("Delete");
-                    break;
-                case AdminActions.UpdateRole:
-                    infoLabel.setText("Change Role");
-                    Label newRoleLabel = new Label();
-                    Roles[] newRole = RolesUtil.intToRoles(a.getContext());
-                    String roles = "";
-                    for (Roles r : newRole) {
-                        int targetRoles = a.getTarget().getRoles();
-                        if (RolesUtil.hasRole(targetRoles, RolesUtil.intToRoles(a.getContext())[0])) {
-                            roles += "remove ";
-                        } else {
-                            roles += "add ";
-                        }
-                        roles += r.toString() + " ";
-                    }
-                    newRoleLabel.setText(roles);
-                    newRoleLabel.setAlignment(Pos.CENTER_RIGHT);
-                    row.getChildren().add(newRoleLabel);
-                    break;
-                case AdminActions.RequestPassword:
-                    infoLabel.setText("Password");
-                    break;
-                default:
-                    infoLabel.setText("Null");
-                    break;
+        // Set up requestView
+        requestView.setPlaceholder(UIFactory.createLabel("No Solved Admin Requests"));
+        requestView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Pair<Integer, VBox> item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(item.getValue());
+                }
             }
-            tempView.getItems().add(row);
-        }
-        return tempView;
+        });
+
+        loadSolvedRequests();
+
+        // Button to reopen the selected admin request
+        Button reopenRequestButton = UIFactory.createButton("Reopen Selected Request", e -> e.onAction(a -> {
+            Pair<Integer,VBox> selectedRequest = requestView.getSelectionModel().getSelectedItem();
+            if (selectedRequest != null) {
+                try {
+                    AdminRequest request = context.adminRequests().getById(selectedRequest.getKey());
+                    if (request.getType() != AdminActions.DeleteUser) {
+                        AdminUserModifyPage.setTargetUser(request.getTarget());
+                        AdminUserModifyPage.setExistingRequest(request);
+                        context.router().navigate(MyPages.ADMIN_USER_MODIFY);
+                    } else {
+                        Alert warning = new Alert(Alert.AlertType.WARNING, "Delete Requests may not be reopened.");
+                        warning.showAndWait();
+                    }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }));
+
+        // Button to navigate to the previous page
+        Button backButton = UIFactory.createBackButton(context);
+
+        layout.getChildren().addAll(titleLabel, requestView);
+        if (context.getSession().getCurrentRole() == Roles.INSTRUCTOR) layout.getChildren().add(reopenRequestButton);
+        layout.getChildren().add(backButton);
+        return layout;
     }
 
-    private ArrayList<AdminRequest> setupSolvedRequestsArrayList() throws SQLException {
-        ArrayList<AdminRequest> solvedRequests = (ArrayList<AdminRequest>) context.adminRequests().filterFetch(RequestState.Denied);
-        ArrayList<AdminRequest> otherRequests = (ArrayList<AdminRequest>) context.adminRequests().filterFetch(RequestState.Accepted);
-        solvedRequests.addAll(otherRequests);
-        return solvedRequests;
+    /**
+     * Loads all solved requests from the database into the requestView
+     * sorted by newest to oldest.
+     */
+    private void loadSolvedRequests() {
+        requestView.getItems().clear();
+        List<AdminRequest> solvedRequests = context.adminRequests().filterFetch(RequestState.Accepted);
+        for (AdminRequest request : solvedRequests) {
+            requestView.getItems().addFirst(new Pair<>(request.getId(), createRequestVBox(request)));
+        }
+    }
+
+    /**
+     * Creates a VBox containing the title and description of the given request.
+     *
+     * @param request the {@link AdminRequest} to create a VBox for.
+     * @return the VBox containing the request information.
+     */
+    private VBox createRequestVBox(AdminRequest request) {
+        Label requesterLabel = new Label("Requester:");
+        requesterLabel.setStyle("-fx-font-weight: bold");
+        Label targetLabel = new Label("Target:");
+        targetLabel.setStyle("-fx-font-weight: bold");
+        Label actionTypeLabel = new Label("Action:");
+        actionTypeLabel.setStyle("-fx-font-weight: bold");
+        Label statusLabel = new Label("Status:");
+        statusLabel.setStyle("-fx-font-weight: bold");
+        Label requesterNameLabel = new Label(request.getRequester().getUserName());
+        Label targetNameLabel = new Label(request.getTarget().getUserName());
+        Label actionTypeNameLabel = new Label(request.getType().name());
+        Label statusNameLabel = new Label(request.getState().name());
+        HBox topLabels = new HBox(10,
+                requesterLabel,
+                requesterNameLabel,
+                targetLabel,
+                targetNameLabel,
+                actionTypeLabel,
+                actionTypeNameLabel,
+                statusLabel,
+                statusNameLabel
+        );
+        Label reasonLabel = new Label("Reason:");
+        reasonLabel.setStyle("-fx-font-weight: bold");
+        Label reasonNameLabel = new Label(request.getReason());
+        HBox reasonBox = new HBox(10, reasonLabel, reasonNameLabel);
+        return new VBox(5,topLabels, reasonBox);
     }
 }

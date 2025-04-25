@@ -124,7 +124,7 @@ public class AddTrustedReviewerPage extends BasePage {
         }));
 
         // Button to route back to the TrustedReviewerPage
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         // HBox to contain the add and cancel buttons
         HBox buttonHBox = new HBox(20, addButton, backButton);
