@@ -187,4 +187,16 @@ public class UsersTest extends BaseDatabaseTest {
         Assertions.assertTrue(notRated.stream().anyMatch(u -> u.getId() == reviewerIds[1]));
         Assertions.assertTrue(notRated.stream().anyMatch(u -> u.getId() == reviewerIds[2]));
     }
+
+    /**
+     * Tests updating a user's roles.
+     */
+    @Test
+    @Order(9)
+    public void testUpdateUserRoles() {
+        User user = userRepo.getById(reviewerIds[0]);
+        user.setRoles(RolesUtil.rolesToInt(new Roles[]{Roles.REVIEWER, Roles.ADMIN}));
+        User updated = userRepo.update(user);
+        Assertions.assertTrue(RolesUtil.hasRole(updated.getRoles(), Roles.ADMIN), "User should now have ADMIN role");
+    }
 }
