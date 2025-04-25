@@ -5,16 +5,18 @@ import application.framework.MyPages;
 import application.framework.Route;
 import application.framework.View;
 import database.model.entities.AdminRequest;
+import javafx.scene.control.ListCell;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import application.framework.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import utils.requests.RequestState;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -40,13 +42,34 @@ public class SolvedAdminRequests extends BasePage {
 
         Label titleLabel = UIFactory.createLabel("Solved Admin Requests");
 
+        // Set up requestView
+        requestView.setPlaceholder(UIFactory.createLabel("No Solved Admin Requests"));
+        requestView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Pair<Integer, VBox> item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(item.getValue());
+                }
+            }
+        });
+
         loadSolvedRequests();
 
         // Button to reopen the selected admin request
         Button reopenRequestButton = UIFactory.createButton("Reopen Selected Request", e -> e.onAction(a -> {
             Pair<Integer,VBox> selectedRequest = requestView.getSelectionModel().getSelectedItem();
             if (selectedRequest != null) {
-                //TODO: navigate to usermodifypage?
+                try {
+                    AdminRequest request = context.adminRequests().getById(selectedRequest.getKey());
+                    AdminUserModifyPage.setTargetUser(request.getTarget());
+                    AdminUserModifyPage.setExistingRequest(request);
+                    context.router().navigate(MyPages.ADMIN_USER_MODIFY);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }));
 
@@ -70,19 +93,38 @@ public class SolvedAdminRequests extends BasePage {
     }
 
     /**
-     * Creates a VBox containing the title and description of the given request
+     * Creates a VBox containing the title and description of the given request.
      *
-     * @param request the {@link AdminRequest} to create a VBox for
-     * @return the VBox containing the request information
+     * @param request the {@link AdminRequest} to create a VBox for.
+     * @return the VBox containing the request information.
      */
     private VBox createRequestVBox(AdminRequest request) {
-        // Label for the Request's title
-        //Label titleLabel = new Label(request.getTitle() + " | " + Helpers.formatTimestamp(announcement.getMessage().getCreatedAt()));
-        //titleLabel.setStyle("-fx-font-weight: bold");
-
-        // Label for the announcement's content
-        //Label contentLabel = new Label(announcement.getMessage().getContent());
-
-        return new VBox();
+        Label requesterLabel = new Label("Requester:");
+        requesterLabel.setStyle("-fx-font-weight: bold");
+        Label targetLabel = new Label("Target:");
+        targetLabel.setStyle("-fx-font-weight: bold");
+        Label actionTypeLabel = new Label("Action:");
+        actionTypeLabel.setStyle("-fx-font-weight: bold");
+        Label statusLabel = new Label("Status:");
+        statusLabel.setStyle("-fx-font-weight: bold");
+        Label requesterNameLabel = new Label(request.getRequester().getUserName());
+        Label targetNameLabel = new Label(request.getTarget().getUserName());
+        Label actionTypeNameLabel = new Label(request.getType().name());
+        Label statusNameLabel = new Label(request.getState().name());
+        HBox topLabels = new HBox(10,
+                requesterLabel,
+                requesterNameLabel,
+                targetLabel,
+                targetNameLabel,
+                actionTypeLabel,
+                actionTypeNameLabel,
+                statusLabel,
+                statusNameLabel
+        );
+        Label reasonLabel = new Label("Reason:");
+        reasonLabel.setStyle("-fx-font-weight: bold");
+        Label reasonNameLabel = new Label(request.getReason());
+        HBox reasonBox = new HBox(10, reasonLabel, reasonNameLabel);
+        return new VBox(5,topLabels, reasonBox);
     }
 }
