@@ -51,8 +51,9 @@ public class StaffMessage extends BaseEntity {
      *
      * @param message The new message for the staff message.
      */
-    public void setMessage(Message message) {
+    public StaffMessage setMessage(Message message) {
         this.message = message;
+        return this;
     }
 
     /**
@@ -69,8 +70,9 @@ public class StaffMessage extends BaseEntity {
      *
      * @param user The new user for the staff message.
      */
-    public void setUser(User user) {
+    public StaffMessage setUser(User user) {
         this.user = user;
+        return this;
     }
 
     /**
@@ -87,7 +89,8 @@ public class StaffMessage extends BaseEntity {
      *
      * @param staff The new staff member for the staff message.
      */
-    public void setStaff(User staff) {
+    public StaffMessage setStaff(User staff) {
         this.staff = staff;
+        return this;
     }
 }
