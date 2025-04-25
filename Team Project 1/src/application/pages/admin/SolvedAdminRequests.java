@@ -5,16 +5,14 @@ import application.framework.MyPages;
 import application.framework.Route;
 import application.framework.View;
 import database.model.entities.AdminRequest;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import application.framework.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import utils.permissions.Roles;
+import utils.requests.AdminActions;
 import utils.requests.RequestState;
 
 import java.sql.SQLException;
@@ -38,6 +36,7 @@ public class SolvedAdminRequests extends BasePage {
      */
     @Override
     public Pane createView() {
+        context.adminRequests().setState(3, RequestState.Accepted);
         VBox layout = new VBox(15);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
@@ -65,9 +64,14 @@ public class SolvedAdminRequests extends BasePage {
             if (selectedRequest != null) {
                 try {
                     AdminRequest request = context.adminRequests().getById(selectedRequest.getKey());
-                    AdminUserModifyPage.setTargetUser(request.getTarget());
-                    AdminUserModifyPage.setExistingRequest(request);
-                    context.router().navigate(MyPages.ADMIN_USER_MODIFY);
+                    if (request.getType() != AdminActions.DeleteUser) {
+                        AdminUserModifyPage.setTargetUser(request.getTarget());
+                        AdminUserModifyPage.setExistingRequest(request);
+                        context.router().navigate(MyPages.ADMIN_USER_MODIFY);
+                    } else {
+                        Alert warning = new Alert(Alert.AlertType.WARNING, "Delete Requests may not be reopened.");
+                        warning.showAndWait();
+                    }
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 }
