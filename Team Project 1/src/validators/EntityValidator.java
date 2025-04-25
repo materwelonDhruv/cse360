@@ -274,6 +274,6 @@ public class EntityValidator {
             }
         }
 
-        validateLength(req.getReason(), 5, 500, "AdminRequest reason must be between 10 and 2000 characters.");
+        validateLength(req.getReason(), 5, 500, "AdminRequest reason must be between 5 and 500 characters.");
     }
 }
