@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 import validators.EmailValidator;
 import validators.PasswordValidator;
 import validators.UsernameValidator;
@@ -118,7 +120,12 @@ public class SetupAccountPage extends BasePage {
             if (invite != null) {
                 User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
                 context.getSession().setActiveUser(context.users().create(user)); // Create user and set as active.
-                context.router().navigate(MyPages.WELCOME_LOGIN);
+                Roles[] roles = RolesUtil.intToRoles(user.getRoles());
+                if (roles.length == 1) {
+                    context.router().navigate(UIFactory.getPageForRole(roles[0]));
+                } else {
+                    context.router().navigate(MyPages.WELCOME_LOGIN);
+                }
             } else {
                 errorLabel.setText("Invitation code does not exist or is expired");
             }
