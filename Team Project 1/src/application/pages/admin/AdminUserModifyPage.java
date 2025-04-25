@@ -1,6 +1,7 @@
 package application.pages.admin;
 
 import application.framework.*;
+import database.model.entities.AdminRequest;
 import database.model.entities.User;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -8,8 +9,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
+import utils.requests.AdminActions;
+import utils.requests.RequestState;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static utils.permissions.RolesUtil.*;
 
@@ -25,6 +29,8 @@ public class AdminUserModifyPage extends BasePage {
     private static User admin;
     // The target user that is to be modified.
     private static User targetUser;
+
+    private final Roles role = context.getSession().getCurrentRole();
 
     public AdminUserModifyPage() {
         super();
@@ -90,37 +96,77 @@ public class AdminUserModifyPage extends BasePage {
                                     new Alert(Alert.AlertType.ERROR, "Cannot remove the last admin!").show();
                                     return;
                                 }
-                                targetUser.setRoles(removeRole(roleInt, Roles.ADMIN));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(removeRole(roleInt, Roles.ADMIN));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.ADMIN);
+                                }
                             } else {
-                                targetUser.setRoles(addRole(roleInt, Roles.ADMIN));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(addRole(roleInt, Roles.ADMIN));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.ADMIN);
+                                }
                             }
                             break;
                         case "Instructor":
                             if (!cb.isSelected()) {
-                                targetUser.setRoles(removeRole(roleInt, Roles.INSTRUCTOR));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(removeRole(roleInt, Roles.INSTRUCTOR));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.INSTRUCTOR);
+                                }
                             } else {
-                                targetUser.setRoles(addRole(roleInt, Roles.INSTRUCTOR));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(addRole(roleInt, Roles.INSTRUCTOR));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.INSTRUCTOR);
+                                }
                             }
                             break;
                         case "Student":
                             if (!cb.isSelected()) {
-                                targetUser.setRoles(removeRole(roleInt, Roles.STUDENT));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(removeRole(roleInt, Roles.STUDENT));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.STUDENT);
+                                }
                             } else {
-                                targetUser.setRoles(addRole(roleInt, Roles.STUDENT));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(addRole(roleInt, Roles.STUDENT));
+                                } else {
+                                    createAdminRoleRequest(roleInt, Roles.STUDENT);
+                                }
                             }
                             break;
                         case "Reviewer":
                             if (!cb.isSelected()) {
-                                targetUser.setRoles(removeRole(roleInt, Roles.REVIEWER));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(removeRole(roleInt, Roles.REVIEWER));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.REVIEWER);
+                                }
                             } else {
-                                targetUser.setRoles(addRole(roleInt, Roles.REVIEWER));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(addRole(roleInt, Roles.REVIEWER));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.REVIEWER);
+                                }
                             }
                             break;
                         case "Staff":
                             if (!cb.isSelected()) {
-                                targetUser.setRoles(removeRole(roleInt, Roles.STAFF));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(removeRole(roleInt, Roles.STAFF));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.STAFF);
+                                }
                             } else {
-                                targetUser.setRoles(addRole(roleInt, Roles.STAFF));
+                                if (role == Roles.ADMIN) {
+                                    targetUser.setRoles(addRole(roleInt, Roles.STAFF));
+                                } else if (role == Roles.INSTRUCTOR) {
+                                    createAdminRoleRequest(roleInt, Roles.STAFF);
+                                }
                             }
                             break;
                     }
@@ -151,6 +197,25 @@ public class AdminUserModifyPage extends BasePage {
 
         layout.getChildren().addAll(nameLabel, roleBox, deleteBtn, backBtn);
         return layout;
+    }
+
+    private void createAdminRoleRequest(int roleInt, Roles roles) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("Would you like to send an admin role change request?");
+        Optional<ButtonType> result = alert.showAndWait();
+        result.ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                AdminRequest adminRequest = new AdminRequest();
+                adminRequest.setRequester(context.getSession().getActiveUser());
+                adminRequest.setContext(roles.getBit());
+                adminRequest.setState(RequestState.Pending);
+                adminRequest.setTarget(targetUser);
+                adminRequest.setReason("reason");
+                adminRequest.setType(AdminActions.UpdateRole);
+                context.adminRequests().create(adminRequest);
+            }
+        });
     }
 
     /**

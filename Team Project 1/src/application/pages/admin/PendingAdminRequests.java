@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
+import utils.requests.AdminActions;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 @Route(MyPages.ADMIN_PENDING)
 @View(title = "Pending Admin Requests")
 public class PendingAdminRequests extends BasePage {
+    private final Roles role = context.getSession().getCurrentRole();
     private final User user = context.getSession().getActiveUser();
     private final Roles currentRole = context.getSession().getCurrentRole();
     private ArrayList<Message> adminRequests;
@@ -36,7 +38,14 @@ public class PendingAdminRequests extends BasePage {
         view.setCenter(titleVBox);
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Button backButton = UIFactory.createHomepageButton("Homepage", context, e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button backButton = UIFactory.createHomepageButton("Back", context);
+        if (role == Roles.INSTRUCTOR) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
+        } else if (role == Roles.ADMIN) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        } else {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        }
         Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
@@ -45,33 +54,35 @@ public class PendingAdminRequests extends BasePage {
 
     private ListView<HBox> setupPendingRequests() {
         ListView<HBox> tempView = new ListView<>();
-        HBox row = new HBox(10);
-        Label title = new Label("...");
-        Label requesterName = new Label("...");
-        Label infoLabel = new Label("...");
-        Label targetUsername = new Label("...");
-        TextArea description = new TextArea("...");
         ArrayList<AdminRequest> pendingRequests = new ArrayList<>();
         try {
             pendingRequests = setupPendingRequestsArrayList();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println(pendingRequests.size());
         for (AdminRequest m : pendingRequests) {
+            HBox row = new HBox(10);
+            Label title = new Label("...");
+            Label requesterName = new Label("...");
+            Label infoLabel = new Label("...");
+            Label targetUsername = new Label("...");
+            TextArea description = new TextArea("...");
+
             title.setText(m.toString());
             requesterName.setText(m.getRequester().getUserName());
-            switch (m.getReason()) {
-                case "delete":
+            switch (m.getType()) {
+                case AdminActions.DeleteUser:
                     infoLabel.setText("Delete");
                     break;
-                case "change role":
+                case AdminActions.UpdateRole:
                     infoLabel.setText("Change Role");
                     break;
-                case "password":
+                case AdminActions.RequestPassword:
                     infoLabel.setText("Password");
                     break;
                 default:
-                    infoLabel.setText("Unknown");
+                    infoLabel.setText("Null");
                     break;
             }
 
@@ -83,8 +94,9 @@ public class PendingAdminRequests extends BasePage {
                 row.getChildren().add(buttonVBox);
                 buttonVBox.setAlignment(Pos.CENTER_RIGHT);
             }
-
             targetUsername.setText(m.getTarget().getUserName());
+            description.setText(m.getReason());
+            tempView.getItems().add(row);
         }
         return tempView;
     }
@@ -92,14 +104,14 @@ public class PendingAdminRequests extends BasePage {
     private Button setupAcceptButton(AdminRequest m) {
         Button acceptButton = new Button("Accept");
         acceptButton.setOnAction(event -> {
-            switch (m.getReason()) {
-                case "delete":
+            switch (m.getType()) {
+                case AdminActions.DeleteUser:
                     context.users().delete(m.getTarget().getId());
                     break;
-                case "change role":
+                case AdminActions.UpdateRole:
                     context.users().getById(m.getTarget().getId()).setRoles(m.getContext());
                     break;
-                case "password":
+                case AdminActions.RequestPassword:
                     sendOTP(m);
                     break;
                 default:
@@ -116,6 +128,7 @@ public class PendingAdminRequests extends BasePage {
 
     private ArrayList<AdminRequest> setupPendingRequestsArrayList() throws SQLException {
         ArrayList<AdminRequest> pendingRequests = (ArrayList<AdminRequest>) context.adminRequests().getAll();
+        System.out.println(pendingRequests);
         return pendingRequests;
     }
 
