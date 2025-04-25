@@ -68,6 +68,11 @@ public class StaffHomePage extends BasePage {
                 b.routeToPage(MyPages.ANNOUNCEMENTS, context)
         );
 
+        // Button to navigate to the staff navigation page
+        Button staffNavigationButton = UIFactory.createButton("Navigate To A Page", b ->
+                b.routeToPage(MyPages.STAFF_NAVIGATION, context)
+        );
+
         // Button to logout
         Button logoutButton = UIFactory.createLogoutButton(context);
 
@@ -85,6 +90,7 @@ public class StaffHomePage extends BasePage {
                 privateChatsButton,
                 questionDisplayButton,
                 announcementsButton,
+                staffNavigationButton,
                 topBar);
 
         return layout;

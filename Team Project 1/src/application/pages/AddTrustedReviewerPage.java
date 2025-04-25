@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import utils.SearchUtil;
 
@@ -29,6 +30,9 @@ public class AddTrustedReviewerPage extends BasePage {
     private final TextField reviewerNameInput = UIFactory.createTextField("Search Reviewers By Name", f ->
             f.minChars(0).maxChars(30));
 
+    // Boolean to keep track of whether the reviewers are sorted in the resultView
+    private boolean sorted = false;
+
     /**
      * Creates the layout for the AddTrustedReviewerPage
      * @return layout
@@ -45,6 +49,22 @@ public class AddTrustedReviewerPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         Label titleLabel = UIFactory.createLabel("Add Trusted Reviewers");
+
+        // Button to toggle sorting of reviewers by their ratings
+        Button sortReviewersByRatingButton = UIFactory.createButton("Sort By Rating");
+        sortReviewersByRatingButton.setOnAction(a -> {
+            sorted = !sorted;
+            loadUntrustedReviewers();
+            if (sorted) {
+                sortReviewersByRatingButton.setText("Show Unsorted");
+            } else {
+                sortReviewersByRatingButton.setText("Sort By Rating");
+            }
+        });
+
+        // HBox to contain the search bar and sort button
+        HBox searchOptions = new HBox(15, reviewerNameInput, sortReviewersByRatingButton);
+        HBox.setHgrow(reviewerNameInput, Priority.ALWAYS);
 
         // Set up resultView
         resultView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -104,13 +124,13 @@ public class AddTrustedReviewerPage extends BasePage {
         }));
 
         // Button to route back to the TrustedReviewerPage
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         // HBox to contain the add and cancel buttons
         HBox buttonHBox = new HBox(20, addButton, backButton);
         buttonHBox.setAlignment(Pos.BASELINE_CENTER);
 
-        layout.getChildren().addAll(titleLabel, reviewerNameInput, resultView, buttonHBox);
+        layout.getChildren().addAll(titleLabel, searchOptions, resultView, buttonHBox);
         return layout;
     }
 
@@ -121,8 +141,16 @@ public class AddTrustedReviewerPage extends BasePage {
         try {
             User currentUser = context.getSession().getActiveUser();
             List<User> untrustedReviewers = context.users().getReviewersNotRatedByUser(currentUser.getId());
+            List<User> reviewerList = new ArrayList<>(untrustedReviewers);
+            if (sorted && !reviewerList.isEmpty()) {
+                reviewerList.sort((u1, u2) -> {
+                        int rating1 = context.reviews().calculateAggregatedRating(u1);
+                        int rating2 = context.reviews().calculateAggregatedRating(u2);
+                        return Integer.compare(rating2, rating1);
+                });
+            }
             resultView.getItems().clear();
-            for (User user : untrustedReviewers) {
+            for (User user : reviewerList) {
                 resultView.getItems().add(user.getUserName());
             }
         } catch (SQLException e) {

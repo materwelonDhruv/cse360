@@ -40,9 +40,11 @@ public class ReviewerProfileWindow {
         reviewerProfile.initModality(Modality.NONE);
         VBox layout = new VBox(15);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
+        User reviewer = context.users().getById(reviewerId);
         //Labels for displaying information about the reviewer
-        Label title = new Label(context.users().getById(reviewerId).getFirstName() + " | Reviewer");
-        Label email = new Label(context.users().getById(reviewerId).getEmail());
+        Label title = new Label(reviewer.getFirstName() + " | Reviewer");
+        Label email = new Label(reviewer.getEmail());
+        Label rating = new Label("Rating: " + context.reviews().calculateAggregatedRating(reviewer) + "/10");
         Label reviewsLabel = new Label("My Reviews");
 
         //Button to allow reviewer to edit their profile
@@ -59,7 +61,6 @@ public class ReviewerProfileWindow {
         }
 
         User user = context.users().getById(userId);
-        User reviewer = context.users().getById(reviewerId);
         Button addTrustedButton = UIFactory.createButton("Add as trusted reviewer");
         try {
             List<User> untrustedReviewers = context.users().getReviewersNotRatedByUser(userId);
@@ -77,7 +78,7 @@ public class ReviewerProfileWindow {
             context.reviews().setRating(reviewer, user, Integer.MAX_VALUE);
             addTrustedButton.setDisable(true);
         });
-        layout.getChildren().addAll(title, email, addTrustedButton, reviewsLabel, reviewTable);
+        layout.getChildren().addAll(title, email, rating, addTrustedButton, reviewsLabel, reviewTable);
         Scene scene = new Scene(layout, 400, 300);
         reviewerProfile.setScene(scene);
         reviewerProfile.setTitle("Reviewer Profile");

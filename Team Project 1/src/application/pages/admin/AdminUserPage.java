@@ -28,7 +28,8 @@ import static utils.permissions.RolesUtil.roleName;
 @View(title = "Admin User Page")
 
 public class AdminUserPage extends BasePage {
-    User admin = context.getSession().getActiveUser();
+    User user = context.getSession().getActiveUser();
+    Roles role = context.getSession().getCurrentRole();
 
     /**
      * Constructor using BasePage
@@ -44,7 +45,14 @@ public class AdminUserPage extends BasePage {
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
         // Header label
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button backButton;
+        if (role == Roles.INSTRUCTOR) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
+        } else if (role == Roles.ADMIN) {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        } else {
+            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
+        }
         var header = UIFactory.createLabel("Choose a User to Modify");
 
         // Create TableView to display users
@@ -87,7 +95,7 @@ public class AdminUserPage extends BasePage {
                     User rowUser = row.getItem();
                     try {
                         AdminUserModifyPage.setTargetUser(rowUser);
-                        AdminUserModifyPage.setAdmin(admin);
+                        AdminUserModifyPage.setAdmin(user);
                         context.router().navigate(MyPages.ADMIN_USER_MODIFY);
                     } catch (Exception ex) {
                         ex.printStackTrace();

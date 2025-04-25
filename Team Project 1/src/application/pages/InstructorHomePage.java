@@ -125,6 +125,25 @@ public class InstructorHomePage extends BasePage {
         // Add logout button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
+        //Add solved admin requests button
+        Button solvedRequestsButton = new Button("Solved Admin Requests");
+        solvedRequestsButton.setOnAction(e -> {
+            context.router().navigate(MyPages.ADMIN_SOLVED);
+        });
+
+        //Add pending admin requests button
+        Button pendingRequestsButton = new Button("Pending Admin Requests");
+        pendingRequestsButton.setOnAction(e -> {
+            context.router().navigate(MyPages.ADMIN_PENDING);
+        });
+
+        //Add admin request creation button
+        Button createRequestsButton = new Button("Create an Admin Request");
+        createRequestsButton.setOnAction(e -> {
+            context.router().navigate(MyPages.ADMIN_USER);
+        });
+        VBox adminRequestsContainer = new VBox(5);
+        adminRequestsContainer.getChildren().addAll(solvedRequestsButton, pendingRequestsButton, createRequestsButton);
         // RoleMenu to change role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
@@ -134,7 +153,7 @@ public class InstructorHomePage extends BasePage {
         });
 
         // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton, privateMessageButton);
+        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton, privateMessageButton, adminRequestsContainer);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPadding(new Insets(10, 0, 0, 0));
 
