@@ -323,7 +323,7 @@ public class ReviewerHomePage extends BasePage {
         if (currentlySelectedQuestionId == -1) return;
         String content = answerInput.getText().trim();
         if (!content.isEmpty()) {
-            Message message = new Message(context.getSession().getActiveUser().getId(), content);
+            Message message = new Message(context.getSession().getActiveUser().getId(), "φ " + content + " φ");
             Answer newAnswer = new Answer(message, currentlySelectedQuestionId, null, false);
 
             Answer createdAnswer = null;
