@@ -173,15 +173,14 @@ public final class UIFactory {
      * @param alertType The type of the alert.
      * @param title     The title of the alert.
      * @param content   The content text of the alert.
-     * @return An {@link Optional} containing the {@link ButtonType} that was clicked, or empty if closed without selection.
      */
-    public static Optional<ButtonType> showAlert(Alert.AlertType alertType, String title, String content) {
+    public static void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new AlertBuilder(alertType)
                 .title(title)
                 .header(null)
                 .content(content)
                 .build();
-        return alert.showAndWait();
+        alert.showAndWait();
     }
 
     /**
