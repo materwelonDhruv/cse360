@@ -55,8 +55,9 @@ public class AdminRequest extends BaseEntity {
         return requester;
     }
 
-    public void setRequester(User requester) {
+    public AdminRequest setRequester(User requester) {
         this.requester = requester;
+        return this;
     }
 
     /**
@@ -66,8 +67,9 @@ public class AdminRequest extends BaseEntity {
         return target;
     }
 
-    public void setTarget(User target) {
+    public AdminRequest setTarget(User target) {
         this.target = target;
+        return this;
     }
 
     /**
@@ -77,8 +79,9 @@ public class AdminRequest extends BaseEntity {
         return type;
     }
 
-    public void setType(AdminActions type) {
+    public AdminRequest setType(AdminActions type) {
         this.type = type;
+        return this;
     }
 
     /**
@@ -88,8 +91,9 @@ public class AdminRequest extends BaseEntity {
         return state;
     }
 
-    public void setState(RequestState state) {
+    public AdminRequest setState(RequestState state) {
         this.state = state;
+        return this;
     }
 
     /**
@@ -99,8 +103,9 @@ public class AdminRequest extends BaseEntity {
         return reason;
     }
 
-    public void setReason(String reason) {
+    public AdminRequest setReason(String reason) {
         this.reason = reason;
+        return this;
     }
 
     /**
