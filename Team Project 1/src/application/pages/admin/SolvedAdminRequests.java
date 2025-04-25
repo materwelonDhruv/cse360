@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
+import utils.permissions.Roles;
 import utils.requests.RequestState;
 
 import java.sql.SQLException;
@@ -76,7 +77,9 @@ public class SolvedAdminRequests extends BasePage {
         // Button to navigate to the previous page
         Button backButton = UIFactory.createBackButton(context);
 
-        layout.getChildren().addAll(titleLabel, requestView, reopenRequestButton, backButton);
+        layout.getChildren().addAll(titleLabel, requestView);
+        if (context.getSession().getCurrentRole() == Roles.INSTRUCTOR) layout.getChildren().add(reopenRequestButton);
+        layout.getChildren().add(backButton);
         return layout;
     }
 
