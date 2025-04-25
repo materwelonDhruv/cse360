@@ -110,6 +110,6 @@ public class AdminSetupPage extends BasePage {
         // Set active user in session.
         context.getSession().setActiveUser(adminUser);
         // Navigate to welcome page.
-        context.router().navigate(MyPages.WELCOME_LOGIN);
+        context.router().navigate(MyPages.ADMIN_HOME);
     }
 }
