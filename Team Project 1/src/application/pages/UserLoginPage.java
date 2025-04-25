@@ -9,8 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import java.util.Optional;
-
 /**
  * The UserLoginPage class provides a login interface for users to access their
  * accounts. It validates the user's credentials and navigates to the appropriate page
@@ -28,16 +26,6 @@ public class UserLoginPage extends BasePage {
 
     @Override
     public Pane createView() {
-        Optional<String> result = UIFactory.showTextInput(
-                "Reason",
-                "Enter reason for request",
-                null,
-                s -> (!s.isBlank() && s.length() >= 5 && s.length() <= 20),   // predicate
-                "Name must be 5–20 characters"           // message on error
-        );
-
-        result.ifPresent(name -> System.out.println("User typed: " + name));
-
         VBox layout = new VBox(10);
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
 
