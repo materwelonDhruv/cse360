@@ -2,15 +2,16 @@ package application.pages.admin;
 
 import application.framework.*;
 import database.model.entities.AdminRequest;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 import utils.requests.AdminActions;
 import utils.requests.RequestState;
 
@@ -48,27 +49,43 @@ public class SolvedAdminRequests extends BasePage {
 
     private ListView<HBox> setupSolvedRequests() {
         ListView<HBox> tempView = new ListView<>();
-        HBox row = new HBox(10);
-        Label title = new Label("...");
-        Label requesterName = new Label("...");
-        Label infoLabel = new Label("...");
-        Label targetUsername = new Label("...");
-        TextArea description = new TextArea("...");
-        ArrayList<AdminRequest> solvedRequests = new ArrayList<>();
+        ArrayList<AdminRequest> pendingRequests = new ArrayList<>();
         try {
-            solvedRequests = setupSolvedRequestsArrayList();
+            pendingRequests = setupSolvedRequestsArrayList();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        for (AdminRequest m : solvedRequests) {
-            title.setText(m.toString());
-            requesterName.setText(m.getRequester().getUserName());
-            switch (m.getType()) {
+        System.out.println(pendingRequests.size());
+        for (AdminRequest a : pendingRequests) {
+            HBox row = new HBox(10);
+            Label title = new Label("...");
+            Label requesterName = new Label("Requester: " + a.getRequester().getUserName());
+            Label infoLabel = new Label("...");
+            Label targetUsername = new Label("Target: " + a.getTarget().getUserName());
+
+            title.setText(a.getReason());
+            row.getChildren().addAll(title, requesterName, infoLabel, targetUsername);
+            switch (a.getType()) {
                 case AdminActions.DeleteUser:
                     infoLabel.setText("Delete");
                     break;
                 case AdminActions.UpdateRole:
                     infoLabel.setText("Change Role");
+                    Label newRoleLabel = new Label();
+                    Roles[] newRole = RolesUtil.intToRoles(a.getContext());
+                    String roles = "";
+                    for (Roles r : newRole) {
+                        int targetRoles = a.getTarget().getRoles();
+                        if (RolesUtil.hasRole(targetRoles, RolesUtil.intToRoles(a.getContext())[0])) {
+                            roles += "remove ";
+                        } else {
+                            roles += "add ";
+                        }
+                        roles += r.toString() + " ";
+                    }
+                    newRoleLabel.setText(roles);
+                    newRoleLabel.setAlignment(Pos.CENTER_RIGHT);
+                    row.getChildren().add(newRoleLabel);
                     break;
                 case AdminActions.RequestPassword:
                     infoLabel.setText("Password");
@@ -77,20 +94,15 @@ public class SolvedAdminRequests extends BasePage {
                     infoLabel.setText("Null");
                     break;
             }
-
-            targetUsername.setText(m.getTarget().getUserName());
+            tempView.getItems().add(row);
         }
         return tempView;
     }
 
     private ArrayList<AdminRequest> setupSolvedRequestsArrayList() throws SQLException {
-        ArrayList<AdminRequest> allRequests = (ArrayList<AdminRequest>) context.adminRequests().getAll();
-        ArrayList<AdminRequest> solvedRequests = new ArrayList<>();
-        for (AdminRequest m : allRequests) {
-            if (m.getState() == RequestState.Denied) {
-                solvedRequests.add(m);
-            }
-        }
+        ArrayList<AdminRequest> solvedRequests = (ArrayList<AdminRequest>) context.adminRequests().filterFetch(RequestState.Denied);
+        ArrayList<AdminRequest> otherRequests = (ArrayList<AdminRequest>) context.adminRequests().filterFetch(RequestState.Accepted);
+        solvedRequests.addAll(otherRequests);
         return solvedRequests;
     }
 }

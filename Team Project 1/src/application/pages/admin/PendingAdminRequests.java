@@ -6,13 +6,14 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 import utils.requests.AdminActions;
+import utils.requests.RequestState;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -61,22 +62,36 @@ public class PendingAdminRequests extends BasePage {
             e.printStackTrace();
         }
         System.out.println(pendingRequests.size());
-        for (AdminRequest m : pendingRequests) {
+        for (AdminRequest a : pendingRequests) {
             HBox row = new HBox(10);
             Label title = new Label("...");
-            Label requesterName = new Label("...");
+            Label requesterName = new Label("Requester: " + a.getRequester().getUserName());
             Label infoLabel = new Label("...");
-            Label targetUsername = new Label("...");
-            TextArea description = new TextArea("...");
+            Label targetUsername = new Label("Target: " + a.getTarget().getUserName());
 
-            title.setText(m.toString());
-            requesterName.setText(m.getRequester().getUserName());
-            switch (m.getType()) {
+            title.setText(a.getReason());
+            row.getChildren().addAll(title, requesterName, infoLabel, targetUsername);
+            switch (a.getType()) {
                 case AdminActions.DeleteUser:
                     infoLabel.setText("Delete");
                     break;
                 case AdminActions.UpdateRole:
                     infoLabel.setText("Change Role");
+                    Label newRoleLabel = new Label();
+                    Roles[] newRole = RolesUtil.intToRoles(a.getContext());
+                    String roles = "";
+                    for (Roles r : newRole) {
+                        int targetRoles = a.getTarget().getRoles();
+                        if (RolesUtil.hasRole(targetRoles, RolesUtil.intToRoles(a.getContext())[0])) {
+                            roles += "remove ";
+                        } else {
+                            roles += "add ";
+                        }
+                        roles += r.toString() + " ";
+                    }
+                    newRoleLabel.setText(roles);
+                    newRoleLabel.setAlignment(Pos.CENTER_RIGHT);
+                    row.getChildren().add(newRoleLabel);
                     break;
                 case AdminActions.RequestPassword:
                     infoLabel.setText("Password");
@@ -85,17 +100,14 @@ public class PendingAdminRequests extends BasePage {
                     infoLabel.setText("Null");
                     break;
             }
-
             if (currentRole == Roles.ADMIN) {
                 VBox buttonVBox = new VBox(10);
-                Button acceptButton = setupAcceptButton(m);
-                Button rejectButton = setupRejectButton(m);
+                Button acceptButton = setupAcceptButton(a);
+                Button rejectButton = setupRejectButton(a);
                 buttonVBox.getChildren().addAll(acceptButton, rejectButton);
                 row.getChildren().add(buttonVBox);
                 buttonVBox.setAlignment(Pos.CENTER_RIGHT);
             }
-            targetUsername.setText(m.getTarget().getUserName());
-            description.setText(m.getReason());
             tempView.getItems().add(row);
         }
         return tempView;
@@ -123,11 +135,15 @@ public class PendingAdminRequests extends BasePage {
 
     private Button setupRejectButton(AdminRequest m) {
         Button rejectButton = new Button("Reject");
+        rejectButton.setOnAction(event -> {
+            m.setState(RequestState.Denied);
+            context.adminRequests().update(m);
+        });
         return rejectButton;
     }
 
     private ArrayList<AdminRequest> setupPendingRequestsArrayList() throws SQLException {
-        ArrayList<AdminRequest> pendingRequests = (ArrayList<AdminRequest>) context.adminRequests().getAll();
+        ArrayList<AdminRequest> pendingRequests = (ArrayList<AdminRequest>) context.adminRequests().filterFetch(RequestState.Pending);
         System.out.println(pendingRequests);
         return pendingRequests;
     }

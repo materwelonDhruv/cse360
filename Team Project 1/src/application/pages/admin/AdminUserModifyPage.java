@@ -206,13 +206,13 @@ public class AdminUserModifyPage extends BasePage {
         Optional<ButtonType> result = alert.showAndWait();
         result.ifPresent(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                AdminRequest adminRequest = new AdminRequest();
-                adminRequest.setRequester(context.getSession().getActiveUser());
-                adminRequest.setContext(roles.getBit());
-                adminRequest.setState(RequestState.Pending);
-                adminRequest.setTarget(targetUser);
-                adminRequest.setReason("reason");
-                adminRequest.setType(AdminActions.UpdateRole);
+                AdminRequest adminRequest = new AdminRequest()
+                        .setRequester(context.getSession().getActiveUser())
+                        .setContext(roles.getBit())
+                        .setState(RequestState.Pending)
+                        .setTarget(targetUser)
+                        .setReason("reason")
+                        .setType(AdminActions.UpdateRole);
                 context.adminRequests().create(adminRequest);
             }
         });
