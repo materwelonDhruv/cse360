@@ -1,4 +1,4 @@
-package application.pages;
+package application.pages.staff;
 
 import application.framework.*;
 import javafx.geometry.Pos;
@@ -20,6 +20,7 @@ import javafx.scene.layout.VBox;
 public class StaffNavigationPage extends BasePage {
     /**
      * Creates the layout for the StaffNavigationPage
+     *
      * @return layout
      */
     @Override
@@ -37,7 +38,9 @@ public class StaffNavigationPage extends BasePage {
         // Add valid pages into the pageView
         int homePageOrdinal = MyPages.USER_HOME.ordinal();
         for (MyPages page : MyPages.values()) {
-            if (page.ordinal() < homePageOrdinal) {continue;}
+            if (page.ordinal() < homePageOrdinal) {
+                continue;
+            }
             pageView.getItems().add(page.name());
         }
 

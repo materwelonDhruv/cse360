@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.pages.user.UserProfileWindow;
 import database.model.entities.User;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -145,9 +146,9 @@ public class AddTrustedReviewerPage extends BasePage {
             List<User> reviewerList = new ArrayList<>(untrustedReviewers);
             if (sorted && !reviewerList.isEmpty()) {
                 reviewerList.sort((u1, u2) -> {
-                        int rating1 = context.reviews().calculateAggregatedRating(u1);
-                        int rating2 = context.reviews().calculateAggregatedRating(u2);
-                        return Integer.compare(rating2, rating1);
+                    int rating1 = context.reviews().calculateAggregatedRating(u1);
+                    int rating2 = context.reviews().calculateAggregatedRating(u2);
+                    return Integer.compare(rating2, rating1);
                 });
             }
             resultView.getItems().clear();

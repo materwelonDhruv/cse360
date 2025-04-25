@@ -1,7 +1,8 @@
-package application.pages;
+package application.pages.reviewer;
 
 
 import application.framework.*;
+import application.pages.user.UserProfileWindow;
 import database.model.entities.Review;
 import database.model.entities.User;
 import javafx.geometry.Pos;
@@ -50,7 +51,7 @@ public class TrustedReviewerPage extends BasePage {
                 if (selectedReviewer != null) {
                     UserProfileWindow UserProfileWindow = new UserProfileWindow();
                     Review r = getReviewFromHBox(selectedReviewer);
-                    application.pages.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
+                    application.pages.user.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), r.getReviewer().getId());
                 }
             }
         });

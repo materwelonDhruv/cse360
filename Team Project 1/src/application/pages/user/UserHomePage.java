@@ -1,6 +1,8 @@
-package application.pages;
+package application.pages.user;
 
 import application.framework.*;
+import application.pages.PrivateMessagePage;
+import application.pages.ReplyList;
 import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Question;

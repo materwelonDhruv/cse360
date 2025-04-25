@@ -1,4 +1,4 @@
-package application.pages;
+package application.pages.staff;
 
 import application.framework.*;
 import database.model.entities.Message;
@@ -48,8 +48,8 @@ public class StaffPrivateChats extends BasePage {
     private VBox chatDisplayBox;
     private ScrollPane chatDisplayScrollPane;
 
-    private StaffMessages staffMessagesRepo;
-    private Users usersRepo;
+    private final StaffMessages staffMessagesRepo;
+    private final Users usersRepo;
 
     private int staffId;         // The logged-in staff's userId
     private User selectedUser;   // The user currently selected in the chat list
@@ -158,7 +158,7 @@ public class StaffPrivateChats extends BasePage {
 
         // Automatically load chat on single-click selection
         userListView.getSelectionModel().selectedItemProperty().addListener(
-                (ChangeListener<User>) (obs, oldVal, newVal) -> {
+                (obs, oldVal, newVal) -> {
                     if (newVal != null) {
                         selectedUser = newVal;
                         loadChat(newVal.getId());

@@ -1,6 +1,7 @@
-package application.pages;
+package application.pages.user;
 
 import application.framework.*;
+import application.pages.PrivateMessageConvoPage;
 import database.model.entities.PrivateMessage;
 import database.model.entities.Question;
 import database.model.entities.ReviewerRequest;
