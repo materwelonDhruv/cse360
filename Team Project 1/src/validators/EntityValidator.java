@@ -261,10 +261,10 @@ public class EntityValidator {
         if (req.getReason() == null || req.getReason().trim().isEmpty()) {
             throw new IllegalArgumentException("Reason cannot be empty.");
         }
-        // If action is UpdateRole, context (new rolesInt) must be present
-        if (req.getType() == AdminActions.UpdateRole
+        // If action is UpdateRole or RequestPassword, context (new rolesInt) must be present
+        if (req.getType() != AdminActions.DeleteUser
                 && req.getContext() == null) {
-            throw new IllegalArgumentException("Context (rolesInt) is required for UpdateRole requests.");
+            throw new IllegalArgumentException("Context (rolesInt or bool) is required for UpdateRole requests.");
         }
 
         // If requester is not a user with the Instructor role, throw an exception

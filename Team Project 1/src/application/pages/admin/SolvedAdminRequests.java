@@ -1,8 +1,10 @@
 package application.pages.admin;
 
 import application.framework.*;
+import application.framework.builders.ButtonBuilder;
 import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.AdminRequest;
+import database.model.entities.OneTimePassword;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -132,9 +134,14 @@ public class SolvedAdminRequests extends BasePage {
 
         // Add copy button for the One Time Password if the user is the requester
         if (request.getType() == AdminActions.RequestPassword && request.getRequester().getId() == context.getSession().getActiveUser().getId()) {
-            Button copyOTPButton = UIFactory.createCopyButton("Copy One Time Password",
-                    () -> context.oneTimePasswords().getById(request.getContext()).getPlainOtp(),
-                    CopyButtonBuilder::onCopy);
+            Button copyOTPButton;
+            if (request.getContext() == 1) {
+                copyOTPButton = UIFactory.createButton("Copy OTP", ButtonBuilder::disable);
+            } else {
+                copyOTPButton = UIFactory.createCopyButton("Copy One Time Password",
+                        () -> generateOTPAndSetGenerated(request),
+                        CopyButtonBuilder::onCopy);
+            }
             topLabels.getChildren().add(copyOTPButton);
         }
 
@@ -143,5 +150,21 @@ public class SolvedAdminRequests extends BasePage {
         Label reasonNameLabel = new Label(request.getReason());
         HBox reasonBox = new HBox(10, reasonLabel, reasonNameLabel);
         return new VBox(5, topLabels, reasonBox);
+    }
+
+    /**
+     * Generates a One Time Password and sets the request context to 1 (generated).
+     *
+     * @param request the {@link AdminRequest} for which to generate the OTP.
+     * @return the generated OTP as a String.
+     */
+    private String generateOTPAndSetGenerated(AdminRequest request) {
+        OneTimePassword otp = new OneTimePassword(request.getRequester().getId(), request.getTarget().getId());
+        context.oneTimePasswords().create(otp);
+
+        request.setContext(1); // Mark as generated
+        context.adminRequests().update(request);
+
+        return otp.getPlainOtp();
     }
 }

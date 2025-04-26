@@ -14,8 +14,8 @@ import utils.requests.AdminActions;
 import utils.requests.RequestState;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import static utils.permissions.RolesUtil.*;
 
@@ -61,9 +61,12 @@ public class AdminUserModifyPage extends BasePage {
     /**
      * Sets the existingRequest. May be called before navigating
      * to the page if a request is being reopened.
+     *
      * @param request The request to be reopened.
      */
-    public static void setExistingRequest(AdminRequest request) {existingRequest = request;}
+    public static void setExistingRequest(AdminRequest request) {
+        existingRequest = request;
+    }
 
     @Override
     public Pane createView() {
@@ -213,7 +216,7 @@ public class AdminUserModifyPage extends BasePage {
 
         // Request OTP Button.
         Button requestOTPBtn = UIFactory.createButton("Request One Time Password",
-                e -> e.onAction(a -> sendAdminRequest(AdminActions.RequestPassword, null))
+                e -> e.onAction(a -> sendAdminRequest(AdminActions.RequestPassword, 0))
         );
 
         // Delete button.
@@ -225,7 +228,9 @@ public class AdminUserModifyPage extends BasePage {
         Button backBtn = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(nameLabel, roleBox);
-        if (currentRole != Roles.ADMIN) {layout.getChildren().addAll(changeRolesBtn, requestOTPBtn);}
+        if (currentRole != Roles.ADMIN) {
+            layout.getChildren().addAll(changeRolesBtn, requestOTPBtn);
+        }
         layout.getChildren().addAll(deleteBtn, backBtn);
 
         // Remove unnecessary elements if a request is being reopened.
@@ -252,6 +257,7 @@ public class AdminUserModifyPage extends BasePage {
     /**
      * Helper method to handle deletion of the targetUser. If the current
      * user is not an admin, an AdminRequest will be created instead.
+     *
      * @param targetUser the user to be deleted from the database.
      */
     private void handleUserDeletion(User targetUser) {
@@ -277,8 +283,9 @@ public class AdminUserModifyPage extends BasePage {
     /**
      * Helper method to create an AdminRequest to change the roles of the
      * targetUser to the currently selected roles in the role checkboxes.
+     *
      * @param targetUser The user whose roles are to be changed.
-     * @param roleInt The roles the targetUser is to be given.
+     * @param roleInt    The roles the targetUser is to be given.
      */
     private void requestRolesChange(User targetUser, int roleInt) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
@@ -296,13 +303,14 @@ public class AdminUserModifyPage extends BasePage {
     }
 
     /**
-     *  If a request is being reopened, that request is updated
-     *  with the given action and roleInt. Otherwise, a new
-     *  request is created.
-     * @param action The action of the request.
-     * @param roleInt The roleInt of the request.
+     * If a request is being reopened, that request is updated
+     * with the given action and roleInt. Otherwise, a new
+     * request is created.
+     *
+     * @param action     The action of the request.
+     * @param contextInt The roleInt or 0/1 for the request.
      */
-    private void sendAdminRequest(AdminActions action, Integer roleInt) {
+    private void sendAdminRequest(AdminActions action, Integer contextInt) {
         Optional<String> result = UIFactory.showTextInput(
                 "Reason",
                 "Enter reason for request",
@@ -313,7 +321,7 @@ public class AdminUserModifyPage extends BasePage {
 
         if (existingRequest != null) {
             existingRequest.setReason(result.isPresent() ? result.get() : "No Reason Given");
-            existingRequest.setContext(roleInt);
+            existingRequest.setContext(contextInt);
             existingRequest.setState(RequestState.Pending);
             context.adminRequests().update(existingRequest);
         } else {
@@ -323,7 +331,7 @@ public class AdminUserModifyPage extends BasePage {
                     action,
                     RequestState.Pending,
                     result.get(),
-                    roleInt
+                    contextInt
             );
             context.adminRequests().create(request);
         }
