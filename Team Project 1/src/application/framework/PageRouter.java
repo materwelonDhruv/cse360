@@ -30,11 +30,18 @@ public class PageRouter {
     private final Stage primaryStage;
     private final Map<MyPages, Class<? extends BasePage>> routeMap = new HashMap<>();
 
+
     // Stack of previously visited pages; top is the most recent
     private final Deque<MyPages> history = new ArrayDeque<>();
+    private final MyPages[] pagesToIgnoreFromHistory = new MyPages[]{
+            MyPages.WELCOME_LOGIN,
+            MyPages.SETUP_LOGIN,
+            MyPages.USER_LOGIN,
+            MyPages.FIRST,
+            MyPages.START
+    };
     // When true, skip pushing currentPage on the next navigate() call
     private boolean skipHistoryPush = false;
-
     // The currently displayed page
     private MyPages currentPage = null;
 
@@ -92,6 +99,11 @@ public class PageRouter {
         }
 
         if (!skipHistoryPush && currentPage != null && !currentPage.equals(page)) {
+            if (Arrays.asList(pagesToIgnoreFromHistory).contains(page)) {
+                history.clear();
+                return;
+            }
+
             history.push(currentPage);
         }
         skipHistoryPush = false;
