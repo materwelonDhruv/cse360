@@ -65,10 +65,7 @@ public class UserLoginPage extends BasePage {
         if (!context.users().validateLogin(userName, password)) {
             // Try one-time password
             var otpRepo = context.oneTimePasswords();
-            if (otpRepo.check(user.getId(), password)) {
-                context.getSession().setActiveUser(user);
-                context.router().navigate(MyPages.WELCOME_LOGIN);
-            } else {
+            if (!otpRepo.check(user.getId(), password)) {
                 errorLabel.setText("Invalid Password or OTP!");
             }
             return;
@@ -80,7 +77,7 @@ public class UserLoginPage extends BasePage {
         if (RolesUtil.intToRoles(user.getRoles()).length <= 1) {
             context.getSession().setCurrentRole(RolesUtil.intToRoles(user.getRoles())[0]);
         }
-        
+
         Roles[] roles = RolesUtil.intToRoles(user.getRoles());
         if (roles.length == 1) {
             context.router().navigate(UIFactory.getPageForRole(roles[0]));

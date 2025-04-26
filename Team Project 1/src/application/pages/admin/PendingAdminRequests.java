@@ -1,7 +1,8 @@
 package application.pages.admin;
 
 import application.framework.*;
-import database.model.entities.*;
+import database.model.entities.AdminRequest;
+import database.model.entities.User;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -70,7 +71,7 @@ public class PendingAdminRequests extends BasePage {
                     m.setState(RequestState.Accepted);
                     break;
                 case AdminActions.RequestPassword:
-                    sendOTP(m);
+                    allowOTPCreation(m);
                     break;
                 default:
                     break;
@@ -98,20 +99,8 @@ public class PendingAdminRequests extends BasePage {
         return pendingRequests;
     }
 
-    private void sendOTP(AdminRequest m) {
-        // Generate one-time password using current active user's ID as the issuer.
-        OneTimePassword newPass = new OneTimePassword(m.getRequester().getId(), m.getTarget().getId());
-        context.oneTimePasswords().create(newPass);
-        System.out.println("New password: " + newPass.getPlainOtp());
-        Message otpMessage = new Message(m.getRequester().getId(), newPass.getPlainOtp());
-        User requester = m.getRequester();
-        requester.setRoles(RolesUtil.addRole(requester.getRoles(), Roles.STAFF));
-        context.users().update(requester);
-        StaffMessage sm = new StaffMessage(otpMessage, context.getSession().getActiveUser(), m.getRequester());
-        context.staffMessages().create(sm);
-        requester.setRoles(RolesUtil.removeRole(requester.getRoles(), Roles.STAFF));
-        context.users().update(requester);
-        m.setContext(newPass.getId());
+    private void allowOTPCreation(AdminRequest m) {
+        m.setContext(0);
     }
 
     private void updateListView(ListView<HBox> listView) {
