@@ -89,6 +89,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         passReqId = arRepo.create(pass).getId();
     }
 
+    /**
+     * Tests creating a new request and retrieving it by ID.
+     */
     @Test
     @Order(1)
     public void testCreateAndGetById() throws SQLException {
@@ -98,6 +101,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertEquals(RequestState.Pending, fetched.getState());
     }
 
+    /**
+     * Tests retrieving all requests.
+     */
     @Test
     @Order(2)
     public void testGetAll() throws SQLException {
@@ -105,6 +111,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertTrue(all.size() >= 3);
     }
 
+    /**
+     * Tests filtering requests by state.
+     */
     @Test
     @Order(3)
     public void testFilterFetchByState() {
@@ -114,6 +123,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertTrue(pending.stream().anyMatch(r -> r.getId() == passReqId));
     }
 
+    /**
+     * Tests filtering requests by action and state.
+     */
     @Test
     @Order(4)
     public void testFilterFetchByActionAndState() {
@@ -121,6 +133,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertTrue(deletes.stream().anyMatch(r -> r.getId() == delReqId));
     }
 
+    /**
+     * Tests filtering requests by action, state, and requester.
+     */
     @Test
     @Order(5)
     public void testFilterFetchByActionStateRequester() {
@@ -130,6 +145,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertEquals(updReqId, requesterUpdates.getFirst().getId());
     }
 
+    /**
+     * Tests filtering requests by action, state, and target.
+     */
     @Test
     @Order(6)
     public void testSetState() {
@@ -141,6 +159,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertEquals(RequestState.Denied, rejected.getState());
     }
 
+    /**
+     * Tests updating a request with a new state.
+     */
     @Test
     @Order(7)
     public void testUpdateWholeRequest() throws SQLException {
@@ -153,6 +174,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertEquals(RequestState.Accepted, saved.getState());
     }
 
+    /**
+     * Tests creating a request with an invalid state.
+     */
     @Test
     @Order(8)
     public void testValidatorEdgeCase_ContextRequiredForUpdateRole() {
@@ -167,6 +191,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertThrows(IllegalArgumentException.class, () -> arRepo.create(bad));
     }
 
+    /**
+     * Tests creating a request with an invalid action.
+     */
     @Test
     @Order(9)
     public void testDelete() throws SQLException {
@@ -174,6 +201,9 @@ public class AdminRequestsTest extends BaseDatabaseTest {
         assertNull(arRepo.getById(passReqId));
     }
 
+    /**
+     * Tests deleting a non-existent request.
+     */
     @Test
     @Order(10)
     public void testSetStateNonExistent() {
