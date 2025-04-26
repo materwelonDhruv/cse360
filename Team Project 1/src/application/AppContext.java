@@ -43,6 +43,9 @@ public class AppContext {
     private final ReadMessages readMessagesRepository;
     private final Reviews reviewsRepository;
     private final ReviewerRequests reviewerRequestsRepository;
+    private final StaffMessages staffMessagesRepository;
+    private final Announcements announcementsRepository;
+    private final AdminRequests adminRequestsRepository;
 
     /**
      * Private constructor sets up the DB connection, runs migrations, and
@@ -72,6 +75,9 @@ public class AppContext {
         this.readMessagesRepository = new ReadMessages(connection);
         this.reviewsRepository = new Reviews(connection);
         this.reviewerRequestsRepository = new ReviewerRequests(connection);
+        this.staffMessagesRepository = new StaffMessages(connection);
+        this.announcementsRepository = new Announcements(connection);
+        this.adminRequestsRepository = new AdminRequests(connection);
 
         // Create the PageRouter ONCE, passing the main stage
         this.router = (primaryStage != null) ? new PageRouter(primaryStage) : null;
@@ -159,6 +165,18 @@ public class AppContext {
 
     public ReviewerRequests reviewerRequests() {
         return reviewerRequestsRepository;
+    }
+
+    public StaffMessages staffMessages() {
+        return staffMessagesRepository;
+    }
+
+    public Announcements announcements() {
+        return announcementsRepository;
+    }
+
+    public AdminRequests adminRequests() {
+        return adminRequestsRepository;
     }
 
     /**

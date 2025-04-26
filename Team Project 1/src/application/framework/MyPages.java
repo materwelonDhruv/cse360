@@ -13,29 +13,34 @@ package application.framework;
  * @see Route
  */
 public enum MyPages {
-    START("/start"),
     ADMIN_HOME("/adminHome"),
     ADMIN_SETUP("/adminSetup"),
     ADMIN_USER("/adminUser"),
     ADMIN_USER_MODIFY("/adminUserModify"),
     INVITATION("/invitation"),
-    RESET_PASSWORD("/resetPassword"),
     SET_PASS("/setPass"),
     FIRST("/first"),
     SETUP_LOGIN("/setupLogin"),
     SETUP_ACCOUNT("/setupAccount"),
     WELCOME_LOGIN("/welcomeLogin"),
-    USER_HOME("/userHome"),
     USER_LOGIN("/userLogin"),
+    STAFF_NAVIGATION("/staffNavigation"),
+    REVIEWER_PROFILE("/reviewerProfile"),
+    REPLY_LIST("/replyList"),
+    USER_HOME("/userHome"),
     USER_QUESTION_DISPLAY("/userQuestionDisplay"),
     PRIVATE_MESSAGE("/privateMessagePage"),
     PRIVATE_CONVERSATION("/privateConversation"),
     INSTRUCTOR_HOME("/instructorHome"),
-    REVIEWER_PROFILE("/reviewerprofile"),
     REVIEW_HOME("/reviewHome"),
-    REPLY_LIST("/replyList"),
     TRUSTED_REVIEWER("/trustedReviewer"),
-    ADD_TRUSTED_REVIEWER("/addTrustedReviewer");
+    ADD_TRUSTED_REVIEWER("/addTrustedReviewer"),
+    ANNOUNCEMENTS("/announcements"),
+    STAFF_HOME("/staffHome"),
+    STAFF_PRIVATE_CHATS("/staffPrivateChats"),
+    REMOVE_REVIEWER("/removeReviewer"),
+    ADMIN_PENDING("/adminPending"),
+    ADMIN_SOLVED("/adminSolved");
 
     private final String route;
 

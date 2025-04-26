@@ -1,4 +1,4 @@
-package application.pages;
+package application.pages.user;
 
 import application.framework.*;
 import database.model.entities.User;
@@ -8,6 +8,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their
@@ -63,17 +65,24 @@ public class UserLoginPage extends BasePage {
         if (!context.users().validateLogin(userName, password)) {
             // Try one-time password
             var otpRepo = context.oneTimePasswords();
-            if (otpRepo.check(user.getId(), password)) {
-                context.getSession().setActiveUser(user);
-                context.router().navigate(MyPages.WELCOME_LOGIN);
-            } else {
+            if (!otpRepo.check(user.getId(), password)) {
                 errorLabel.setText("Invalid Password or OTP!");
+                return;
             }
-            return;
         }
 
         // Valid login: set active user and navigate
         context.getSession().setActiveUser(user);
-        context.router().navigate(MyPages.WELCOME_LOGIN);
+        Roles[] roles = RolesUtil.intToRoles(user.getRoles());
+
+        if (RolesUtil.intToRoles(user.getRoles()).length <= 1) {
+            context.getSession().setCurrentRole(roles[0]);
+        }
+
+        if (roles.length == 1) {
+            context.router().navigate(UIFactory.getPageForRole(roles[0]));
+        } else {
+            context.router().navigate(MyPages.WELCOME_LOGIN);
+        }
     }
 }

@@ -1,6 +1,8 @@
-package application.pages;
+package application.pages.user;
 
 import application.framework.*;
+import application.pages.PrivateMessagePage;
+import application.pages.ReplyList;
 import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Question;
@@ -17,9 +19,11 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
+import validators.PasswordValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Constructs the UserHomePage and initializes the layout and user interface components.
@@ -29,7 +33,7 @@ import java.util.List;
  * @author Atharva
  */
 @Route(MyPages.USER_HOME)
-@View(title = "User Page")
+@View(title = "User Home Page")
 public class UserHomePage extends BasePage {
     //max length for number of characters in the text field
     private static final int MAX_LENGTH = 300;
@@ -37,16 +41,20 @@ public class UserHomePage extends BasePage {
     private static final ListView<String> resultView = new ListView<>();
     //Question and Question title TextFields
     private final TextField questionTitleInput = UIFactory.createTextField("Enter the title", f ->
-            f.minWidth(200).maxWidth(600).minChars(5).maxChars(10));
+            f.minWidth(200).maxWidth(600).minChars(5).maxChars(100));
     private final TextField questionInput = UIFactory.createTextField("Enter question", f ->
             f.minWidth(200).maxWidth(600).minChars(10).maxChars(MAX_LENGTH));
     //Answer TextField
     private final TextField answerInput = UIFactory.createTextField("Enter answer", f ->
             f.minWidth(500).maxWidth(1200).minChars(10).maxChars(600));
+    private final TextField searchInput = UIFactory.createTextField("Search", f ->
+            f.minWidth(200).maxWidth(1200).minChars(10).maxChars(48));
     //Question and Answers list to store and
     //interact with each element in the list -- questions and answers
     private final ListView<Pair<Integer, String>> questionListView = new ListView<>();
     private final ListView<Pair<Integer, String>> answerListView = new ListView<>();
+    private final ListView<Pair<Integer, String>> searchListView = new ListView<>();
+
     private final Questions questionsRepo;
     private final Answers answersRepo;
 
@@ -88,7 +96,7 @@ public class UserHomePage extends BasePage {
             resultView.getItems().add(q.getTitle());
         }
         int height = list.size();
-        resultView.setPrefHeight(height * 26); //Gives 26 height for every element to cleanly display
+        resultView.setPrefHeight(Math.min(height * 26, 150)); //Gives 26 height for every element to cleanly display
     }
 
 //--------------------------------------------------------------------------------------------------------------------------//
@@ -104,9 +112,9 @@ public class UserHomePage extends BasePage {
     @Override
     public Pane createView() {
         loadQuestions();
-        double rowHeight = 26; // Original height for search listview
+        searchListView.setPrefHeight(150);// Original height for search listview
+        questionListView.setPrefHeight(150);
         resultView.getItems().clear();
-        resultView.setPrefHeight(rowHeight);
         VBox layout = new VBox(10);
 
         layout.setStyle(DesignGuide.MAIN_PADDING + " " + DesignGuide.CENTER_ALIGN);
@@ -145,7 +153,11 @@ public class UserHomePage extends BasePage {
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
         // Create Question Display buttons.
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
+        Button questionDisplayButton = UIFactory.createHomepageButton(context);
+
+        //Create Trusted Reviewer button
+        MenuItem trustedReviewersItem = new MenuItem("Manage Trusted Reviewers");
+        trustedReviewersItem.setOnAction(e -> context.router().navigate(MyPages.TRUSTED_REVIEWER));
 
         //Create Trusted Reviewer button
         Button trustedReviewerButton = UIFactory.createButton("Manage Trusted Reviewers", e -> e.routeToPage(MyPages.TRUSTED_REVIEWER, context));
@@ -160,6 +172,113 @@ public class UserHomePage extends BasePage {
                 editQuestionWindow(selectedQuestion.getKey());
             }
         }));
+        searchInput.setOnKeyReleased(event -> {
+            if (searchInput.getText().length() >= 3) {
+                try {
+                    searchListView.setVisible(true);
+                    List<Question> searchedQuestions = questionsRepo.searchQuestions(searchInput.getText());
+                    List<Question> unansweredQuestions = new ArrayList<Question>();
+                    List<Question> answeredQuestions = new ArrayList<Question>();
+                    List<Integer> allUnansweredQuestionIds = new ArrayList<Integer>();
+                    List<User> reviewerList = context.users().getAllReviewers();
+                    Pair<Integer, String> question;
+                    searchListView.getItems().clear();
+                    for (Question q : context.questions().getUnansweredQuestions()) {
+                        allUnansweredQuestionIds.add(q.getId());
+                    }
+                    for (Question q : searchedQuestions) {
+                        if (allUnansweredQuestionIds.contains(q.getId())) {
+                            unansweredQuestions.add(q);
+                        } else {
+                            answeredQuestions.add(q);
+                        }
+                    }
+                    for (Question q : answeredQuestions) {
+                        question = new Pair<Integer, String>(q.getId(), q.getTitle());
+                        searchListView.getItems().add(question);
+                    }
+                    for (Question q : unansweredQuestions) {
+                        question = new Pair<Integer, String>(q.getId(), q.getTitle());
+                        searchListView.getItems().add(question);
+                    }
+                    for (User u : reviewerList) {
+                        question = new Pair<Integer, String>(u.getId(), u.getUserName());
+                        searchListView.getItems().add(question);
+                    }
+
+
+                    searchListView.setPrefHeight(searchListView.getItems().size() * 26);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                searchListView.setVisible(false);
+            }
+        });
+
+        //Display only the question title or reviewer's username
+        searchListView.setCellFactory(lv -> new ListCell<Pair<Integer, String>>() {
+            @Override
+            protected void updateItem(Pair<Integer, String> item, boolean empty) {
+                //List to hold a list of all reviewers id's to cross-check
+                List<Integer> reviewerIds = new ArrayList<Integer>();
+                //List to hold a list of all question id's to differentiate between users and questions
+                List<Integer> questionIds = new ArrayList<Integer>();
+                //List to hold a list of all reviewer usernames to accurately assign reviewer or question appended text
+                List<String> reviewerUserNames = new ArrayList<String>();
+                for (User u : context.users().getAllReviewers()) {
+                    reviewerIds.add(u.getId());
+                    reviewerUserNames.add(u.getUserName());
+                }
+                for (Question q : context.questions().getAll()) {
+                    questionIds.add(q.getId());
+                }
+
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    //checks if selected item is a reviewer or a question and appends appropriate text
+                    if (reviewerUserNames.contains(item.getValue()) || reviewerIds.contains(item.getKey()) && !questionIds.contains(item.getKey())) {
+                        setText(item.getValue() + "(Reviewer)");
+                    } else if (questionIds.contains(item.getKey())) {
+                        Question q = context.questions().getById(item.getKey());
+                        if (!context.questions().hasPinnedAnswer(q.getId())) {
+                            setText(item.getValue() + " (Unresolved)");
+                        } else {
+                            setText(item.getValue());
+                        }
+
+                    }
+                }
+            }
+        });
+
+        //Go to answer list on double-click
+        searchListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Pair<Integer, String> selectedItem = searchListView.getSelectionModel().getSelectedItem();
+                List<Integer> reviewerIds = new ArrayList<Integer>();
+                List<Integer> questionIds = new ArrayList<Integer>();
+                for (User u : context.users().getAllReviewers()) {
+                    reviewerIds.add(u.getId());
+                }
+                for (Question q : context.questions().getAll()) {
+                    questionIds.add(q.getId());
+                }
+                if (selectedItem != null) {
+                    if (reviewerIds.contains(selectedItem.getKey())) { //If item is a reviewer, open their profile
+                        UserProfileWindow userProfileWindow = new UserProfileWindow();
+                        UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), selectedItem.getKey());
+                    } else if (questionIds.contains(selectedItem.getKey())) { //if item is a question, open answer stage
+                        currentlySelectedQuestionId = selectedItem.getKey();
+                        createAnswerStage(currentlySelectedQuestionId);
+                        showAnswerWindow(currentlySelectedQuestionId);
+                    }
+                }
+            }
+        });
+
 
         //Delete button to delete a question
         Button deleteQuestionButton = UIFactory.createButton("Delete", e -> e.onAction
@@ -193,12 +312,31 @@ public class UserHomePage extends BasePage {
         //Creating log out button
         Button logoutButton = UIFactory.createLogoutButton(context);
 
-        //Add spacer for better UI
-        //Region spacer = new Region();
-        //spacer.setPrefWidth(250);
+        Button dotMenuButton = new Button("⋮");
+        dotMenuButton.setStyle("-fx-font-size: 15px; -fx-cursor: hand;");
+
+// Create the menu
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem announcementsItem = new MenuItem("Announcements");
+        announcementsItem.setOnAction(e -> context.router().navigate(MyPages.ANNOUNCEMENTS));
+
+        MenuItem staffChatItem = new MenuItem("Chat With Staff");
+        staffChatItem.setOnAction(e -> {
+            UserStaffChatWindow chatWindow = new UserStaffChatWindow();
+            chatWindow.createStaffChatStage(context);
+        });
+
+
+        // Button to navigate to StaffNavigationPage
+        Button staffNavigationButton = UIFactory.createButton("Navigate To Other Pages", b ->
+                b.routeToPage(MyPages.STAFF_NAVIGATION, context)
+        );
+
+
         //Button Bar above ListView for horizontal orientation
-        HBox buttonBar = new HBox(10, resultView, questionDisplayButton, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton, reviwerProfileButton, logoutButton);
-        HBox questionListBar = new HBox(10, resultView, addQuestionButton, editQuestionButton, deleteQuestionButton, unresolvedQuestionsButton, myQuestionsButton);
+        HBox questionListBar = new HBox(10, addQuestionButton, editQuestionButton, deleteQuestionButton,
+                unresolvedQuestionsButton, myQuestionsButton, searchInput, dotMenuButton);
 
         //Call the Question stage and Answer stage
         createQuestionStage(user.getId());
@@ -231,25 +369,38 @@ public class UserHomePage extends BasePage {
             }
         });
 
+        //menu bar for options
+        contextMenu.getItems().addAll(announcementsItem, staffChatItem);
+        dotMenuButton.setOnMouseClicked(e -> contextMenu.show(dotMenuButton, e.getScreenX(), e.getScreenY()));
+
         // HBox for option buttons
         HBox optionBar = new HBox(10, questionDisplayButton);
 
         // Add the trusted reviewer button only if the user is a student
         if (userCurrentRole == Roles.STUDENT) {
-            optionBar.getChildren().add(trustedReviewerButton);
+            contextMenu.getItems().add(trustedReviewersItem);
+        } else if (userCurrentRole == Roles.STAFF) { // Add staff navigation button only for staff
+            optionBar.getChildren().add(staffNavigationButton);
+            questionListBar.getChildren().remove(dotMenuButton);
+        } else {
+            questionListBar.getChildren().remove(dotMenuButton);
         }
 
-        layout.getChildren().addAll(userLabel, questionListBar, questionListView, optionBar);
+
+        layout.getChildren().addAll(userLabel, questionListBar, searchListView, questionListView, optionBar);
 
         // If more than one role, add a role selection dropdown and a Go button.
         if (allRoles.length > 1) {
-            final Roles[] selectedRole = new Roles[1];
-
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
-
             optionBar.getChildren().addAll(roleMenu);
         }
-        optionBar.getChildren().add(logoutButton);
+
+        Button updatePassworButton = UIFactory.createButton(
+                "Update Password",
+                e -> e.onAction(a -> updatePassword())
+        );
+
+        optionBar.getChildren().addAll(updatePassworButton, logoutButton);
 
         return layout;
     }
@@ -340,6 +491,17 @@ public class UserHomePage extends BasePage {
     private void deleteQuestion() {
         Pair<Integer, String> selectedItem = questionListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
+            int questionId = selectedItem.getKey();
+            Question question = context.questions().getById(questionId);
+            User questionAuthor = context.users().getById(question.getMessage().getUserId());
+            boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN, Roles.INSTRUCTOR});
+
+            if (questionAuthor.getId() != context.getSession().getActiveUser().getId() && !checkIfStaff) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "You cannot delete this question.");
+                alert.showAndWait();
+                return;
+            }
+
             context.questions().delete(selectedItem.getKey());// Use Questions class
             questionListView.getItems().remove(selectedItem);
         }
@@ -421,7 +583,7 @@ public class UserHomePage extends BasePage {
         assert queContent != null;
         Label questionContent = UIFactory.createLabel("Question: " + queContent.getMessage().getContent(),
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
-        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;"));
+        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style(DesignGuide.BOLD_TEXT));
 
         //Adding answer UI
         Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
@@ -569,8 +731,18 @@ public class UserHomePage extends BasePage {
     private void deleteAnswer() {
         Pair<Integer, String> selectedItem = answerListView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            boolean isPinned = context.answers().getById(selectedItem.getKey()).getIsPinned();
-            context.answers().delete(selectedItem.getKey()); // Use the Answers instance to delete
+            int answerId = selectedItem.getKey();
+            Answer answer = context.answers().getById(answerId);
+            boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN, Roles.INSTRUCTOR});
+            boolean isPinned = answer.getIsPinned();
+            User answerAuthor = context.users().getById(answer.getMessage().getUserId());
+            if (answerAuthor.getId() != context.getSession().getActiveUser().getId() && !checkIfStaff) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "You cannot delete this answer.");
+                alert.showAndWait();
+                return;
+            } else {
+                context.answers().delete(answerId); // Use the Answers instance to delete
+            }
             //if answer is pinned, loadQuestions to update questionViewList
             if (isPinned) {
                 currentlySelectedQuestionResolved = false;
@@ -630,4 +802,39 @@ public class UserHomePage extends BasePage {
         answerStage.show();
     }
 
+    /**
+     * Update password button allows the user to click this button, type a new password in the popup, and then reset their password.
+     */
+    private void updatePassword() {
+        Optional<String> result = UIFactory.showTextInput(
+                "Update Password",
+                "Enter new password",
+                null,
+                this::validatePasswordReturnBool,
+                "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
+        );
+
+        result.ifPresent(password -> {
+            try {
+                User currentUser = context.getSession().getActiveUser();
+                currentUser.setPassword(password);
+                context.users().updatePassword(currentUser);
+                UIFactory.showAlert(Alert.AlertType.INFORMATION, "Updated Password", "Your new password: " + password);
+            } catch (IllegalArgumentException e) {
+                UIFactory.showAlert(Alert.AlertType.ERROR, "Invalid Password", "Please try again.");
+            }
+        });
+    }
+
+    /**
+     * Helper method to validate the password and return a boolean value to use as validator for the password input.
+     */
+    private boolean validatePasswordReturnBool(String password) {
+        try {
+            PasswordValidator.validatePassword(password);
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
 }

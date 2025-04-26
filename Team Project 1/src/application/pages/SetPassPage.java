@@ -56,11 +56,11 @@ public class SetPassPage extends BasePage {
         Label passLabel = UIFactory.createLabel("");
 
         Button setOTPButton = UIFactory.createButton("Set One-Time Password",
-                e -> handleSetOneTimePassword(passLabel));
+                e -> e.onAction(a -> handleSetOneTimePassword(passLabel)));
 
         Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, CopyButtonBuilder::onCopy);
 
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(titleLabel, userDropBox, passLabel, setOTPButton, copyButton, backButton);
         return layout;
@@ -79,6 +79,5 @@ public class SetPassPage extends BasePage {
         OneTimePassword newPass = new OneTimePassword(context.getSession().getActiveUser().getId(), targetID);
         context.oneTimePasswords().create(newPass);
         passLabel.setText(newPass.getPlainOtp());
-        System.out.println("New password: " + newPass.getPlainOtp());
     }
 }

@@ -1,5 +1,7 @@
 package application.framework.builders;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
@@ -68,6 +70,11 @@ public class TextFieldBuilder {
      */
     public TextFieldBuilder placeholder(String text) {
         textField.setPromptText(text);
+        return this;
+    }
+
+    public TextFieldBuilder onAction(EventHandler<ActionEvent> handler) {
+        textField.setOnAction(handler);
         return this;
     }
 

@@ -8,7 +8,9 @@ import validators.EntityValidator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Repository class for managing {@link Review} entities in the database.
@@ -165,8 +167,8 @@ public class Reviews extends Repository<Review> {
      *
      * @param reviewer  The user who is reviewing.
      * @param user      The user being reviewed.
-     * @param newRating The new rating to be set for the review.
-     * @return The {@link Review} object with the updated or newly set rating.
+     * @param newRating The new position to be set for the reviewer in the user's list.
+     * @return The {@link Review} object with the updated or newly set position.
      */
     public Review setRating(User reviewer, User user, int newRating) {
         Review existing = getByCompositeKey(reviewer.getId(), user.getId());
@@ -185,5 +187,93 @@ public class Reviews extends Repository<Review> {
             newReview.setUser(user);
             return create(newReview);
         }
+    }
+
+    /**
+     * Calculates the aggregated 1–10 trust rating for a given reviewer using
+     * Bayesian smoothing and a minimum-list requirement.
+     * <p>
+     * Steps:
+     * <ol>
+     *   <li>Find U = number of distinct users with any Reviews.</li>
+     *   <li>For each such user u, let Lᵤ = their list size (COUNT(*) WHERE userID = u).</li>
+     *   <li>Find this reviewer’s position pᵤ in each list (rating field), if any.</li>
+     *   <li>Normalize: rᵤ = (Lᵤ−pᵤ+1)/Lᵤ, weight: wᵤ = (Lᵤ−1)/Lᵤ.</li>
+     *   <li>Sum wᵤ·rᵤ over all users, divide by U → R₀ ∈ [0,1].</li>
+     *   <li>Apply Bayesian smoothing: R = (R₀·U + m·0.5)/(U + m) with m=10.</li>
+     *   <li>If this reviewer appears in fewer than 3 lists, return 1.</li>
+     *   <li>Otherwise map R to [1..10] via round(1 + 9·R).</li>
+     * </ol>
+     *
+     * @param reviewer the {@link User} whose trust rating is being calculated
+     * @return an integer between 1 (lowest trust) and 10 (highest trust)
+     */
+    public int calculateAggregatedRating(User reviewer) {
+        // 1) total distinct list-owners U
+        Integer U = queryForObject(
+                "SELECT COUNT(DISTINCT userID) FROM Reviews",
+                pstmt -> {
+                },
+                rs -> rs.getInt(1)
+        );
+        int totalOwners = (U == null ? 0 : U);
+
+        if (totalOwners == 0) {
+            return 1;
+        }
+
+        // 2) map userID → list size L_u
+        Map<Integer, Integer> listSizes = new HashMap<>();
+        queryForList(
+                "SELECT userID, COUNT(*) AS cnt FROM Reviews GROUP BY userID",
+                pstmt -> {
+                },
+                rs -> {
+                    listSizes.put(rs.getInt("userID"), rs.getInt("cnt"));
+                    return null;
+                }
+        );
+
+        // 3) map userID → this reviewer’s position p_u
+        Map<Integer, Integer> positions = new HashMap<>();
+        queryForList(
+                "SELECT userID, rating FROM Reviews WHERE reviewerID = ?",
+                pstmt -> pstmt.setInt(1, reviewer.getId()),
+                rs -> {
+                    positions.put(rs.getInt("userID"), rs.getInt("rating"));
+                    return null;
+                }
+        );
+
+        int appearances = positions.size();
+
+        // 4) sum weighted normalized ranks
+        double sum = 0;
+        for (var e : positions.entrySet()) {
+            int uId = e.getKey();
+            int pos = e.getValue();
+            int L = listSizes.getOrDefault(uId, 0);
+            if (pos < 1 || pos > L) {
+                continue;
+            }
+            double r = (double) (L - pos + 1) / L;
+            double w = (double) (L - 1) / L;
+            sum += w * r;
+        }
+
+        double R0 = sum / totalOwners;            // raw average ∈ [0,1]
+
+        // 5) Bayesian smoothing: m=10, prior=0.5
+        double m = 10;
+        double prior = 0.5;
+        double R = (R0 * totalOwners + m * prior) / (totalOwners + m);
+
+        // 6) minimum-list requirement
+        if (appearances < 3) {
+            return 1;
+        }
+
+        // 7) map to 1–10
+        return Math.max(1, (int) Math.round(1 + 9 * R));
     }
 }

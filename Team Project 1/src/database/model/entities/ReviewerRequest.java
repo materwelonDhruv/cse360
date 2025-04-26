@@ -55,8 +55,9 @@ public class ReviewerRequest extends BaseEntity {
      *
      * @param requester The user making the request.
      */
-    public void setRequester(User requester) {
+    public ReviewerRequest setRequester(User requester) {
         this.requester = requester;
+        return this;
     }
 
     /**
@@ -73,8 +74,9 @@ public class ReviewerRequest extends BaseEntity {
      *
      * @param instructor The instructor who handles the request.
      */
-    public void setInstructor(User instructor) {
+    public ReviewerRequest setInstructor(User instructor) {
         this.instructor = instructor;
+        return this;
     }
 
     /**
@@ -91,8 +93,9 @@ public class ReviewerRequest extends BaseEntity {
      *
      * @param status The new status of the request (approved or pending).
      */
-    public void setStatus(Boolean status) {
+    public ReviewerRequest setStatus(Boolean status) {
         this.status = status;
+        return this;
     }
 
     /**
@@ -109,8 +112,9 @@ public class ReviewerRequest extends BaseEntity {
      *
      * @param createdAt The timestamp when the request was created.
      */
-    public void setCreatedAt(Timestamp createdAt) {
+    public ReviewerRequest setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 
     /**
@@ -127,7 +131,8 @@ public class ReviewerRequest extends BaseEntity {
      *
      * @param updatedAt The timestamp when the request was last updated.
      */
-    public void setUpdatedAt(Timestamp updatedAt) {
+    public ReviewerRequest setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+        return this;
     }
 }

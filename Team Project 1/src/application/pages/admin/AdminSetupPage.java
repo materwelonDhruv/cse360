@@ -1,4 +1,4 @@
-package application.pages;
+package application.pages.admin;
 
 import application.framework.*;
 import database.model.entities.User;
@@ -62,7 +62,7 @@ public class AdminSetupPage extends BasePage {
                 e -> e.onAction(a -> handleSetup(userNameField, firstNameField, lastNameField, passwordField, emailField, errorLabel))
         );
 
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(userNameField, firstNameField, lastNameField, passwordField, emailField, setupButton, errorLabel, backButton);
         return layout;
@@ -109,7 +109,8 @@ public class AdminSetupPage extends BasePage {
         context.users().create(adminUser);
         // Set active user in session.
         context.getSession().setActiveUser(adminUser);
-        // Navigate to welcome page.
-        context.router().navigate(MyPages.WELCOME_LOGIN);
+        context.getSession().setCurrentRole(Roles.ADMIN);
+        // Navigate to Admin Home Page
+        context.router().navigate(MyPages.ADMIN_HOME);
     }
 }

@@ -1,6 +1,7 @@
 package application.pages;
 
 import application.framework.*;
+import application.pages.user.UserProfileWindow;
 import database.model.entities.Answer;
 import database.model.entities.Message;
 import database.model.entities.Review;
@@ -18,7 +19,6 @@ import utils.permissions.Roles;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -56,8 +56,8 @@ public class ReplyList extends BasePage {
         HBox bottomBar = new HBox(10);
         HBox topBar = new HBox(10);
         //Setup bottom toolbar
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
+        Button logoutButton = UIFactory.createLogoutButton(context);
         bottomBar.getChildren().addAll(backButton, logoutButton);
         layout.setBottom(bottomBar);
         //Setup ListView of replies
@@ -71,7 +71,9 @@ public class ReplyList extends BasePage {
         Button addReplyToSelected = replyToSelectedButtonSetup(replyList, replyInput);
         Button showTrustedReviewsOnly = showTrustedReviewsOnlySetup(replyList);
         topBar.getChildren().addAll(replyInput, addReply, addReplyToSelected, editReply, deleteReply);
-        if (context.getSession().getCurrentRole() == Roles.STUDENT) {topBar.getChildren().add(showTrustedReviewsOnly);}
+        if (context.getSession().getCurrentRole() == Roles.STUDENT) {
+            topBar.getChildren().add(showTrustedReviewsOnly);
+        }
         layout.setTop(topBar);
 
         replyList.setOnMouseClicked(event -> {
@@ -80,8 +82,8 @@ public class ReplyList extends BasePage {
                 if (selectedItem != null && selectedItem.getMessage().getContent().contains("φ")) {
                     int id = selectedItem.getMessage().getUserId();
                     if (context.reviews().getReviewersByUserId(id) != null) {
-                        ReviewerProfileWindow reviewerProfileWindow = new ReviewerProfileWindow();
-                        reviewerProfileWindow.createReviewerProfileStage(context, context.getSession().getActiveUser().getId(), id);
+                        UserProfileWindow UserProfileWindow = new UserProfileWindow();
+                        application.pages.user.UserProfileWindow.createUserProfileStage(context, context.getSession().getActiveUser().getId(), id);
                     }
                 }
             }
@@ -106,7 +108,8 @@ public class ReplyList extends BasePage {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item.getMessage().getContent());
+                    String userName = context.users().getById(item.getMessage().getUserId()).getUserName();
+                    setText(userName + " " + item.getMessage().getContent());
                 }
             }
         });
@@ -256,7 +259,9 @@ public class ReplyList extends BasePage {
             try {
                 List<User> untrustedReviewers = context.users().getReviewersNotRatedByUser(context.getSession().getActiveUser().getId());
                 List<Integer> untrustedReviewerIds = new ArrayList<>();
-                for (User untrustedReviewer : untrustedReviewers) {untrustedReviewerIds.add(untrustedReviewer.getId());}
+                for (User untrustedReviewer : untrustedReviewers) {
+                    untrustedReviewerIds.add(untrustedReviewer.getId());
+                }
                 localReplies.removeIf(a -> untrustedReviewerIds.contains(a.getMessage().getUserId()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -310,7 +315,9 @@ public class ReplyList extends BasePage {
      * All other replies are added below trusted reviewer replies.
      */
     private ObservableList<Answer> sendTrustedReviewsToTop(ObservableList<Answer> replies) {
-        if (context.getSession().getCurrentRole() != Roles.STUDENT) {return replies;}
+        if (context.getSession().getCurrentRole() != Roles.STUDENT) {
+            return replies;
+        }
         ObservableList<Answer> newList = FXCollections.observableArrayList();
         for (Answer reply : replies) {
             if (reply.getMessage().getContent().contains("φ") && reply.getParentAnswerId() == root.getId()) {

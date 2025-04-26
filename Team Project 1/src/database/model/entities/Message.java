@@ -52,8 +52,9 @@ public class Message extends BaseEntity {
      *
      * @param userId The new user ID of the message sender.
      */
-    public void setUserId(int userId) {
+    public Message setUserId(int userId) {
         this.userId = userId;
+        return this;
     }
 
     /**
@@ -70,8 +71,9 @@ public class Message extends BaseEntity {
      *
      * @param content The new content to be set for the message.
      */
-    public void setContent(String content) {
+    public Message setContent(String content) {
         this.content = content;
+        return this;
     }
 
     /**
@@ -88,7 +90,8 @@ public class Message extends BaseEntity {
      *
      * @param createdAt The new timestamp to be set for the message creation time.
      */
-    public void setCreatedAt(Timestamp createdAt) {
+    public Message setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 }

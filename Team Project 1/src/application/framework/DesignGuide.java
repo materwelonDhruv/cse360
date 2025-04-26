@@ -14,12 +14,12 @@ public final class DesignGuide {
     /**
      * Default width for the application windows.
      */
-    public static final int DEFAULT_WIDTH = 800;
+    public static final int DEFAULT_WIDTH = 1250;
 
     /**
      * Default height for the application windows.
      */
-    public static final int DEFAULT_HEIGHT = 400;
+    public static final int DEFAULT_HEIGHT = 600;
 
     // Style constants
 
@@ -42,6 +42,21 @@ public final class DesignGuide {
      * Style for the error label (font size and color).
      */
     public static final String ERROR_LABEL = "-fx-text-fill: red; -fx-font-size: 12px;";
+
+    /**
+     * Bold style for text.
+     */
+    public static final String BOLD_TEXT = "-fx-font-weight: bold;";
+
+    /**
+     * Italic style for text.
+     */
+    public static final String ITALIC_TEXT = "-fx-font-style: italic;";
+
+    /**
+     * Invalid input style (red border).
+     */
+    public static final String INVALID_INPUT = "-fx-border-color: red; -fx-border-width: 1.5px;";
 
     /**
      * Private constructor to prevent instantiation of the class.

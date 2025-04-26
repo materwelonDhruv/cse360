@@ -59,16 +59,8 @@ public class PrivateMessagePage extends BasePage {
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
-        Roles role = context.getSession().getCurrentRole();
-        Button backButton;
-        if (role == Roles.INSTRUCTOR) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.REVIEWER) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
-        } else {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        }
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
+        Button logoutButton = UIFactory.createLogoutButton(context);
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
 

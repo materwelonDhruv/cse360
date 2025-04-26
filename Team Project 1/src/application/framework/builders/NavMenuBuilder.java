@@ -46,6 +46,11 @@ public class NavMenuBuilder {
             });
             menuButton.getItems().add(roleItem);
         }
+
+        // If user only has one role, disable menu
+        if (allRoles.length <= 1) {
+            menuButton.setDisable(true);
+        }
     }
 
     /**

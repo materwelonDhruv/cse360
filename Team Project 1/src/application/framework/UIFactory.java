@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -32,6 +33,7 @@ public final class UIFactory {
         ROLE_PAGE_MAP.put(Roles.INSTRUCTOR, MyPages.INSTRUCTOR_HOME);
         ROLE_PAGE_MAP.put(Roles.REVIEWER, MyPages.REVIEW_HOME);
         ROLE_PAGE_MAP.put(Roles.STUDENT, MyPages.USER_QUESTION_DISPLAY);
+        ROLE_PAGE_MAP.put(Roles.STAFF, MyPages.STAFF_HOME);
     }
 
     private UIFactory() {
@@ -171,15 +173,14 @@ public final class UIFactory {
      * @param alertType The type of the alert.
      * @param title     The title of the alert.
      * @param content   The content text of the alert.
-     * @return An {@link Optional} containing the {@link ButtonType} that was clicked, or empty if closed without selection.
      */
-    public static Optional<ButtonType> showAlert(Alert.AlertType alertType, String title, String content) {
+    public static void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new AlertBuilder(alertType)
                 .title(title)
                 .header(null)
                 .content(content)
                 .build();
-        return alert.showAndWait();
+        alert.showAndWait();
     }
 
     /**
@@ -224,14 +225,13 @@ public final class UIFactory {
      * <p>
      * If the current page is already the homepage, it will navigate to the user's specific homepage based on their currently selected role. If not, it will navigate to the default homepage.
      *
-     * @param text    The text to display on the homepage button.
      * @param context The application context.
      * @param configs Customizations for the {@link HomepageButtonBuilder}.
      * @return A {@link Button} for navigating to the homepage.
      */
     @SafeVarargs
-    public static Button createHomepageButton(String text, AppContext context, Consumer<HomepageButtonBuilder>... configs) {
-        HomepageButtonBuilder builder = new HomepageButtonBuilder(text, context);
+    public static Button createHomepageButton(AppContext context, Consumer<HomepageButtonBuilder>... configs) {
+        HomepageButtonBuilder builder = new HomepageButtonBuilder(context);
         for (Consumer<HomepageButtonBuilder> config : configs) {
             config.accept(builder);
         }
@@ -266,5 +266,56 @@ public final class UIFactory {
                 context.router().navigate(MyPages.USER_HOME);
             }
         }));
+    }
+
+    /**
+     * Opens a modal input dialog with a single text field with validation.
+     *
+     * @param title       dialog window title
+     * @param placeholder placeholder text for the field
+     * @param defaultText optional pre‑fill text (may be null)
+     * @param validator   validator
+     * @param errorMsg    error message to show when validation fails
+     * @param configs     additional customisations for the {@link InputDialogBuilder}
+     * @return an {@link Optional} containing the user input when OK was pressed, otherwise empty
+     */
+    @SafeVarargs
+    public static Optional<String> showTextInput(String title,
+                                                 String placeholder,
+                                                 String defaultText,
+                                                 Predicate<String> validator,
+                                                 String errorMsg,
+                                                 Consumer<InputDialogBuilder>... configs) {
+        InputDialogBuilder builder = new InputDialogBuilder()
+                .setTitle(title)
+                .setPlaceholder(placeholder)
+                .attachValidator(validator, errorMsg);
+        if (defaultText != null) builder.setDefaultText(defaultText);
+        for (Consumer<InputDialogBuilder> cfg : configs) cfg.accept(builder);
+        return builder.showAndWaitValidated();
+    }
+
+    /**
+     * Opens a modal input dialog with a single text field with validation.
+     * <p>
+     * Don't use this method and set validator via configs. Use {@link #showTextInput(String, String, String, Predicate, String, Consumer[])} instead.
+     *
+     * @param title       dialog window title
+     * @param placeholder placeholder text for the field
+     * @param defaultText optional pre‑fill text (may be null)
+     * @param configs     additional customisations for the {@link InputDialogBuilder}
+     * @return an {@link Optional} containing the user input when OK was pressed, otherwise empty
+     */
+    @SafeVarargs
+    public static Optional<String> showTextInput(String title,
+                                                 String placeholder,
+                                                 String defaultText,
+                                                 Consumer<InputDialogBuilder>... configs) {
+        InputDialogBuilder builder = new InputDialogBuilder()
+                .setTitle(title)
+                .setPlaceholder(placeholder);
+        if (defaultText != null) builder.setDefaultText(defaultText);
+        for (Consumer<InputDialogBuilder> cfg : configs) cfg.accept(builder);
+        return builder.showAndWait();
     }
 }

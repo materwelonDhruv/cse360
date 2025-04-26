@@ -13,14 +13,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import utils.Helpers;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
 import java.util.List;
 
 /**
- * The InstructorHomePage class provides an interface for instructors to manage reviewer requests.
- * Instructors can approve or reject pending reviewer requests and navigate to other sections.
+ * The InstructorHomePage class provides an interface for instructors to manage
+ * reviewer requests.
+ * Instructors can approve or reject pending reviewer requests and navigate to
+ * other sections.
  *
  * @author Atharva
  */
@@ -35,7 +38,8 @@ public class InstructorHomePage extends BasePage {
      * The page includes:
      * - A welcome message for instructors.
      * - A table displaying pending reviewer requests.
-     * - Buttons to approve/reject requests, refresh, logout, change roles, and navigate to the question display.
+     * - Buttons to approve/reject requests, refresh, logout, change roles, and
+     * navigate to the question display.
      *
      * @return A Pane containing the instructor's dashboard.
      */
@@ -58,13 +62,14 @@ public class InstructorHomePage extends BasePage {
         // Set up the table columns
         TableColumn<ReviewerRequest, String> requesterCol = new TableColumn<>("Requester");
         requesterCol.setPrefWidth(150);
-        requesterCol.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getRequester().getUserName()));
+        requesterCol
+                .setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getRequester().getUserName()));
 
         TableColumn<ReviewerRequest, String> dateCol = new TableColumn<>("Request Date");
         dateCol.setPrefWidth(200);
-        dateCol.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getCreatedAt().toString()));
+        dateCol.setCellValueFactory(
+                data -> new SimpleStringProperty(Helpers.formatTimestamp(data.getValue().getCreatedAt()))
+        );
 
         TableColumn<ReviewerRequest, Void> actionsCol = new TableColumn<>("Actions");
         actionsCol.setPrefWidth(200);
@@ -74,14 +79,12 @@ public class InstructorHomePage extends BasePage {
             {
                 buttonBox.setAlignment(Pos.CENTER);
 
-                Button approveButton = UIFactory.createButton("Approve", e -> e.onAction(a ->
-                {
+                Button approveButton = UIFactory.createButton("Approve", e -> e.onAction(a -> {
                     ReviewerRequest request = getTableView().getItems().get(getIndex());
                     handleRequestAction(request, true);
                 }));
 
-                Button rejectButton = UIFactory.createButton("Reject", e -> e.onAction(a ->
-                {
+                Button rejectButton = UIFactory.createButton("Reject", e -> e.onAction(a -> {
                     ReviewerRequest request = getTableView().getItems().get(getIndex());
                     handleRequestAction(request, false);
                 }));
@@ -115,31 +118,62 @@ public class InstructorHomePage extends BasePage {
         // Add placeholder text when there are no requests
         requestTable.setPlaceholder(new Label("No pending reviewer requests"));
 
-        //Button to go the question_display page
-        Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
+        // Button to go the question_display page
+        Button questionDisplayButton = UIFactory.createHomepageButton(context);
+
         // Add a refresh button
         Button refreshButton = UIFactory.createButton("Refresh Requests", e -> {
             refreshRequestsTable();
         });
 
+        //Button to navigate to remove reviewers role
+        Button manageReviewerButton = UIFactory.createButton("Manage Reviewer Roles", b ->
+                b.routeToPage(MyPages.REMOVE_REVIEWER, context));
+
         // Add logout button
         Button logoutButton = UIFactory.createLogoutButton(context);
+
+
+        //menu button to operate requests to admin
+        MenuButton requests_for_admin = new MenuButton("Admin Requests");
+        MenuItem solved_requests = new MenuItem("Solved Requests");
+        solved_requests.setOnAction(e -> context.router().navigate(MyPages.ADMIN_SOLVED));
+
+        MenuItem pending_requests = new MenuItem("Pending Requests");
+        pending_requests.setOnAction(e -> context.router().navigate(MyPages.ADMIN_PENDING));
+
+        MenuItem create_requests = new MenuItem("Create Request");
+        create_requests.setOnAction(e -> context.router().navigate(MyPages.ADMIN_USER));
+
+        requests_for_admin.getItems().addAll(create_requests, pending_requests, solved_requests);
+
 
         // RoleMenu to change role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
-        // Button container
-        HBox buttonContainer = new HBox(10, refreshButton, logoutButton, roleMenu, questionDisplayButton);
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.setPadding(new Insets(10, 0, 0, 0));
+        Button privateMessageButton = new Button("Private Messages");
+        privateMessageButton.setOnAction(e -> {
+            context.router().navigate(MyPages.USER_QUESTION_DISPLAY);
+        });
+
+        // Button container for bottom of the page
+        HBox buttonContainerBelow = new HBox(10, requests_for_admin, roleMenu, logoutButton);
+        buttonContainerBelow.setAlignment(Pos.CENTER);
+        buttonContainerBelow.setPadding(new Insets(10, 0, 0, 0));
+
+        //Button container for top of the page
+        HBox buttonContainerAbove = new HBox(10, questionDisplayButton, privateMessageButton, manageReviewerButton);
+        buttonContainerAbove.setAlignment(Pos.CENTER);
+        buttonContainerAbove.setPadding(new Insets(10, 0, 0, 0));
 
         // Add everything to the layout
         layout.getChildren().addAll(
                 welcomeLabel,
+                buttonContainerAbove,
                 requestsLabel,
                 requestTable,
-                buttonContainer
-        );
+                refreshButton,
+                buttonContainerBelow);
 
         return layout;
     }
@@ -178,7 +212,8 @@ public class InstructorHomePage extends BasePage {
 
                 if (updatedRequest != null) {
                     UIFactory.showAlert(Alert.AlertType.INFORMATION, "Request Rejected",
-                            "You have rejected the reviewer request from " + request.getRequester().getUserName() + ".");
+                            "You have rejected the reviewer request from " + request.getRequester().getUserName()
+                                    + ".");
                 }
             }
 

@@ -136,10 +136,6 @@ public class Users extends Repository<User> {
      */
     @Override
     public User update(User user) {
-        // If allowing password changes, re-hash
-        String hashed = PasswordUtil.hashPassword(user.getPassword());
-        user.setPassword(hashed);
-
         String sql = "UPDATE Users SET userName = ?, "
                 + "firstName = ?, lastName = ?, "
                 + "email = ?, roles = ? WHERE userID = ?";
@@ -244,5 +240,22 @@ public class Users extends Repository<User> {
                 .filter(reviewer -> !ratedReviewerIds.contains(reviewer.getId())
                         && reviewer.getId() != userId)
                 .toList();
+    }
+
+    /**
+     * Update user password
+     *
+     * @param user The user whose password is to be updated
+     */
+    public void updatePassword(User user) {
+        // If allowing password changes, re-hash
+        String hashed = PasswordUtil.hashPassword(user.getPassword());
+        user.setPassword(hashed);
+
+        String sql = "UPDATE Users SET password = ? WHERE userID = ?";
+        executeUpdate(sql, pstmt -> {
+            pstmt.setString(1, user.getPassword());
+            pstmt.setInt(2, user.getId());
+        });
     }
 }

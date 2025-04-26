@@ -5,6 +5,7 @@ import database.repository.repos.Reviews;
 import database.repository.repos.Users;
 import org.junit.jupiter.api.*;
 import tests.database.BaseDatabaseTest;
+import utils.PasswordUtil;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
@@ -186,5 +187,35 @@ public class UsersTest extends BaseDatabaseTest {
         Assertions.assertTrue(notRated.stream().noneMatch(u -> u.getId() == firstReviewer.getId()));
         Assertions.assertTrue(notRated.stream().anyMatch(u -> u.getId() == reviewerIds[1]));
         Assertions.assertTrue(notRated.stream().anyMatch(u -> u.getId() == reviewerIds[2]));
+    }
+
+    /**
+     * Tests updating a user's roles.
+     */
+    @Test
+    @Order(9)
+    public void testUpdateUserRoles() {
+        User user = userRepo.getById(reviewerIds[0]);
+        user.setRoles(RolesUtil.rolesToInt(new Roles[]{Roles.REVIEWER, Roles.ADMIN}));
+        User updated = userRepo.update(user);
+        Assertions.assertTrue(RolesUtil.hasRole(updated.getRoles(), Roles.ADMIN), "User should now have ADMIN role");
+    }
+
+    /**
+     * Tests updating user password
+     */
+    @Test
+    @Order(10)
+    public void testUpdateUserPassword() {
+        User user = userRepo.getById(reviewerIds[0]);
+        String newPassword = "NewSecurePassword";
+        user.setPassword(newPassword);
+        userRepo.updatePassword(user);
+
+        // Verify that the password has been updated
+        User updatedUser = userRepo.getById(reviewerIds[0]);
+        boolean isPasswordValid = PasswordUtil.verifyPassword(updatedUser.getPassword(), newPassword);
+
+        Assertions.assertTrue(isPasswordValid, "Password should be updated and valid");
     }
 }

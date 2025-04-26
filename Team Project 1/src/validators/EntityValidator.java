@@ -3,12 +3,13 @@ package validators;
 import database.model.entities.*;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
+import utils.requests.AdminActions;
 
 /**
  * Provides validation methods for various entities within the system.
  * <p>
  * This class includes validation mechanisms for entities such as Question, Answer, PrivateMessage,
- * Message, Review, and ReviewerRequest. It ensures required fields are present and valid according
+ * Message, Review, and ReviewerRequest, etc. It ensures required fields are present and valid according
  * to specified criteria.
  * </p>
  *
@@ -194,5 +195,85 @@ public class EntityValidator {
                 throw new IllegalArgumentException("The instructor user must have the INSTRUCTOR role.");
             }
         }
+    }
+
+    /**
+     * Validates a StaffMessage object.
+     *
+     * @param staffMessage The StaffMessage object to validate.
+     * @throws IllegalArgumentException if the staffMessage or its internal fields are invalid.
+     */
+    public static void validateStaffMessage(StaffMessage staffMessage) {
+        if (staffMessage == null) {
+            throw new IllegalArgumentException("StaffMessage cannot be null.");
+        }
+        if (staffMessage.getMessage() == null) {
+            throw new IllegalArgumentException("StaffMessage must contain a valid Message object.");
+        }
+        if (staffMessage.getUser() == null || staffMessage.getUser().getId() <= 0) {
+            throw new IllegalArgumentException("A valid user is required for a staff message.");
+        }
+        if (staffMessage.getStaff() == null || staffMessage.getStaff().getId() <= 0) {
+            throw new IllegalArgumentException("A valid staff member is required for a staff message.");
+        }
+        // staff != user
+        if (staffMessage.getUser().getId() == staffMessage.getStaff().getId()) {
+            throw new IllegalArgumentException("Staff and user cannot be the same person.");
+        }
+
+        // Validate roles
+        if (!RolesUtil.hasRole(staffMessage.getStaff().getRoles(), Roles.STAFF)) {
+            throw new IllegalArgumentException("Staff member must have the STAFF role.");
+        }
+
+        // Reuse existing message validations
+        validateMessage(staffMessage.getMessage());
+    }
+
+    /**
+     * Validates an {@link AdminRequest} object.
+     * <p>
+     * Ensures that requester and target are non-null with valid IDs,
+     * that type and state enums are set,
+     * that reason is non-empty,
+     * and if the action is {@link AdminActions#UpdateRole}, that a non-null context (role ID) is provided.
+     * </p>
+     *
+     * @param req the AdminRequest to validate
+     * @throws IllegalArgumentException if any required field is missing or invalid
+     */
+    public static void validateAdminRequest(AdminRequest req) {
+        if (req == null) {
+            throw new IllegalArgumentException("AdminRequest cannot be null.");
+        }
+        if (req.getRequester() == null || req.getRequester().getId() <= 0) {
+            throw new IllegalArgumentException("A valid requester is required.");
+        }
+        if (req.getTarget() == null || req.getTarget().getId() <= 0) {
+            throw new IllegalArgumentException("A valid target user is required.");
+        }
+        if (req.getType() == null) {
+            throw new IllegalArgumentException("Admin action type must be specified.");
+        }
+        if (req.getState() == null) {
+            throw new IllegalArgumentException("Request state must be specified.");
+        }
+        if (req.getReason() == null || req.getReason().trim().isEmpty()) {
+            throw new IllegalArgumentException("Reason cannot be empty.");
+        }
+        // If action is UpdateRole or RequestPassword, context (new rolesInt) must be present
+        if (req.getType() != AdminActions.DeleteUser
+                && req.getContext() == null) {
+            throw new IllegalArgumentException("Context (rolesInt or bool) is required for UpdateRole requests.");
+        }
+
+        // If requester is not a user with the Instructor role, throw an exception
+        if (req.getRequester() != null && req.getRequester().getId() > 0) {
+            if (!RolesUtil.hasAnyRole(RolesUtil.intToRoles(req.getRequester().getRoles()), new Roles[]{Roles.INSTRUCTOR, Roles.ADMIN})) {
+                throw new IllegalArgumentException("Requester must have the INSTRUCTOR role.");
+            }
+        }
+
+        validateLength(req.getReason(), 5, 500, "AdminRequest reason must be between 5 and 500 characters.");
     }
 }

@@ -60,8 +60,9 @@ public class User extends BaseEntity {
      *
      * @param userName The new username for the user.
      */
-    public void setUserName(String userName) {
+    public User setUserName(String userName) {
         this.userName = userName;
+        return this;
     }
 
     /**
@@ -78,8 +79,9 @@ public class User extends BaseEntity {
      *
      * @param firstName The new first name for the user.
      */
-    public void setFirstName(String firstName) {
+    public User setFirstName(String firstName) {
         this.firstName = firstName;
+        return this;
     }
 
     /**
@@ -96,8 +98,9 @@ public class User extends BaseEntity {
      *
      * @param lastName The new last name for the user.
      */
-    public void setLastName(String lastName) {
+    public User setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
     }
 
     /**
@@ -114,8 +117,9 @@ public class User extends BaseEntity {
      *
      * @param password The new password for the user.
      */
-    public void setPassword(String password) {
+    public User setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     /**
@@ -132,8 +136,9 @@ public class User extends BaseEntity {
      *
      * @param email The new email address for the user.
      */
-    public void setEmail(String email) {
+    public User setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     /**
@@ -150,7 +155,8 @@ public class User extends BaseEntity {
      *
      * @param roles The new roles for the user represented as an integer.
      */
-    public void setRoles(int roles) {
+    public User setRoles(int roles) {
         this.roles = roles;
+        return this;
     }
 }

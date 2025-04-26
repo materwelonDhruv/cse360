@@ -1,7 +1,11 @@
-package application.pages;
+package application.pages.user;
 
 import application.framework.*;
-import database.model.entities.*;
+import application.pages.PrivateMessageConvoPage;
+import database.model.entities.PrivateMessage;
+import database.model.entities.Question;
+import database.model.entities.ReviewerRequest;
+import database.model.entities.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,10 +14,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.Helpers;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,32 +55,37 @@ public class UserQuestionDisplay extends BasePage {
 
         // Create table for user's questions
         TableView<Question> questionTable = questionTableSetup();
-        // Create table for Reviewer's reviews
-        TableView<Answer> reviewTable = reviewTableSetup();
+        questionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox questionTableVBox = new VBox(10);
+        Label questionLabel = new Label("Your Questions");
+        questionLabel.setStyle("-fx-font-weight: bold;");
+        questionTableVBox.getChildren().addAll(questionLabel, questionTable);
 
         //Private message table declaration
         TableView<PrivateMessage> privateMessageTable = privateMessageTableSetup();
+        privateMessageTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox privateMessageVBox = new VBox(10);
+        Label privateMessageLabel = new Label("Received PrivateMessages");
+        privateMessageLabel.setStyle("-fx-font-weight: bold;");
+        privateMessageVBox.getChildren().addAll(privateMessageLabel, privateMessageTable);
 
         //Set up SentPMTable
         TableView<PrivateMessage> sentPrivateMessageTable = sentPrivateMessageTableSetup();
-
+        sentPrivateMessageTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox sentPrivateMessageVBox = new VBox(10);
+        Label sentPrivateMessageLabel = new Label("Sent PrivateMessages");
+        sentPrivateMessageLabel.setStyle("-fx-font-weight: bold;");
+        sentPrivateMessageVBox.getChildren().addAll(sentPrivateMessageLabel, sentPrivateMessageTable);
         // Add tables to the split pane
         SplitPane sp = new SplitPane();
-        sp.getItems().addAll(privateMessageTable, sentPrivateMessageTable);
-        splitPane.getItems().addAll(questionTable, sp);
+        sp.getItems().addAll(privateMessageVBox, sentPrivateMessageVBox);
+        splitPane.getItems().addAll(questionTableVBox, sp);
 
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
         Roles role = context.getSession().getCurrentRole();
-        Button backButton;
-        if (role == Roles.INSTRUCTOR) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.REVIEWER) {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
-        } else {
-            backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.USER_HOME, context));
-        }
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button homepageBttn = UIFactory.createHomepageButton(context);
+        Button logoutButton = UIFactory.createLogoutButton(context);
         // Add reviewer request button
         Button requestReviewerButton = UIFactory.createButton("Request Reviewer Status", e -> e.onAction(a -> {
             User currentUser = context.getSession().getActiveUser();
@@ -181,16 +190,16 @@ public class UserQuestionDisplay extends BasePage {
                 }
             });
         }));
+        User currentUser = context.getSession().getActiveUser();
+        if (RolesUtil.hasRole(currentUser.getRoles(), Roles.REVIEWER)) {
+            toolbar.getChildren().addAll(homepageBttn, logoutButton);
+        } else {
+            toolbar.getChildren().addAll(homepageBttn, requestReviewerButton, logoutButton);
+        }
 
-        toolbar.getChildren().addAll(backButton, requestReviewerButton, logoutButton);
 
         container.getChildren().addAll(splitPane, toolbar);
         return container;
-    }
-
-    private TableView<Answer> reviewTableSetup() {
-        //TODO: write this method and make it work
-        return null;
     }
 
     private TableView<PrivateMessage> sentPrivateMessageTableSetup() {
@@ -290,7 +299,6 @@ public class UserQuestionDisplay extends BasePage {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     Question q = row.getItem();
-                    System.out.println("Load details for: " + q.getTitle());
                     if (q != null) {
                         //createAnswerStage(q.getId());
                         //showAnswerWindow(q.getId());
@@ -313,8 +321,7 @@ public class UserQuestionDisplay extends BasePage {
         TableColumn<Question, String> timeCol = new TableColumn<>("Time");
         timeCol.setCellValueFactory(param -> {
             Question q = param.getValue();
-            Timestamp timestamp = q.getMessage().getCreatedAt();
-            return new SimpleStringProperty(timestamp.toString());
+            return new SimpleStringProperty(Helpers.formatTimestamp(q.getMessage().getCreatedAt()));
         });
 
         questionTable.getColumns().addAll(idCol, titleCol, timeCol);

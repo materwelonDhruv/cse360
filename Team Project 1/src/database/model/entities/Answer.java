@@ -54,8 +54,9 @@ public class Answer extends BaseEntity {
      *
      * @param message The new message to be associated with the answer.
      */
-    public void setMessage(Message message) {
+    public Answer setMessage(Message message) {
         this.message = message;
+        return this;
     }
 
     /**
@@ -72,8 +73,9 @@ public class Answer extends BaseEntity {
      *
      * @param questionId The new question ID to be associated with the answer.
      */
-    public void setQuestionId(Integer questionId) {
+    public Answer setQuestionId(Integer questionId) {
         this.questionId = questionId;
+        return this;
     }
 
     /**
@@ -90,8 +92,9 @@ public class Answer extends BaseEntity {
      *
      * @param parentAnswerId The new parent answer ID to be set.
      */
-    public void setParentAnswerId(Integer parentAnswerId) {
+    public Answer setParentAnswerId(Integer parentAnswerId) {
         this.parentAnswerId = parentAnswerId;
+        return this;
     }
 
     /**
@@ -108,7 +111,8 @@ public class Answer extends BaseEntity {
      *
      * @param pinned {@code true} if the answer should be pinned, {@code false} otherwise.
      */
-    public void setPinned(boolean pinned) {
+    public Answer setPinned(boolean pinned) {
         this.isPinned = pinned;
+        return this;
     }
 }
