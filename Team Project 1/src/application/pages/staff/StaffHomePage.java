@@ -75,6 +75,11 @@ public class StaffHomePage extends BasePage {
         // Question display button
         Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
 
+        //Button for solved requests
+        Button solved_requests = UIFactory.createButton("Solved Requests", e -> e.routeToPage(
+                MyPages.ADMIN_SOLVED, context
+        ));
+
         // role menu to select and switch between the role
         MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
 
@@ -83,6 +88,7 @@ public class StaffHomePage extends BasePage {
 
         layout.getChildren().addAll(greeting,
                 manageReviewerButton,
+                solved_requests,
                 privateChatsButton,
                 questionDisplayButton,
                 announcementsButton,
