@@ -14,10 +14,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.Helpers;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -321,8 +321,7 @@ public class UserQuestionDisplay extends BasePage {
         TableColumn<Question, String> timeCol = new TableColumn<>("Time");
         timeCol.setCellValueFactory(param -> {
             Question q = param.getValue();
-            Timestamp timestamp = q.getMessage().getCreatedAt();
-            return new SimpleStringProperty(timestamp.toString());
+            return new SimpleStringProperty(Helpers.formatTimestamp(q.getMessage().getCreatedAt()));
         });
 
         questionTable.getColumns().addAll(idCol, titleCol, timeCol);

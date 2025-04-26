@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import utils.Helpers;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
@@ -66,7 +67,9 @@ public class InstructorHomePage extends BasePage {
 
         TableColumn<ReviewerRequest, String> dateCol = new TableColumn<>("Request Date");
         dateCol.setPrefWidth(200);
-        dateCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCreatedAt().toString()));
+        dateCol.setCellValueFactory(
+                data -> new SimpleStringProperty(Helpers.formatTimestamp(data.getValue().getCreatedAt()))
+        );
 
         TableColumn<ReviewerRequest, Void> actionsCol = new TableColumn<>("Actions");
         actionsCol.setPrefWidth(200);
