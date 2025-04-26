@@ -46,7 +46,7 @@ public class UserLoginPage extends BasePage {
         );
 
         // Back button using UIFactory
-        Button backButton = UIFactory.createBackButton(context);
+        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
 
         layout.getChildren().addAll(userNameField, passwordField, loginButton, errorLabel, backButton);
         return layout;

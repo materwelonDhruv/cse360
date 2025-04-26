@@ -100,10 +100,9 @@ public class PageRouter {
         if (!skipHistoryPush && currentPage != null && !currentPage.equals(page)) {
             if (Arrays.asList(pagesToIgnoreFromHistory).contains(page)) {
                 history.clear();
-                return;
+            } else {
+                history.push(currentPage);
             }
-
-            history.push(currentPage);
         }
         skipHistoryPush = false;
 
