@@ -116,7 +116,7 @@ public class InstructorHomePage extends BasePage {
         requestTable.setPlaceholder(new Label("No pending reviewer requests"));
 
         // Button to go the question_display page
-        Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
+        Button questionDisplayButton = UIFactory.createHomepageButton(context);
 
         // Add a refresh button
         Button refreshButton = UIFactory.createButton("Refresh Requests", e -> {

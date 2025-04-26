@@ -73,7 +73,7 @@ public class StaffHomePage extends BasePage {
         Button logoutButton = UIFactory.createLogoutButton(context);
 
         // Question display button
-        Button questionDisplayButton = UIFactory.createHomepageButton("Question Display", context);
+        Button questionDisplayButton = UIFactory.createHomepageButton(context);
 
         //Button for solved requests
         Button solved_requests = UIFactory.createButton("Solved Requests", e -> e.routeToPage(

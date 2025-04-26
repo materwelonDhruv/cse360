@@ -15,18 +15,22 @@ public class HomepageButtonBuilder extends ButtonBuilder {
     /**
      * Initializes the builder with the given text and application context.
      */
-    public HomepageButtonBuilder(String text, AppContext context) {
-        super(text);
-        Button button = super.getSource();
+    public HomepageButtonBuilder(AppContext context) {
+        super("");
+
+        boolean isUserHome = context.router().getCurrentPage() == MyPages.USER_HOME;
+        Button button = super
+                .text(isUserHome ? "Your Homepage" : "Back to User Home")
+                .getSource();
+
         button.setOnAction(e -> {
-            if (context.router().getCurrentPage() == MyPages.USER_HOME) {
+            if (isUserHome) {
                 Roles currentRole = context.getSession().getCurrentRole();
                 MyPages homepage = UIFactory.getPageForRole(currentRole);
                 context.router().navigate(homepage);
             } else {
                 context.router().navigate(MyPages.USER_HOME);
             }
-
         });
     }
 }

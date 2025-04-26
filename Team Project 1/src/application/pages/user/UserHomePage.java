@@ -19,9 +19,11 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
+import validators.PasswordValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Constructs the UserHomePage and initializes the layout and user interface components.
@@ -31,7 +33,7 @@ import java.util.List;
  * @author Atharva
  */
 @Route(MyPages.USER_HOME)
-@View(title = "User Page")
+@View(title = "User Home Page")
 public class UserHomePage extends BasePage {
     //max length for number of characters in the text field
     private static final int MAX_LENGTH = 300;
@@ -151,7 +153,7 @@ public class UserHomePage extends BasePage {
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
         // Create Question Display buttons.
-        Button questionDisplayButton = UIFactory.createHomepageButton("Your Homepage", context);
+        Button questionDisplayButton = UIFactory.createHomepageButton(context);
 
         //Create Trusted Reviewer button
         MenuItem trustedReviewersItem = new MenuItem("Manage Trusted Reviewers");
@@ -389,7 +391,13 @@ public class UserHomePage extends BasePage {
             MenuButton roleMenu = UIFactory.createNavMenu(context, "Select Role");
             optionBar.getChildren().addAll(roleMenu);
         }
-        optionBar.getChildren().add(logoutButton);
+
+        Button updatePassworButton = UIFactory.createButton(
+                "Update Password",
+                e -> e.onAction(a -> updatePassword())
+        );
+
+        optionBar.getChildren().addAll(updatePassworButton, logoutButton);
 
         return layout;
     }
@@ -573,7 +581,7 @@ public class UserHomePage extends BasePage {
         assert queContent != null;
         Label questionContent = UIFactory.createLabel("Question: " + queContent.getMessage().getContent(),
                 f -> f.style("-fx-font-weight: bold; -fx-font-size: 13pt;"));
-        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style("-fx-font-weight: bold;"));
+        Label answerLabelList = UIFactory.createLabel("Answers:", f -> f.style(DesignGuide.BOLD_TEXT));
 
         //Adding answer UI
         Button addAnswerButton = UIFactory.createButton("Add Answer", e -> e.onAction(
@@ -792,4 +800,36 @@ public class UserHomePage extends BasePage {
         answerStage.show();
     }
 
+    /**
+     * Update password button allows the user to click this button, type a new password in the popup, and then reset their password.
+     */
+    private void updatePassword() {
+        Optional<String> result = UIFactory.showTextInput(
+                "Update Password",
+                "Enter new password",
+                null,
+                this::validatePasswordReturnBool,
+                "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
+        );
+
+        result.ifPresent(password -> {
+            try {
+                User currentUser = context.getSession().getActiveUser();
+                currentUser.setPassword(password);
+                context.users().updatePassword(currentUser);
+                UIFactory.showAlert(Alert.AlertType.INFORMATION, "Updated Password", "Your new password: " + password);
+            } catch (IllegalArgumentException e) {
+                UIFactory.showAlert(Alert.AlertType.ERROR, "Invalid Password", "Please try again.");
+            }
+        });
+    }
+
+    private boolean validatePasswordReturnBool(String password) {
+        try {
+            PasswordValidator.validatePassword(password);
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
 }

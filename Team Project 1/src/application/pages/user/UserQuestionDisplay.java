@@ -84,14 +84,7 @@ public class UserQuestionDisplay extends BasePage {
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
         Roles role = context.getSession().getCurrentRole();
-        Button backButton;
-        if (role == Roles.INSTRUCTOR) {
-            backButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.INSTRUCTOR_HOME, context));
-        } else if (role == Roles.REVIEWER) {
-            backButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.REVIEW_HOME, context));
-        } else {
-            backButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_HOME, context));
-        }
+        Button homepageBttn = UIFactory.createHomepageButton(context);
         Button logoutButton = UIFactory.createLogoutButton(context);
         // Add reviewer request button
         Button requestReviewerButton = UIFactory.createButton("Request Reviewer Status", e -> e.onAction(a -> {
@@ -199,9 +192,9 @@ public class UserQuestionDisplay extends BasePage {
         }));
         User currentUser = context.getSession().getActiveUser();
         if (RolesUtil.hasRole(currentUser.getRoles(), Roles.REVIEWER)) {
-            toolbar.getChildren().addAll(backButton, logoutButton);
+            toolbar.getChildren().addAll(homepageBttn, logoutButton);
         } else {
-            toolbar.getChildren().addAll(backButton, requestReviewerButton, logoutButton);
+            toolbar.getChildren().addAll(homepageBttn, requestReviewerButton, logoutButton);
         }
 
 

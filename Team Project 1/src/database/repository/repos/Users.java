@@ -4,7 +4,6 @@ import database.model.entities.Review;
 import database.model.entities.User;
 import database.repository.Repository;
 import utils.PasswordUtil;
-import utils.SearchUtil;
 import utils.permissions.Roles;
 import utils.permissions.RolesUtil;
 
@@ -137,10 +136,6 @@ public class Users extends Repository<User> {
      */
     @Override
     public User update(User user) {
-        // If allowing password changes, re-hash
-        String hashed = PasswordUtil.hashPassword(user.getPassword());
-        user.setPassword(hashed);
-
         String sql = "UPDATE Users SET userName = ?, "
                 + "firstName = ?, lastName = ?, "
                 + "email = ?, roles = ? WHERE userID = ?";
@@ -248,21 +243,19 @@ public class Users extends Repository<User> {
     }
 
     /**
-     * Searches users by fuzzy-matching both the user's username
-     * <p>
-     * This method retrieves all users and performs an in-memory fuzzy search using the specified keyword.
-     * </p>
+     * Update user password
      *
-     * @param keyword The search keyword to match the user.
-     * @return A list of {@link User} objects that match the search keyword.
-     * @throws Exception If an error occurs during the search operation.
+     * @param user The user whose password is to be updated
      */
-    public List<User> searchUsers(String keyword) throws Exception {
-        // Basic approach: retrieve all, then do fuzzy filter in-memory
-        List<User> all = getAll();
-        return SearchUtil.fullTextSearch(all, keyword,
-                u -> u.getUserName() + " " + u.getFirstName() + " "
-        );
-    }
+    public void updatePassword(User user) {
+        // If allowing password changes, re-hash
+        String hashed = PasswordUtil.hashPassword(user.getPassword());
+        user.setPassword(hashed);
 
+        String sql = "UPDATE Users SET password = ? WHERE userID = ?";
+        executeUpdate(sql, pstmt -> {
+            pstmt.setString(1, user.getPassword());
+            pstmt.setInt(2, user.getId());
+        });
+    }
 }

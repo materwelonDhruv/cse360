@@ -38,6 +38,14 @@ public class ButtonBuilder {
     }
 
     /**
+     * Set button text.
+     */
+    public ButtonBuilder text(String text) {
+        button.setText(text);
+        return this;
+    }
+
+    /**
      * Builds and returns the {@link Button} instance.
      */
     public Button build() {

@@ -225,14 +225,13 @@ public final class UIFactory {
      * <p>
      * If the current page is already the homepage, it will navigate to the user's specific homepage based on their currently selected role. If not, it will navigate to the default homepage.
      *
-     * @param text    The text to display on the homepage button.
      * @param context The application context.
      * @param configs Customizations for the {@link HomepageButtonBuilder}.
      * @return A {@link Button} for navigating to the homepage.
      */
     @SafeVarargs
-    public static Button createHomepageButton(String text, AppContext context, Consumer<HomepageButtonBuilder>... configs) {
-        HomepageButtonBuilder builder = new HomepageButtonBuilder(text, context);
+    public static Button createHomepageButton(AppContext context, Consumer<HomepageButtonBuilder>... configs) {
+        HomepageButtonBuilder builder = new HomepageButtonBuilder(context);
         for (Consumer<HomepageButtonBuilder> config : configs) {
             config.accept(builder);
         }

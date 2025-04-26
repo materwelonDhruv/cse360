@@ -130,7 +130,7 @@ public class ReviewerHomePage extends BasePage {
                 f.style("-fx-font-weight: bold;-fx-font-size: 16px;"));
 
         // Create Question Display buttons.
-        Button questionDisplayButton = UIFactory.createButton("Your Homepage", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
+        Button questionDisplayButton = UIFactory.createButton("Your Questions", e -> e.routeToPage(MyPages.USER_QUESTION_DISPLAY, context));
 
         //Toggle unresolved questions only button
         Button unresolvedQuestionsButton = UIFactory.createButton("Show Unresolved Only");
