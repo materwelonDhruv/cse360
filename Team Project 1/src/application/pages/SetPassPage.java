@@ -79,6 +79,5 @@ public class SetPassPage extends BasePage {
         OneTimePassword newPass = new OneTimePassword(context.getSession().getActiveUser().getId(), targetID);
         context.oneTimePasswords().create(newPass);
         passLabel.setText(newPass.getPlainOtp());
-        System.out.println("New password: " + newPass.getPlainOtp());
     }
 }

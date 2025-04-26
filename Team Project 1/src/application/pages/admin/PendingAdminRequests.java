@@ -49,7 +49,6 @@ public class PendingAdminRequests extends BasePage {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println(pendingRequests.size());
         for (AdminRequest a : pendingRequests) {
             HBox row = buildRequestRow(a, tempView);
             tempView.getItems().add(row);
@@ -95,7 +94,6 @@ public class PendingAdminRequests extends BasePage {
 
     private ArrayList<AdminRequest> setupPendingRequestsArrayList() throws SQLException {
         ArrayList<AdminRequest> pendingRequests = (ArrayList<AdminRequest>) context.adminRequests().filterFetch(RequestState.Pending);
-        System.out.println(pendingRequests);
         return pendingRequests;
     }
 

@@ -253,7 +253,7 @@ public class Reviews extends Repository<Review> {
             int uId = e.getKey();
             int pos = e.getValue();
             int L = listSizes.getOrDefault(uId, 0);
-            if (L < 1 || pos < 1 || pos > L) {
+            if (pos < 1 || pos > L) {
                 continue;
             }
             double r = (double) (L - pos + 1) / L;

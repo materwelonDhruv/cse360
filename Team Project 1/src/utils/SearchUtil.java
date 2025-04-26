@@ -46,7 +46,6 @@ public class SearchUtil {
             String text = textExtractor.apply(item);
             if (text == null) text = "";
             int score = FuzzySearch.ratio(text.toLowerCase(), keyword.toLowerCase());
-            System.out.println("Text: " + text + " Score: " + score);
             if (score >= threshold) {
                 results.add(item);
             }

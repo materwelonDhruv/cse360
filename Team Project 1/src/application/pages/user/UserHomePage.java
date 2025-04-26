@@ -492,7 +492,6 @@ public class UserHomePage extends BasePage {
             Question question = context.questions().getById(questionId);
             User questionAuthor = context.users().getById(question.getMessage().getUserId());
             boolean checkIfStaff = RolesUtil.hasAnyRole(RolesUtil.intToRoles(context.getSession().getActiveUser().getRoles()), new Roles[]{Roles.STAFF, Roles.ADMIN, Roles.INSTRUCTOR});
-            System.out.println(("Staff Check: " + checkIfStaff));
 
             if (questionAuthor.getId() != context.getSession().getActiveUser().getId() && !checkIfStaff) {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "You cannot delete this question.");
@@ -824,6 +823,9 @@ public class UserHomePage extends BasePage {
         });
     }
 
+    /**
+     * Helper method to validate the password and return a boolean value to use as validator for the password input.
+     */
     private boolean validatePasswordReturnBool(String password) {
         try {
             PasswordValidator.validatePassword(password);

@@ -84,7 +84,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
                 AdminActions.RequestPassword,
                 RequestState.Pending,
                 "Forgot password",
-                null
+                0
         );
         passReqId = arRepo.create(pass).getId();
     }

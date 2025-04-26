@@ -18,7 +18,6 @@ public enum MyPages {
     ADMIN_USER("/adminUser"),
     ADMIN_USER_MODIFY("/adminUserModify"),
     INVITATION("/invitation"),
-    RESET_PASSWORD("/resetPassword"),
     SET_PASS("/setPass"),
     FIRST("/first"),
     SETUP_LOGIN("/setupLogin"),

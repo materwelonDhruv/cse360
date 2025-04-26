@@ -102,13 +102,11 @@ public class PrivateMessageConvoPage extends BasePage {
             conversation.append("(").append(pmSender.getUserName()).append("): ").append(pm.getMessage().getContent());
             conversation.append("\n");
             if (!context.privateMessages().getRepliesToPrivateMessage(pm.getId()).isEmpty()) {
-                System.out.println("Private message has replies: " + context.privateMessages().getRepliesToPrivateMessage(pm.getId()));
                 pm = context.privateMessages().getRepliesToPrivateMessage(pm.getId()).getFirst();
             } else {
                 break;
             }
         }
-        //System.out.println("conversation: " + conversation);
         return conversation.toString();
     }
 
@@ -120,7 +118,6 @@ public class PrivateMessageConvoPage extends BasePage {
      */
     private void sendReply(TextField replyText, PrivateMessage parent) {
         Message tempMessage = new Message(user.getId(), replyText.getText());
-        System.out.println("Parent: " + parent.getMessage().getContent());
         PrivateMessage pm = new PrivateMessage(tempMessage, null, parent.getId());
         context.privateMessages().create(pm);
     }
