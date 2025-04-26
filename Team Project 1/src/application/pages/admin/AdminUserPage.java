@@ -64,7 +64,7 @@ public class AdminUserPage extends BasePage {
             Roles[] roleList = intToRoles(rolesInt);
             StringBuilder out = new StringBuilder();
             for (Roles r : roleList) {
-                out.append(roleName(r)).append(" ");
+                out.append(roleName(r)).append(", ");
             }
             return new SimpleStringProperty(out.toString().trim());
         });

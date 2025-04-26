@@ -21,10 +21,7 @@ import java.util.ArrayList;
 @Route(MyPages.ADMIN_PENDING)
 @View(title = "Pending Admin Requests")
 public class PendingAdminRequests extends BasePage {
-    private final Roles role = context.getSession().getCurrentRole();
-    private final User user = context.getSession().getActiveUser();
     private final Roles currentRole = context.getSession().getCurrentRole();
-    private ArrayList<Message> adminRequests;
 
     public Pane createView() {
         BorderPane view = new BorderPane();
@@ -37,7 +34,7 @@ public class PendingAdminRequests extends BasePage {
         // Bottom toolbar with Back and Logout buttons using UIFactory
         HBox toolbar = new HBox(10);
         Button backButton = UIFactory.createBackButton(context);
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
         toolbar.getChildren().addAll(backButton, logoutButton);
         view.setBottom(toolbar);
         return view;
@@ -180,7 +177,7 @@ public class PendingAdminRequests extends BasePage {
                 break;
         }
         if (currentRole == Roles.ADMIN) {
-            VBox buttonVBox = new VBox(10);
+            HBox buttonVBox = new HBox(10);
             Button acceptButton = setupAcceptButton(a, listView);
             Button rejectButton = setupRejectButton(a, listView);
             buttonVBox.getChildren().addAll(acceptButton, rejectButton);

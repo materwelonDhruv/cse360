@@ -3,32 +3,21 @@ package application.pages.admin;
 import application.framework.*;
 import application.framework.builders.CopyButtonBuilder;
 import database.model.entities.AdminRequest;
-import database.model.entities.OneTimePassword;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import utils.permissions.Roles;
-import application.framework.BasePage;
-import application.framework.MyPages;
-import application.framework.Route;
-import application.framework.View;
-import javafx.scene.control.*;
 import javafx.util.Pair;
+import utils.permissions.Roles;
 import utils.requests.AdminActions;
 import utils.requests.RequestState;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
- *  Displays the list of all closed/solved admin requests and allows Instructors
- *  to reopen a closed admin request and update its description.
+ * Displays the list of all closed/solved admin requests and allows Instructors
+ * to reopen a closed admin request and update its description.
  *
  * @author Tyler
  */
@@ -36,10 +25,11 @@ import java.util.function.Supplier;
 @View(title = "Solved Admin Requests")
 public class SolvedAdminRequests extends BasePage {
     // ListView containing all solved admin requests
-    private final ListView<Pair<Integer,VBox>> requestView = new ListView<>();
+    private final ListView<Pair<Integer, VBox>> requestView = new ListView<>();
 
     /**
      * Creates the layout for the SolvedAdminRequests Page.
+     *
      * @return A Pane containing the layout of the page.
      */
     @Override
@@ -67,7 +57,7 @@ public class SolvedAdminRequests extends BasePage {
 
         // Button to reopen the selected admin request
         Button reopenRequestButton = UIFactory.createButton("Reopen Selected Request", e -> e.onAction(a -> {
-            Pair<Integer,VBox> selectedRequest = requestView.getSelectionModel().getSelectedItem();
+            Pair<Integer, VBox> selectedRequest = requestView.getSelectionModel().getSelectedItem();
             if (selectedRequest != null) {
                 try {
                     AdminRequest request = context.adminRequests().getById(selectedRequest.getKey());
@@ -101,6 +91,9 @@ public class SolvedAdminRequests extends BasePage {
     private void loadSolvedRequests() {
         requestView.getItems().clear();
         List<AdminRequest> solvedRequests = context.adminRequests().filterFetch(RequestState.Accepted);
+        List<AdminRequest> others = context.adminRequests().filterFetch(RequestState.Denied);
+        solvedRequests.addAll(others);
+
         for (AdminRequest request : solvedRequests) {
             requestView.getItems().addFirst(new Pair<>(request.getId(), createRequestVBox(request)));
         }
@@ -149,6 +142,6 @@ public class SolvedAdminRequests extends BasePage {
         reasonLabel.setStyle("-fx-font-weight: bold");
         Label reasonNameLabel = new Label(request.getReason());
         HBox reasonBox = new HBox(10, reasonLabel, reasonNameLabel);
-        return new VBox(5,topLabels, reasonBox);
+        return new VBox(5, topLabels, reasonBox);
     }
 }

@@ -41,7 +41,7 @@ public class AdminHomePage extends BasePage {
         Button otpButton = UIFactory.createButton("Set user OTP", e -> e.routeToPage(MyPages.SET_PASS, context));
         Button pendingReuestButton = UIFactory.createButton("Pending Requests", e -> e.routeToPage(MyPages.ADMIN_PENDING, context));
         Button solvedReuestButton = UIFactory.createButton("Solved Requests", e -> e.routeToPage(MyPages.ADMIN_SOLVED, context));
-        Button logoutButton = UIFactory.createButton("Logout", e -> e.routeToPage(MyPages.USER_LOGIN, context));
+        Button logoutButton = UIFactory.createLogoutButton(context);
 
         layout.getChildren().addAll(adminLabel, userButton, inviteButton, otpButton, pendingReuestButton, solvedReuestButton, logoutButton);
         return layout;

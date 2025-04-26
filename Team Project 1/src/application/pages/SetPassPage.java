@@ -60,7 +60,7 @@ public class SetPassPage extends BasePage {
 
         Button copyButton = UIFactory.createCopyButton("Copy Password To Clipboard", passLabel::getText, CopyButtonBuilder::onCopy);
 
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.ADMIN_HOME, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         layout.getChildren().addAll(titleLabel, userDropBox, passLabel, setOTPButton, copyButton, backButton);
         return layout;

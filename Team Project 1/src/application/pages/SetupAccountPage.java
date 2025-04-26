@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import utils.permissions.Roles;
+import utils.permissions.RolesUtil;
 import validators.EmailValidator;
 import validators.PasswordValidator;
 import validators.UsernameValidator;
@@ -28,6 +30,7 @@ public class SetupAccountPage extends BasePage {
 
     /**
      * Creates the layout for the SetupAccountPage
+     *
      * @return layout
      */
     @Override
@@ -54,7 +57,7 @@ public class SetupAccountPage extends BasePage {
                 l -> l.style(DesignGuide.ERROR_LABEL));
 
         // Back button navigates to SetupLoginSelectionPage.
-        Button backButton = UIFactory.createButton("Back", e -> e.routeToPage(MyPages.SETUP_LOGIN, context));
+        Button backButton = UIFactory.createBackButton(context);
 
         // Setup button to process registration.
         Button setupButton = UIFactory.createButton("Setup",
@@ -69,13 +72,14 @@ public class SetupAccountPage extends BasePage {
 
     /**
      * Handles the set-up of a new user's account
-     * @param userNameField TextField for the username
-     * @param firstNameField TextField for the first name
-     * @param lastNameField TextField for the last name
-     * @param passwordField TextField for the password
-     * @param emailField TextField for the email
+     *
+     * @param userNameField   TextField for the username
+     * @param firstNameField  TextField for the first name
+     * @param lastNameField   TextField for the last name
+     * @param passwordField   TextField for the password
+     * @param emailField      TextField for the email
      * @param inviteCodeField TextField for the invite code
-     * @param errorLabel Label to display any input validation error messages
+     * @param errorLabel      Label to display any input validation error messages
      */
     private void handleUserSetup(TextField userNameField, TextField firstNameField, TextField lastNameField,
                                  TextField passwordField, TextField emailField, TextField inviteCodeField,
@@ -116,7 +120,13 @@ public class SetupAccountPage extends BasePage {
             if (invite != null) {
                 User user = new User(userName, firstName, lastName, password, email, invite.getRoles());
                 context.getSession().setActiveUser(context.users().create(user)); // Create user and set as active.
-                context.router().navigate(MyPages.WELCOME_LOGIN);
+                Roles[] roles = RolesUtil.intToRoles(user.getRoles());
+                if (roles.length <= 1) {
+                    context.router().navigate(UIFactory.getPageForRole(roles[0]));
+                    context.getSession().setCurrentRole(roles[0]);
+                } else {
+                    context.router().navigate(MyPages.WELCOME_LOGIN);
+                }
             } else {
                 errorLabel.setText("Invitation code does not exist or is expired");
             }
