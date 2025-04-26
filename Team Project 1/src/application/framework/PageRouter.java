@@ -37,8 +37,7 @@ public class PageRouter {
             MyPages.WELCOME_LOGIN,
             MyPages.SETUP_LOGIN,
             MyPages.USER_LOGIN,
-            MyPages.FIRST,
-            MyPages.START
+            MyPages.FIRST
     };
     // When true, skip pushing currentPage on the next navigate() call
     private boolean skipHistoryPush = false;
