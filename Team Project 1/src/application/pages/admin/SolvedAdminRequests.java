@@ -136,7 +136,7 @@ public class SolvedAdminRequests extends BasePage {
         if (request.getType() == AdminActions.RequestPassword && request.getRequester().getId() == context.getSession().getActiveUser().getId()) {
             Button copyOTPButton;
             if (request.getContext() == 1) {
-                copyOTPButton = UIFactory.createButton("Copy OTP", ButtonBuilder::disable);
+                copyOTPButton = UIFactory.createButton("Already Copied!", ButtonBuilder::disable);
             } else {
                 copyOTPButton = UIFactory.createCopyButton("Copy One Time Password",
                         () -> generateOTPAndSetGenerated(request),
