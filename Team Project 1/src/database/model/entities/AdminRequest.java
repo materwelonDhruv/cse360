@@ -16,7 +16,6 @@ import utils.requests.RequestState;
  *   <li>reason:    the textual reason for the request</li>
  *   <li>context:   an optional integer context (e.g., rolesInt), or null</li>
  * </ul>
- * </p>
  *
  * @author Dhruv
  * @see User

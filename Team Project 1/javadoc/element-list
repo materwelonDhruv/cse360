@@ -3,6 +3,10 @@ application
 application.framework
 application.framework.builders
 application.pages
+application.pages.admin
+application.pages.reviewer
+application.pages.staff
+application.pages.user
 database.connection
 database.migration
 database.migration.tables
@@ -17,4 +21,5 @@ tests.database.tests
 tests.password
 utils
 utils.permissions
+utils.requests
 validators

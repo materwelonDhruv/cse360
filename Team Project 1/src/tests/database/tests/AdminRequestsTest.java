@@ -146,7 +146,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     /**
-     * Tests filtering requests by action, state, and target.
+     * Tests setting a new state for a request.
      */
     @Test
     @Order(6)
@@ -160,7 +160,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     /**
-     * Tests updating a request with a new state.
+     * Tests updating a request with a new reason and state.
      */
     @Test
     @Order(7)
@@ -175,7 +175,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     /**
-     * Tests creating a request with an invalid state.
+     * Tests creating a request with missing context for a role update.
      */
     @Test
     @Order(8)
@@ -192,7 +192,7 @@ public class AdminRequestsTest extends BaseDatabaseTest {
     }
 
     /**
-     * Tests creating a request with an invalid action.
+     * Tests deleting a request by ID.
      */
     @Test
     @Order(9)
