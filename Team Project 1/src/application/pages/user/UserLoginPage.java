@@ -67,18 +67,18 @@ public class UserLoginPage extends BasePage {
             var otpRepo = context.oneTimePasswords();
             if (!otpRepo.check(user.getId(), password)) {
                 errorLabel.setText("Invalid Password or OTP!");
+                return;
             }
-            return;
         }
 
         // Valid login: set active user and navigate
         context.getSession().setActiveUser(user);
+        Roles[] roles = RolesUtil.intToRoles(user.getRoles());
 
         if (RolesUtil.intToRoles(user.getRoles()).length <= 1) {
-            context.getSession().setCurrentRole(RolesUtil.intToRoles(user.getRoles())[0]);
+            context.getSession().setCurrentRole(roles[0]);
         }
 
-        Roles[] roles = RolesUtil.intToRoles(user.getRoles());
         if (roles.length == 1) {
             context.router().navigate(UIFactory.getPageForRole(roles[0]));
         } else {
