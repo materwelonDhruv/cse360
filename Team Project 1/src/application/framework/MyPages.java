@@ -13,7 +13,6 @@ package application.framework;
  * @see Route
  */
 public enum MyPages {
-    START("/start"),
     ADMIN_HOME("/adminHome"),
     ADMIN_SETUP("/adminSetup"),
     ADMIN_USER("/adminUser"),
@@ -27,7 +26,7 @@ public enum MyPages {
     WELCOME_LOGIN("/welcomeLogin"),
     USER_LOGIN("/userLogin"),
     STAFF_NAVIGATION("/staffNavigation"),
-    REVIEWER_PROFILE("/reviewerprofile"),
+    REVIEWER_PROFILE("/reviewerProfile"),
     REPLY_LIST("/replyList"),
     USER_HOME("/userHome"),
     USER_QUESTION_DISPLAY("/userQuestionDisplay"),
