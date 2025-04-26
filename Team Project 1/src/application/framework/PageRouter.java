@@ -33,11 +33,14 @@ public class PageRouter {
 
     // Stack of previously visited pages; top is the most recent
     private final Deque<MyPages> history = new ArrayDeque<>();
-    private final MyPages[] pagesToIgnoreFromHistory = new MyPages[]{
+    private final MyPages[] clearHistoryTriggers = new MyPages[]{
             MyPages.WELCOME_LOGIN,
             MyPages.SETUP_LOGIN,
             MyPages.USER_LOGIN,
             MyPages.FIRST
+    };
+    private final MyPages[] pagesToIgnore = new MyPages[]{
+            MyPages.ADMIN_USER_MODIFY
     };
     // When true, skip pushing currentPage on the next navigate() call
     private boolean skipHistoryPush = false;
@@ -98,8 +101,10 @@ public class PageRouter {
         }
 
         if (!skipHistoryPush && currentPage != null && !currentPage.equals(page)) {
-            if (Arrays.asList(pagesToIgnoreFromHistory).contains(page)) {
+            if (Arrays.asList(clearHistoryTriggers).contains(page)) {
                 history.clear();
+            } else if (Arrays.asList(pagesToIgnore).contains(currentPage)) {
+                // Do nothing, ignore this page
             } else {
                 history.push(currentPage);
             }
