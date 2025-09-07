@@ -16,9 +16,9 @@ database.repository
 database.repository.repos
 development
 tests
-tests.database
-tests.database.tests
-tests.password
+database
+database.tests
+password
 utils
 utils.permissions
 utils.requests
