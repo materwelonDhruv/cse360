@@ -24,15 +24,16 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     private static final String DEFAULT_DB_URL = "jdbc:h2:~/FoundationDatabase";
-    private static final String DB_URL = System.getProperty("db.url", DEFAULT_DB_URL);
     private static final String JDBC_DRIVER = "org.h2.Driver";
     private static final String USER = "sa";
     private static final String PASS = "";
-
     private static Connection connection;
     private static boolean initialized = false;
-
     private DatabaseConnection() {
+    }
+
+    private static String dbUrl() {
+        return System.getProperty("db.url", DEFAULT_DB_URL);
     }
 
     /**
@@ -48,8 +49,8 @@ public class DatabaseConnection {
         if (!initialized) {
             try {
                 Class.forName(JDBC_DRIVER);
-                System.out.println("Connecting to database with URL: " + DB_URL);
-                connection = DriverManager.getConnection(DB_URL, USER, PASS);
+                System.out.println("Connecting to database with URL: " + dbUrl());
+                connection = DriverManager.getConnection(dbUrl(), USER, PASS);
                 System.out.println("Connected to database.");
 
                 initialized = true;
@@ -69,9 +70,13 @@ public class DatabaseConnection {
      * @return The active database connection.
      * @throws SQLException if the connection cannot be established.
      */
-    public static Connection getConnection() throws SQLException {
-        if (!initialized || connection == null || connection.isClosed()) {
+    public static synchronized Connection getConnection() throws SQLException {
+        if (!initialized) {
             initialize();
+        } else if (connection == null || connection.isClosed()) {
+            // Re-open transparently if someone closed it
+            connection = DriverManager.getConnection(dbUrl(), USER, PASS);
+            System.out.println("Reopened database connection.");
         }
         return connection;
     }

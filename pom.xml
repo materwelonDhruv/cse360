@@ -123,10 +123,9 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
-                    <forkCount>1</forkCount>
-                    <reuseForks>true</reuseForks>
+                    <forkCount>0</forkCount>
                     <systemPropertyVariables>
-                        <db.url>jdbc:h2:mem:TestDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.url>
+                        <db.url>jdbc:h2:mem:TestDb;DB_CLOSE_DELAY=-1</db.url>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
